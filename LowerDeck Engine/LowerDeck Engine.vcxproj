@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\vcpkg.F.vcpkg.1.0.0\build\native\vcpkg.F.vcpkg.props" Condition="Exists('..\packages\vcpkg.F.vcpkg.1.0.0\build\native\vcpkg.F.vcpkg.props')" />
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{fb1b5032-455e-4512-b46b-80899341a764}</ProjectGuid>
+    <RootNamespace>LowerDeckEngine</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnabled>true</VcpkgEnabled>
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
+    <VcpkgManifestInstall>true</VcpkgManifestInstall>
+    <VcpkgAutoLink>true</VcpkgAutoLink>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <VcpkgConfiguration>Release</VcpkgConfiguration>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <VcpkgConfiguration>Debug</VcpkgConfiguration>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(ProjectDir)Dependencies</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <Optimization>MinSpace</Optimization>
+      <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;dinput8.lib;pdh.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>(robocopy "$(SolutionDir)Libraries\\" "$(TargetDir)\" dxil.dll dxcompiler.dll /COPY:DAT /XC /XN /XO /z /NP /NS /NFL /NDL /NJH  /NJS) ^&amp; IF %ERRORLEVEL% LEQ 1 exit 0</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Engine\D3D\D3D12Utility.cpp" />
+    <ClCompile Include="Engine\Engine\Engine.cpp" />
+    <ClCompile Include="Engine\Render\Camera.cpp" />
+    <ClCompile Include="Dependencies\D3D12MA\D3D12MemAlloc.cpp" />
+    <ClCompile Include="Dependencies\imgui\imgui_draw.cpp" />
+    <ClCompile Include="Dependencies\imgui\imgui_impl_dx12.cpp" />
+    <ClCompile Include="Dependencies\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="Dependencies\imgui\imgui_tables.cpp" />
+    <ClCompile Include="Dependencies\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Editor\Editor.cpp" />
+    <ClCompile Include="Engine\D3D\D3D12Command.cpp" />
+    <ClCompile Include="Engine\D3D\D3D12Context.cpp" />
+    <ClCompile Include="Engine\D3D\D3D12DescriptorHeap.cpp" />
+    <ClCompile Include="Engine\D3D\D3D12Device.cpp" />
+    <ClCompile Include="Engine\D3D\D3D12SwapChain.cpp" />
+    <ClCompile Include="Engine\D3D\D3D12Viewport.cpp" />
+    <ClCompile Include="Engine\Window\Window.cpp" />
+    <ClCompile Include="Dependencies\imgui\imgui.cpp" />
+    <ClCompile Include="Input\CameraInput.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Engine\Engine\Renderer.cpp" />
+    <ClCompile Include="Engine\ECS\World.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Engine\D3D\D3D12Descriptor.hpp" />
+    <ClInclude Include="Engine\Engine\Engine.hpp" />
+    <ClInclude Include="Engine\Render\Camera.hpp" />
+    <ClInclude Include="Dependencies\D3D12MA\D3D12MemAlloc.h" />
+    <ClInclude Include="Dependencies\d3dx12.h" />
+    <ClInclude Include="Dependencies\imgui\imconfig.h" />
+    <ClInclude Include="Dependencies\imgui\imgui_impl_dx12.h" />
+    <ClInclude Include="Dependencies\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="Dependencies\imgui\imgui_internal.h" />
+    <ClInclude Include="Dependencies\imgui\imstb_rectpack.h" />
+    <ClInclude Include="Dependencies\imgui\imstb_textedit.h" />
+    <ClInclude Include="Dependencies\imgui\imstb_truetype.h" />
+    <ClInclude Include="Editor\Editor.hpp" />
+    <ClInclude Include="Engine\D3D\D3D12Command.hpp" />
+    <ClInclude Include="Engine\D3D\D3D12Context.hpp" />
+    <ClInclude Include="Engine\D3D\D3D12DescriptorHeap.hpp" />
+    <ClInclude Include="Engine\D3D\D3D12Device.hpp" />
+    <ClInclude Include="Engine\D3D\D3D12SwapChain.hpp" />
+    <ClInclude Include="Engine\D3D\D3D12Types.hpp" />
+    <ClInclude Include="Engine\D3D\D3D12Utility.hpp" />
+    <ClInclude Include="Engine\D3D\D3D12Viewport.hpp" />
+    <ClInclude Include="Engine\Utility\Timer.hpp" />
+    <ClInclude Include="Engine\Utility\TimeUtility.hpp" />
+    <ClInclude Include="Engine\Utility\Utility.hpp" />
+    <ClInclude Include="Engine\Window\Window.hpp" />
+    <ClInclude Include="Dependencies\imgui\imgui.h" />
+    <ClInclude Include="Input\CameraInput.hpp" />
+    <ClInclude Include="Engine\Engine\Renderer.hpp" />
+    <ClInclude Include="Engine\ECS\World.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Assets\Fonts\CascadiaCode-Bold.ttf">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+    </Font>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\vcpkg.F.vcpkg.1.0.0\build\native\vcpkg.F.vcpkg.targets" Condition="Exists('..\packages\vcpkg.F.vcpkg.1.0.0\build\native\vcpkg.F.vcpkg.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\vcpkg.F.vcpkg.1.0.0\build\native\vcpkg.F.vcpkg.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\vcpkg.F.vcpkg.1.0.0\build\native\vcpkg.F.vcpkg.props'))" />
+    <Error Condition="!Exists('..\packages\vcpkg.F.vcpkg.1.0.0\build\native\vcpkg.F.vcpkg.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\vcpkg.F.vcpkg.1.0.0\build\native\vcpkg.F.vcpkg.targets'))" />
+  </Target>
+</Project>
