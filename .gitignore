@@ -363,5 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # Project dependencies and assets
-/vcpkg_installed/
-/LowerDeck Engine/packages.config
+vcpkg_installed/
+LowerDeck Engine/packages.config
