@@ -170,6 +170,9 @@
     <ClInclude Include="Engine\D3D\D3D12Descriptor.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\ECS\Component.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

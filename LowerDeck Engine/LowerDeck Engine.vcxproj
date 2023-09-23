@@ -124,6 +124,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\D3D\D3D12Descriptor.hpp" />
+    <ClInclude Include="Engine\ECS\Component.hpp" />
     <ClInclude Include="Engine\Engine\Engine.hpp" />
     <ClInclude Include="Engine\Render\Camera.hpp" />
     <ClInclude Include="Dependencies\D3D12MA\D3D12MemAlloc.h" />
