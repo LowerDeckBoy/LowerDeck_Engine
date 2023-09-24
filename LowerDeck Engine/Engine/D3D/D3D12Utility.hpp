@@ -4,6 +4,9 @@
 #include <cstdint>
 #include <wrl/client.h>
 
+
+enum class ShaderType : uint8_t;
+
 namespace D3D
 {
 	// Number of total frames used in SwapChain.
@@ -23,3 +26,8 @@ extern uint32_t FRAME_INDEX;
 // Releasing IUnknown pointer that is NOT of a ComPtr type
 #define SAFE_DELETE(_Ptr) { if (_Ptr) { _Ptr->Release(); _Ptr = nullptr; } }
 #endif
+
+namespace gfx
+{
+	LPCWSTR EnumToType(ShaderType TypeOf);
+}

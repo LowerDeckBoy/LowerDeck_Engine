@@ -6,6 +6,12 @@
 
 namespace gfx
 {
+	// TODO:
+	// shader wrapper
+	class Shader
+	{
+	};
+
 	/// <summary>
 	/// Single instance for creating and compiling shader model 6.x.<br/>
 	/// DXIL Libraries require to create Compiler and Library
@@ -28,6 +34,5 @@ namespace gfx
 		Microsoft::WRL::ComPtr<IDxcLibrary>			m_Library;
 		Microsoft::WRL::ComPtr<IDxcIncludeHandler>	m_IncludeHandler;
 
-		constexpr LPCWSTR EnumToType(ShaderType TypeOf);
 	};
 }
