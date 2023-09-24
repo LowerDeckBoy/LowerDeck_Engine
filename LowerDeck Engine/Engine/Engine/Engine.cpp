@@ -17,10 +17,11 @@ void Engine::Initialize()
 	m_SceneCamera = std::make_unique<Camera>();
 	m_SceneCameraInputs = std::make_unique<CameraInput>();
 	
-	//m_Editor = std::make_unique<Editor>();
-
 	m_Renderer = std::make_unique<Renderer>(m_SceneCamera);
-	//m_Editor->Initialize();
+
+	m_Editor = std::make_shared<Editor>();
+	m_Editor->Initialize();
+	m_Renderer->SetEditor(m_Editor);
 }
 
 void Engine::Run()
@@ -30,8 +31,7 @@ void Engine::Run()
 	// resources are ready to render
 	Window::Show();
 
-	// Stop timer on Resize event 
-	// so Backbuffer resizing can't be done
+	// Stop timer on Resize event so Backbuffer resizing can't be done
 	// without ongoing frame rendering
 	// m_EngineTimer->Start();
 
@@ -72,6 +72,8 @@ void Engine::Run()
 
 void Engine::OnResize()
 {
+	m_Renderer->OnResize();
+	m_SceneCamera->OnAspectRatioChange(Window::m_Resolution.AspectRatio);
 }
 
 void Engine::Release()
@@ -79,11 +81,11 @@ void Engine::Release()
 	m_Renderer->Release();
 }
 
-//extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 LRESULT Engine::WindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
-	//if (ImGui_ImplWin32_WndProcHandler(hWnd, Msg, wParam, lParam))
-	//	return true;
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, Msg, wParam, lParam))
+		return true;
 
 	switch (Msg)
 	{
@@ -104,10 +106,7 @@ LRESULT Engine::WindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	case WM_SIZE:
 	{
 		Window::SetResolution(static_cast<uint32_t>(LOWORD(lParam)), static_cast<uint32_t>(HIWORD(lParam)));
-		//m_Display.Width  = static_cast<float>(LOWORD(lParam));
-		//m_Display.Height = static_cast<float>(HIWORD(lParam));
-		//m_Display.AspectRatio = (m_Display.Width / m_Display.Height);
-
+		
 		if (!m_Renderer)
 		{
 			return 0;

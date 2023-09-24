@@ -39,7 +39,7 @@ private:
 	std::shared_ptr<Timer>			m_EngineTimer;
 	std::shared_ptr<Camera>			m_SceneCamera;
 	std::shared_ptr<CameraInput>	m_SceneCameraInputs;
-	std::unique_ptr<Editor>			m_Editor;
+	std::shared_ptr<Editor>			m_Editor;
 	std::unique_ptr<Renderer>		m_Renderer;
 
 	//std::shared_ptr<D3D::D3D12Context> m_D3D12Context;

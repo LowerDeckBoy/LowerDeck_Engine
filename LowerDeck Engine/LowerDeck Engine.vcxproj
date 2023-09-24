@@ -99,8 +99,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\D3D\D3D12GraphicsPipelineState.cpp" />
     <ClCompile Include="Engine\D3D\D3D12Utility.cpp" />
     <ClCompile Include="Engine\Engine\Engine.cpp" />
+    <ClCompile Include="Engine\Graphics\Shader5.cpp" />
     <ClCompile Include="Engine\Render\Camera.cpp" />
     <ClCompile Include="Dependencies\D3D12MA\D3D12MemAlloc.cpp" />
     <ClCompile Include="Dependencies\imgui\imgui_draw.cpp" />
@@ -121,8 +123,10 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Engine\Renderer.cpp" />
     <ClCompile Include="Engine\ECS\World.cpp" />
+    <ClCompile Include="Engine\Graphics\ShaderManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\D3D\D3D12GraphicsPipelineState.hpp" />
     <ClInclude Include="Engine\D3D\D3D12Descriptor.hpp" />
     <ClInclude Include="Engine\ECS\Component.hpp" />
     <ClInclude Include="Engine\Engine\Engine.hpp" />
@@ -153,6 +157,8 @@
     <ClInclude Include="Input\CameraInput.hpp" />
     <ClInclude Include="Engine\Engine\Renderer.hpp" />
     <ClInclude Include="Engine\ECS\World.hpp" />
+    <ClInclude Include="Engine\Graphics\ShaderManager.hpp" />
+    <ClInclude Include="Engine\Graphics\Shader5.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -19,19 +19,17 @@ namespace D3D
 	extern ComPtr<ID3D12Fence1> g_Fence;
 	extern HANDLE g_FenceEvent;
 	extern std::array<uint64_t, FRAME_COUNT> g_FenceValues;
-	
+	/// Swap Chain backbuffer background color
 	extern std::array<float, 4> g_ClearColor;
 
-	/// <summary> Get Render Target for current frame. </summary>
-	/// <returns>ID3D12Resource*</returns>
+	/// <summary> Get Render Target for <b>current</b> frame. </summary>
+	/// <returns><c>ID3D12Resource*</c></returns>
 	ID3D12Resource* GetRenderTarget();
 
 	bool InitializeSwapChain(D3D12Viewport Viewport);
 	void CreateSwapChain(D3D12Viewport Viewport);
 	void CreateBackbuffers();
 	void CreateFence();
-	// TODO:
-	//void OnSwapChainResize(D3D12Viewport Viewport);
 
 	void ReleaseSwapChain();
 }

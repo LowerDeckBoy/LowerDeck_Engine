@@ -21,13 +21,13 @@ namespace D3D
 		~D3D12DescriptorHeap();
 
 		/// <summary>
-		/// Allocate given D3D12Descriptor inside the Heap of this class object.
+		/// Allocate given <b><c>D3D12Descriptor</c></b> inside the Heap of this class object.
 		/// </summary>
 		/// <param name="TargetDescriptor"></param>
 		void Allocate(D3D12Descriptor& TargetDescriptor);
 		
 		/// <summary>
-		/// Used when a D3D12Descriptor is already allocated (non-zero pointer)
+		/// Used when a <b>D3D12Descriptor</b> is already allocated (non-zero pointer)
 		/// to avoid allocating another, redundant index inside of the Heap.
 		/// </summary>
 		/// <param name="TargetDescriptor"></param>
@@ -37,8 +37,8 @@ namespace D3D
 		/// <returns> ID3D12DescriptorHeap* </returns>
 		[[nodiscard]] inline ID3D12DescriptorHeap* Heap() { return m_Heap.Get(); }
 
-		[[nodiscard]] inline D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle() const { return m_Heap.Get()->GetCPUDescriptorHandleForHeapStart(); }
-		[[nodiscard]] inline D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle() const { return m_Heap.Get()->GetGPUDescriptorHandleForHeapStart(); }
+		[[nodiscard]] inline D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle() { return m_Heap.Get()->GetCPUDescriptorHandleForHeapStart(); }
+		[[nodiscard]] inline D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle() { return m_Heap.Get()->GetGPUDescriptorHandleForHeapStart(); }
 
 		[[nodiscard]] inline uint32_t GetDescriptorSize() const { return m_DescriptorSize; }
 

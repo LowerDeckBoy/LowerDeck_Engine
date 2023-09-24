@@ -8,9 +8,9 @@
 namespace D3D
 {
 	/// <summary>
-	/// Main class (entry point) for DirectX 12 based context.
+	/// Main class (entry point) for DirectX 12 based context.<br/>
 	/// All pointers to DX structures are initialized here,
-	/// as well as they are cleanup here via class destructor.
+	/// as well as they are cleanup here via class destructor.<br/>
 	/// It is meant for simplying and securing both context creation and it's later cleanup.
 	/// </summary>
 	class D3D12Context
@@ -32,8 +32,16 @@ namespace D3D
 
 		void OnResize();
 
+		/// <summary>
+		/// Safe release of all member ComPtrs
+		/// and other DirectX based structs.
+		/// </summary>
 		void ReleaseD3D();
 
+		/// <summary>
+		/// Preventing from re-initializing D3D context.
+		/// </summary>
+		/// <returns> <b>True</b> if was already initialized. </returns>
 		bool IsInitialized();
 
 		inline static D3D12DescriptorHeap* GetMainHeap() { return m_MainHeap.get(); }
@@ -45,7 +53,13 @@ namespace D3D
 
 		bool bInitialized{ false };
 
-	public:
+	private:
+		/// <summary>
+		/// Used before resizing SwapChain context.
+		/// Required to proper resizing of SwapChain Backbuffers.
+		/// </summary>
+		void ReleaseRenderTargets();
+
 		// CBV_SRV_UAV heap
 		// Main source of resource allocations
 		static std::unique_ptr<D3D12DescriptorHeap> m_MainHeap;

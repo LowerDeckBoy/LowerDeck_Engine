@@ -1,7 +1,10 @@
 #pragma once
 #include "../Engine/D3D/D3D12Context.hpp"
+#include "../Graphics/ShaderManager.hpp"
+#include "../Graphics/Shader5.hpp"
 
 class Camera;
+class Editor;
 class Scene;
 
 /// <summary>
@@ -27,6 +30,8 @@ public:
 	void OnResize();
 	void Release();
 
+	void SetEditor(std::shared_ptr<Editor> pEditor);
+
 protected:
 	void TransitToRender();
 	void TransitToPresent(D3D12_RESOURCE_STATES StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET);
@@ -41,9 +46,14 @@ protected:
 
 	void DrawGUI();
 
+	
+
 private:
 	std::unique_ptr<D3D::D3D12Viewport> m_SceneViewport;
 	std::shared_ptr<D3D::D3D12Context> m_D3DContext;
 	std::shared_ptr<Camera> m_SceneCamera;
+	std::shared_ptr<Editor> m_Editor;
+
+	std::shared_ptr<gfx::ShaderManager> m_ShaderManager;
 
 };

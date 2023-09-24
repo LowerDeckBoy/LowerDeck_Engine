@@ -26,7 +26,7 @@ namespace D3D
 		void SetScissor(uint32_t Width, uint32_t Height);
 
 		/// <summary> Viewport getter </summary>
-		/// <returns> Private member of type: D3D12_VIEWPORT</returns>
+		/// <returns> Private member of type: D3D12_VIEWPORT </returns>
 		[[nodiscard]] inline const D3D12_VIEWPORT& Viewport() const { return m_Viewport; }
 		/// <summary> Scissor getter </summary>
 		/// <returns> Private member of type: D3D12_RECT </returns>

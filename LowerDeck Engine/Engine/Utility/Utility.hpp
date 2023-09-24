@@ -7,13 +7,6 @@
 #include <debugapi.h>
 #include <comdef.h>
 
-#ifndef ASSERT
-#define ASSERT(Expression, ...)							\
-	{													\
-		std::string message{ std::string(__VA_ARGS__) };\
-		assert(Expression && message);					\
-	}
-#endif
 
 #ifndef TraceError
 // Tracing where HRESULT error occured.

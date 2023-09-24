@@ -1,4 +1,5 @@
 #include "../Render/Camera.hpp"
+#include "../Editor/Editor.hpp"
 #include "Renderer.hpp"
 #include "../Window/Window.hpp"
 #include "../Utility/Utility.hpp"
@@ -20,6 +21,8 @@ void Renderer::Initialize()
 	m_D3DContext = std::make_shared<D3D::D3D12Context>();
 	m_D3DContext->InitializeD3D();
 
+	m_ShaderManager = std::make_shared<gfx::ShaderManager>();
+
 	D3D::ExecuteCommandLists(false);
 	m_D3DContext->WaitForGPU();
 }
@@ -30,6 +33,17 @@ void Renderer::RecordCommandLists()
 	ClearRenderTarget();
 
 	SetHeaps({ D3D::D3D12Context::GetMainHeap()->Heap() });
+
+	// TODO:
+	// Output viewport window
+	//ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
+	//auto viewportSize{ ImGui::GetContentRegionAvail() };
+	//const auto& pgpu = m_DeviceCtx->GetRenderTargetDesc().GetGPU();
+	//m_OutputWidth = static_cast<uint32_t>(viewportSize.x);
+	//m_OutputHeight = static_cast<uint32_t>(viewportSize.y);
+	//ImGui::Image(reinterpret_cast<ImTextureID>(pgpu.ptr), { (float)m_OutputWidth, (float)m_OutputHeight });
+	//ImGui::End();
+
 
 }
 
@@ -54,6 +68,12 @@ void Renderer::Render()
 
 void Renderer::OnResize()
 {
+	m_D3DContext->OnResize();
+
+	m_D3DContext->WaitForGPU();
+	m_D3DContext->FlushGPU();
+	//D3D::ExecuteCommandLists();
+	//m_D3DContext->WaitForGPU();
 }
 
 void Renderer::BeginFrame()
@@ -62,11 +82,16 @@ void Renderer::BeginFrame()
 
 	SetViewport();
 
+	//if (m_Editor)
+	//	m_Editor->OnFrameBegin();
+
 	TransitToRender();
 }
 
 void Renderer::EndFrame()
 {
+	//if (m_Editor)
+	//	m_Editor->OnFrameEnd();
 
 	TransitToPresent();
 }
@@ -77,7 +102,7 @@ void Renderer::TransitToRender()
 	D3D::g_CommandList.Get()->ResourceBarrier(1, &presentToRender);
 }
 
-void Renderer::TransitToPresent(D3D12_RESOURCE_STATES StateBefore)
+void Renderer::TransitToPresent(D3D12_RESOURCE_STATES)
 {
 
 	D3D12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(D3D::GetRenderTarget(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
@@ -121,4 +146,9 @@ void Renderer::Release()
 
 	m_D3DContext->ReleaseD3D();
 	::CloseHandle(D3D::g_FenceEvent);
+}
+
+void Renderer::SetEditor(std::shared_ptr<Editor> pEditor)
+{
+	m_Editor = pEditor;
 }

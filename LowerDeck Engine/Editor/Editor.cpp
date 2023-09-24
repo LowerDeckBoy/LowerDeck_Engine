@@ -28,7 +28,7 @@ void Editor::Initialize()
 	assert(ImGui_ImplWin32_Init(Window::GetHwnd()));
 	assert(ImGui_ImplDX12_Init(D3D::g_Device.Get(),
 		D3D::FRAME_COUNT,
-		DXGI_FORMAT_R8G8B8A8_UNORM,
+		D3D::g_RenderTargetFormat,
 		D3D::D3D12Context::GetMainHeap()->Heap(),
 		D3D::D3D12Context::GetMainHeap()->GetCPUHandle(),
 		D3D::D3D12Context::GetMainHeap()->GetGPUHandle()));
@@ -38,11 +38,15 @@ void Editor::Initialize()
 
 	m_MainViewport = ImGui::GetMainViewport();
 	m_MainViewport->Flags |= ImGuiViewportFlags_TopMost;
-	m_MainViewport->Flags |= ImGuiViewportFlags_OwnedByApp;
+	m_MainViewport->Flags |= ImGuiViewportFlags_OwnedByApp; 
+
 }
 
 void Editor::OnFrameBegin()
 {
+	//m_ViewportWidth = Width;
+	//m_ViewportHeigth = Height;
+
 	ImGui_ImplWin32_NewFrame();
 	ImGui_ImplDX12_NewFrame();
 	ImGui::NewFrame();
@@ -61,6 +65,11 @@ void Editor::OnFrameBegin()
 
 void Editor::OnFrameEnd()
 {
+	{
+		ImGui::Begin("TEST");
+		ImGui::End();
+	}
+
 
 	ImGui::PopFont();
 	ImGui::EndFrame();
@@ -72,7 +81,6 @@ void Editor::OnFrameEnd()
 		ImGui::RenderPlatformWindowsDefault();
 	}
 
-	//m_DeviceCtx->GetCommandList()->SetDescriptorHeaps(1, m_DeviceCtx->GetMainHeap()->GetHeapAddressOf());
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), D3D::g_CommandList.Get());
 }
 

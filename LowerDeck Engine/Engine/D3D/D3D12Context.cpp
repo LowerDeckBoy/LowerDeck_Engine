@@ -90,6 +90,28 @@ namespace D3D
 
 	void D3D12Context::OnResize()
 	{
+		WaitForGPU();
+
+		if (!g_Device.Get() || !g_SwapChain.Get() || !GetCommandAllocator())
+			throw std::exception();
+
+		ResetCommandLists();
+		ReleaseRenderTargets();
+
+		// Reset DepthStencil
+
+		ThrowIfFailed(g_SwapChain.Get()->ResizeBuffers(
+			FRAME_COUNT, 
+			static_cast<uint32_t>(m_Viewport.Viewport().Width), static_cast<uint32_t>(m_Viewport.Viewport().Width), 
+			g_RenderTargetFormat, 0));
+
+		FRAME_INDEX = 0;
+
+		// SetViewport();
+		CreateBackbuffers();
+		// DepthStencil
+
+		ExecuteCommandLists(false);
 	}
 
 	void D3D12Context::ReleaseD3D()
@@ -110,5 +132,14 @@ namespace D3D
 	bool D3D12Context::IsInitialized()
 	{
 		return bInitialized;
+	}
+
+	void D3D12Context::ReleaseRenderTargets()
+	{
+		for (uint32_t i = 0; i < FRAME_COUNT; i++)
+		{
+			g_RenderTargets.at(i).Reset();
+			g_FenceValues.at(i) = g_FenceValues.at(FRAME_INDEX);
+		}
 	}
 }

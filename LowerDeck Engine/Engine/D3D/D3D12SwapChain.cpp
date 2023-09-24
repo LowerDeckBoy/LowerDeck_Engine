@@ -17,7 +17,6 @@ namespace D3D
 	HANDLE g_FenceEvent{ nullptr };
 	std::array<uint64_t, FRAME_COUNT> g_FenceValues; 
 
-	// Swap Chain backbuffer background color
 	std::array<float, 4> g_ClearColor = { 0.5f, 0.5f, 1.0f, 1.0f };
 
 	ID3D12Resource* GetRenderTarget()
@@ -75,10 +74,6 @@ namespace D3D
 			g_RenderTargets.at(i).Get()->SetName(debugName.c_str());
 			rtvHandle.Offset(1, g_RenderTargetHeap->GetDescriptorSize());
 		}
-	}
-
-	void OnSwapChainResize()
-	{
 	}
 
 	void ReleaseSwapChain()
