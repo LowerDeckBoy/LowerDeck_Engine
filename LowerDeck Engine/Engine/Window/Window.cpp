@@ -33,21 +33,6 @@ Window::~Window()
 {
 	Release();
 }
-/*
-LRESULT Window::MsgProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
-{
-	switch (Msg)
-	{
-	case WM_QUIT:
-	case WM_DESTROY:
-	{
-		::PostQuitMessage(0);
-		break;
-	}
-	}
-	return ::DefWindowProcW(hWnd, Msg, wParam, lParam);
-}
-*/
 
 bool Window::Initialize()
 {

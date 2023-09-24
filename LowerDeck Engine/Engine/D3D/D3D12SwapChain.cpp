@@ -70,8 +70,10 @@ namespace D3D
 		{
 			ThrowIfFailed(g_SwapChain.Get()->GetBuffer(i, IID_PPV_ARGS(g_RenderTargets.at(i).ReleaseAndGetAddressOf())));
 			g_Device.Get()->CreateRenderTargetView(g_RenderTargets.at(i).Get(), nullptr, rtvHandle);
+
 			std::wstring debugName{ L"Backbuffer #" + std::to_wstring(i) };
 			g_RenderTargets.at(i).Get()->SetName(debugName.c_str());
+
 			rtvHandle.Offset(1, g_RenderTargetHeap->GetDescriptorSize());
 		}
 	}

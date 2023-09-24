@@ -28,7 +28,7 @@ namespace D3D
 	{
 		m_Scissor.left	 = 0L;
 		m_Scissor.top	 = 0L;
-		m_Scissor.right  = static_cast<LONG>(Width);
-		m_Scissor.bottom = static_cast<LONG>(Height);
+		m_Scissor.right  = static_cast<uint64_t>(Width);
+		m_Scissor.bottom = static_cast<uint64_t>(Height);
 	}
 }

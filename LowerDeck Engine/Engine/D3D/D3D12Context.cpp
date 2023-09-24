@@ -99,15 +99,18 @@ namespace D3D
 		ReleaseRenderTargets();
 
 		// Reset DepthStencil
-
+		m_Viewport.Set(Window::m_Resolution.Width, Window::m_Resolution.Height);
+		//static_cast<uint32_t>(m_Viewport.Viewport().Width), static_cast<uint32_t>(m_Viewport.Viewport().Width), 
 		ThrowIfFailed(g_SwapChain.Get()->ResizeBuffers(
 			FRAME_COUNT, 
-			static_cast<uint32_t>(m_Viewport.Viewport().Width), static_cast<uint32_t>(m_Viewport.Viewport().Width), 
+			Window::m_Resolution.Width, Window::m_Resolution.Height,
 			g_RenderTargetFormat, 0));
 
 		FRAME_INDEX = 0;
-
-		// SetViewport();
+		//uint32_t w;
+		//uint32_t h;
+		//g_SwapChain.Get()->GetSourceSize(&w, &h);
+		//m_Viewport.Set(w, h);
 		CreateBackbuffers();
 		// DepthStencil
 
