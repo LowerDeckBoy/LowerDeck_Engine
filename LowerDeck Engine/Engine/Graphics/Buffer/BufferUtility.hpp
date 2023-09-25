@@ -5,7 +5,7 @@
 namespace gfx
 {
 	/// <summary>
-	/// 
+	/// Used to pass to Buffer upon creation.<br/>
 	/// </summary>
 	struct BufferData
 	{
@@ -20,14 +20,10 @@ namespace gfx
 		uint32_t Stride{ 0 };
 	};
 
-	struct BufferDesc
-	{
-		CD3DX12_HEAP_PROPERTIES HeapProperties{ D3D12_HEAP_TYPE_UPLOAD };
-		D3D12_RESOURCE_STATES	State{ D3D12_RESOURCE_STATE_GENERIC_READ };
-		D3D12_HEAP_FLAGS		HeapFlags{ D3D12_HEAP_FLAG_NONE };
-		DXGI_FORMAT				Format{ DXGI_FORMAT_UNKNOWN };
-	};
-
+	/// <summary>
+	/// Indicating desired buffer type.<br/>
+	/// Used to transit buffer resource into appropiate state.
+	/// </summary>
 	enum BufferType
 	{
 		eVertex		= 0x00,

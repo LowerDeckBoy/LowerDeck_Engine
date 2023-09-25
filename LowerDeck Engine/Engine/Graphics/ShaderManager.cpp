@@ -52,7 +52,7 @@ namespace gfx
 		std::wstring wstr{ std::wstring(Filepath.begin(), Filepath.end()) };
 		LPCWSTR filepath{ wstr.c_str() };
 
-		ThrowIfFailed(m_Compiler.Get()->Compile(textBlob, filepath, EntryPoint, EnumToType(eType), nullptr, 0, nullptr, 0, m_IncludeHandler.Get(), &result), "Failed to compile shader 6.x!");
+		ThrowIfFailed(m_Compiler.Get()->Compile(textBlob, filepath, EntryPoint, ShaderTypeToName(eType), nullptr, 0, nullptr, 0, m_IncludeHandler.Get(), &result), "Failed to compile shader 6.x!");
 
 		HRESULT resultCode{};
 		ThrowIfFailed(result->GetStatus(&resultCode), "Failed to get shader 6.x Status!");
