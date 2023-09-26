@@ -9,7 +9,7 @@ namespace gfx
 	// as they use different View types.
 	
 	/// <summary>
-	/// Inherits from <c>Buffer</c> class.
+	/// Inherits from <see cref="Buffer"></see> class.
 	/// </summary>
 	class VertexBuffer : public Buffer
 	{
@@ -21,6 +21,10 @@ namespace gfx
 		/// <param name="Data"></param>
 		/// <param name="bSRV"> Indicates whether ShaderResourceView should be allocated. </param>
 		VertexBuffer(BufferData Data, bool bSRV = false);
+		/// <summary>
+		/// 
+		/// </summary>
+		~VertexBuffer() = default;
 
 		/// <summary>
 		/// 
@@ -28,6 +32,11 @@ namespace gfx
 		/// <param name="Data"></param>
 		/// <param name="bSRV">Indicates whether ShaderResourceView should be allocated.</param>
 		void Create(BufferData Data, bool bSRV = false);
+
+		/// <summary>
+		/// 
+		/// </summary>
+		void Release() override;
 
 		/// <summary>
 		/// 
@@ -50,13 +59,18 @@ namespace gfx
 		/// <param name="Data"></param>
 		/// <param name="bSRV">Indicates whether ShaderResourceView should be allocated.</param>
 		IndexBuffer(BufferData Data, bool bSRV = false);
-
+		~IndexBuffer() = default;
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="Data"></param>
 		/// <param name="bSRV">Indicates whether ShaderResourceView should be allocated.</param>
 		void Create(BufferData Data, bool bSRV = false);
+
+		/// <summary>
+		/// 
+		/// </summary>
+		void Release() override;
 
 		// TODO: Add indicating whether indices are of 16 or 32 bits size
 		// Might result greatly in final total sizes

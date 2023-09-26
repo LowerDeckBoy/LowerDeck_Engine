@@ -13,6 +13,12 @@ namespace gfx
 		SetView();
 	}
 
+	void VertexBuffer::Release()
+	{
+		View = {};
+		Buffer::Release();
+	}
+
 	void VertexBuffer::SetView()
 	{
 		View.BufferLocation = Buffer::GetGPUAddress();
@@ -29,6 +35,12 @@ namespace gfx
 	{
 		Buffer::Create(Data, BufferType::eIndex, bSRV);
 		SetView();
+	}
+
+	void IndexBuffer::Release()
+	{
+		View = {};
+		Buffer::Release();
 	}
 
 	void IndexBuffer::SetView()

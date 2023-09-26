@@ -24,7 +24,7 @@ namespace gfx
 	/// Indicating desired buffer type.<br/>
 	/// Used to transit buffer resource into appropiate state.
 	/// </summary>
-	enum BufferType
+	enum BufferType : uint8_t
 	{
 		eVertex		= 0x00,
 		eIndex		= 0x01,
@@ -38,18 +38,49 @@ namespace gfx
 	class Buffer
 	{
 	public:
+		/// <summary></summary>
 		Buffer() = default;
-		Buffer(BufferData Data, BufferType TypeOf, bool bSRV);
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="Data"></param>
+		/// <param name="Usage"></param>
+		/// <param name="bSRV"></param>
+		Buffer(BufferData Data, BufferType Usage, bool bSRV = false);
+		/// <summary>
+		/// 
+		/// </summary>
 		~Buffer();
 
-		void Create(BufferData Data, BufferType TypeOf, bool bSRV);
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="Data"></param>
+		/// <param name="Usage"></param>
+		/// <param name="bSRV"></param>
+		void Create(BufferData Data, BufferType Usage, bool bSRV = false);
 
-		void MapMemory();
+		/// <summary>
+		/// Note: Not sure if should be called in destructure rather then manually.
+		/// Might cause issues when using DXR later.
+		/// </summary>
+		virtual void Release();
 
-		ID3D12Resource* GetBuffer() const noexcept;
-		D3D12_GPU_VIRTUAL_ADDRESS GetGPUAddress() const;
+		// TOOD: 
+		// General helper function to map memory -> used when not making D3D12MA allocs.
+		//static void MapMemory();
 
-		BufferData GetData() noexcept;
+		/// <summary></summary>
+		/// <returns></returns>
+		inline ID3D12Resource* GetBuffer() const noexcept { return m_Buffer.Get(); }
+		/// <summary></summary>
+		/// <returns></returns>
+		inline const D3D12_GPU_VIRTUAL_ADDRESS GetGPUAddress() const { return m_Buffer.Get()->GetGPUVirtualAddress(); }
+
+		/// <summary></summary>
+		/// <returns></returns>
+		inline BufferData GetData() noexcept { return m_BufferData; }
+
 
 	protected:
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_Buffer;
@@ -59,4 +90,19 @@ namespace gfx
 
 		BufferData m_BufferData{};
 	};
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="pResource"></param>
+	/// <param name="Data"></param>
+	/// <param name="Descriptor"></param>
+	static void CreateSRV(ID3D12Resource* pResource, BufferData Data, D3D::D3D12Descriptor& Descriptor);
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="pResource"></param>
+	/// <param name="Data"></param>
+	/// <param name="Descriptor"></param>
+	static void CreateUAV(ID3D12Resource* pResource, BufferData Data, D3D::D3D12Descriptor& Descriptor);
 }
