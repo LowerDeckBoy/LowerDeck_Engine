@@ -64,7 +64,7 @@ namespace gfx
 		/// Note: Not sure if should be called in destructure rather then manually.
 		/// Might cause issues when using DXR later.
 		/// </summary>
-		virtual void Release();
+		//virtual void Release() = 0;
 
 		// TOOD: 
 		// General helper function to map memory -> used when not making D3D12MA allocs.
@@ -84,6 +84,7 @@ namespace gfx
 
 	protected:
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_Buffer;
+		Microsoft::WRL::ComPtr<ID3D12Resource> m_UploadBuffer;
 		D3D12MA::Allocation* m_Allocation{ nullptr };
 
 		D3D::D3D12Descriptor m_Descriptor;

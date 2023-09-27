@@ -24,7 +24,7 @@ namespace gfx
 		/// <summary>
 		/// 
 		/// </summary>
-		~VertexBuffer() = default;
+		//~VertexBuffer() { Release(); }
 
 		/// <summary>
 		/// 
@@ -36,7 +36,7 @@ namespace gfx
 		/// <summary>
 		/// 
 		/// </summary>
-		void Release() override;
+		//void Release() override;
 
 		/// <summary>
 		/// 
@@ -59,7 +59,7 @@ namespace gfx
 		/// <param name="Data"></param>
 		/// <param name="bSRV">Indicates whether ShaderResourceView should be allocated.</param>
 		IndexBuffer(BufferData Data, bool bSRV = false);
-		~IndexBuffer() = default;
+		//~IndexBuffer() { Release(); }
 		/// <summary>
 		/// 
 		/// </summary>
@@ -70,7 +70,7 @@ namespace gfx
 		/// <summary>
 		/// 
 		/// </summary>
-		void Release() override;
+		//void Release() override;
 
 		// TODO: Add indicating whether indices are of 16 or 32 bits size
 		// Might result greatly in final total sizes
