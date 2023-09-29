@@ -14,7 +14,8 @@ class CameraInput
 {
 public:
 	void Initialize();
-	void ProcessInputs(std::shared_ptr<Camera> pCamera, float DeltaTime);
+	//void ProcessInputs(std::shared_ptr<Camera> pCamera, float DeltaTime);
+	void ProcessInputs(Camera* pCamera, float DeltaTime);
 	void Release() noexcept;
 
 private:

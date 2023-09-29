@@ -3,6 +3,9 @@
 #include <imgui/imgui_impl_win32.h>
 #include <imgui/imgui_impl_dx12.h>
 
+class Camera;
+class Timer;
+
 /// <summary>
 /// <b>ImGui</b> based.
 /// </summary>
@@ -12,7 +15,7 @@ public:
 	Editor() = default;
 	~Editor();
 
-	void Initialize();
+	void Initialize(Camera* pCamera, Timer* pEngineTimer);
 
 	/// <summary>
 	/// Goes after reseting commend lists.
@@ -26,6 +29,11 @@ public:
 
 	void Release();
 
+	//std::vector<>
+
+	float GetWidth() { return m_ViewportWidth; }
+	float GetHeight() { return m_ViewportHeigth; }
+
 private:
 	/// <summary>
 	/// Viewport area
@@ -35,6 +43,15 @@ private:
 	/// CascadiaCode Bold by default.
 	/// </summary>
 	ImFont*			m_MainFont{ nullptr };
+
+	/// <summary>
+	/// Reference to Scene Camera object.
+	/// </summary>
+	Camera* m_Camera;
+	/// <summary>
+	/// Reference to Engine Timer object.
+	/// </summary>
+	Timer* m_Timer;
 
 	/// <summary>Image output Viewport width</summary>
 	float m_ViewportWidth{};

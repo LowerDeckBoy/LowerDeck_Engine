@@ -22,12 +22,11 @@ struct DeferredOutput
 
 struct GBuffer_Output
 {
-	float4 Albedo : SV_Target0;
-	float4 Normal : SV_Target1;
-	float4 Metallic : SV_Target2;
-	float4 Emissive : SV_Target3;
-	float4 WorldPosition : SV_Target4;
-	float4 DepthMap : SV_Target5;
+	float4 DepthMap			: SV_Target0;
+	float4 Albedo			: SV_Target1;
+	float4 Normal			: SV_Target2;
+	float4 Metallic			: SV_Target3;
+	float4 WorldPosition	: SV_Target4;
 };
 
 // Textures 
@@ -39,11 +38,11 @@ struct MaterialIndices
 	int EmissiveIndex;
 };
 
-ConstantBuffer<MaterialIndices> Indices : register(b0, space2);
-Texture2D<float4> bindless_textures[] : register(t0, space1);
-Texture2D<float4> DepthTexture : register(t4, space0);
+//ConstantBuffer<MaterialIndices> Indices : register(b0, space2);
+//Texture2D<float4> bindless_textures[] : register(t0, space1);
+//Texture2D<float4> DepthTexture : register(t4, space0);
 
-SamplerState texSampler : register(s0);
+SamplerState texSampler : register(s0, space0);
 
 cbuffer cbCamera : register(b1, space0)
 {

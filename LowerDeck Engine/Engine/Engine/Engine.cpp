@@ -12,15 +12,20 @@ Engine::~Engine()
 void Engine::Initialize()
 {
 	m_EngineTimer = std::make_unique<Timer>();
+
 	Window::Initialize();
 
 	m_SceneCamera = std::make_unique<Camera>();
+	m_SceneCamera->Initialize(Window::m_Resolution.AspectRatio);
+
 	m_SceneCameraInputs = std::make_unique<CameraInput>();
+	m_SceneCameraInputs->Initialize();
 	
-	m_Renderer = std::make_unique<Renderer>(m_SceneCamera);
+	m_Renderer = std::make_unique<Renderer>(m_SceneCamera.get());
 
 	m_Editor = std::make_shared<Editor>();
-	m_Editor->Initialize();
+	m_Editor->Initialize(m_SceneCamera.get(), m_EngineTimer.get());
+
 	m_Renderer->SetEditor(m_Editor);
 }
 
@@ -35,7 +40,6 @@ void Engine::Run()
 	// without ongoing frame rendering
 	// m_EngineTimer->Start();
 
-	m_SceneCameraInputs->Initialize();
 	// Ensure Timer clean start
 	m_EngineTimer->Reset();
 	m_SceneCamera->ResetCamera();
@@ -54,11 +58,11 @@ void Engine::Run()
 		{
 			m_EngineTimer->Tick();
 			m_EngineTimer->GetFrameStats();
-
+			
 			if (!bAppPaused)
 			{
-				m_SceneCameraInputs->ProcessInputs(m_SceneCamera, m_EngineTimer->DeltaTime());
-				
+				m_SceneCameraInputs->ProcessInputs(m_SceneCamera.get(), m_EngineTimer->DeltaTime());
+
 				m_Renderer->Update();
 				m_Renderer->Render();
 
@@ -78,6 +82,7 @@ void Engine::OnResize()
 
 void Engine::Release()
 {
+	m_Editor->Release();
 	m_Renderer->Release();
 }
 

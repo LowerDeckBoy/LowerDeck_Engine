@@ -10,6 +10,11 @@
 class Timer
 {
 public:
+	Timer()
+	{
+		Initialize();
+	}
+
 	void Initialize()
 	{
 		__int64 countsPerSec{};

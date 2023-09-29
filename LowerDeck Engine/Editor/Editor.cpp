@@ -1,29 +1,38 @@
+#include "../Engine/Render/Camera.hpp"
+#include "../Engine/Utility/Timer.hpp"
 #include "Editor.hpp"
 #include "../Engine/Window/Window.hpp"
 #include "../Engine/D3D/D3D12Context.hpp"
 #include "../Engine/Utility/Utility.hpp"
+#include "../Engine/Utility/MemoryUsage.hpp"
 
 
 Editor::~Editor()
 {
-	Release();
+	//Release();
 }
 
-void Editor::Initialize()
+void Editor::Initialize(Camera* pCamera, Timer* pEngineTimer)
 {
+	m_Camera = pCamera;
+	m_Timer = pEngineTimer;
+
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 
 	ImGuiIO& IO{ ImGui::GetIO() };
 	ImGuiStyle& Style{ ImGui::GetStyle() };
+	ImGui::StyleColorsDark();
 	Style.WindowRounding	= 0.0f;
 	Style.WindowBorderSize	= 0.0f;
 
 	// Docking
-	IO.BackendFlags |= ImGuiBackendFlags_PlatformHasViewports;
 	IO.BackendFlags |= ImGuiBackendFlags_RendererHasViewports;
+	IO.BackendFlags |= ImGuiBackendFlags_PlatformHasViewports;
 	IO.ConfigFlags  |= ImGuiConfigFlags_DockingEnable;
-	IO.ConfigFlags  |= ImGuiConfigFlags_ViewportsEnable;
+	//IO.ConfigFlags  |= ImGuiConfigFlags_ViewportsEnable;
+
+	
 
 	assert(ImGui_ImplWin32_Init(Window::GetHwnd()));
 	assert(ImGui_ImplDX12_Init(D3D::g_Device.Get(),
@@ -52,24 +61,53 @@ void Editor::OnFrameBegin()
 	ImGui::NewFrame();
 	ImGui::PushFont(m_MainFont);
 
-	{
-		ImGui::BeginMainMenuBar();
-		ImGui::MenuItem("File", nullptr, false);
-
-		ImGui::EndMainMenuBar();
-	}
-
+	// https://www.youtube.com/watch?v=UljMVrQ_zYY
 	m_MainViewport = ImGui::GetMainViewport();
 	ImGui::DockSpaceOverViewport(m_MainViewport);
+
 }
 
 void Editor::OnFrameEnd()
 {
+	//ImGuiIO& IO{ ImGui::GetIO() };
+	//if (IO.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+	//{
+	//	ImGuiID dockspaceID{ ImGui::GetID("MyDockSpace") };
+	//	ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_DockNodeHost);
+	//}
 	{
-		ImGui::Begin("TEST");
-		ImGui::End();
+		ImGui::BeginMainMenuBar();
+		ImGui::MenuItem("File", nullptr, false);
+		ImGui::MenuItem("Window", nullptr, false);
+		ImGui::Separator();
+		// Performance data
+		ImGui::Text("FPS: %d ms: %.2f", m_Timer->m_FPS, m_Timer->m_Miliseconds);
+		ImGui::Separator();
+		ImGui::Text("Memory: %.2f MB", utility::MemoryUsage::ReadRAM());
+		ImGui::Separator();
+		ImGui::Text("VRAM: %d MB", D3D::QueryAdapterMemory());
+
+		ImGui::EndMainMenuBar();
 	}
 
+	// DEBUG
+	ImGui::Begin("Properties", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
+	const auto dims{ ImGui::GetWindowSize() };
+	const auto avail{ ImGui::GetContentRegionAvail() };
+	ImGui::Text("Window size: %.2f x %.2f", dims.x, dims.y);
+	ImGui::Text("Available size: %.2f x %.2f", avail.x, avail.y);
+	ImGui::End();
+
+
+	//{
+	//	ImGui::Begin("Camera");
+	//	m_Camera->DrawGUI();
+	//	ImGui::End();
+	//}
+
+	ImGui::Begin("Log", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
+	ImGui::Text("TODO");
+	ImGui::End();
 
 	ImGui::PopFont();
 	ImGui::EndFrame();

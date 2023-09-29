@@ -14,7 +14,7 @@ void CameraInput::Initialize()
 	ThrowIfFailed(DxMouse->SetCooperativeLevel(Window::GetHwnd(), DISCL_NONEXCLUSIVE | DISCL_NOWINKEY | DISCL_FOREGROUND));
 }
 
-void CameraInput::ProcessInputs(std::shared_ptr<Camera> pCamera, float DeltaTime)
+void CameraInput::ProcessInputs(Camera* pCamera, float DeltaTime)
 {
 	DIMOUSESTATE mouseState{};
 	constexpr int keys{ 256 };

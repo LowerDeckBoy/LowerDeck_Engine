@@ -1,4 +1,0 @@
-#ifndef GBUFFER_VS_HLSL
-#define GBUFFER_VS_HLSL
-
-#endif // GBUFFER_VS_HLSL

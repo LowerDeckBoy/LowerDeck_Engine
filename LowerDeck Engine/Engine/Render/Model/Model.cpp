@@ -49,16 +49,12 @@ void Model::Draw(Camera* pCamera)
 
 	for (size_t i = 0; i < m_Meshes.size(); i++)
 	{
-		//const auto frameIndex{ FRAME_INDEX };
 
-		auto transposed{ DirectX::XMMatrixTranspose(m_Meshes.at(i)->Matrix * m_WorldMatrix * pCamera->GetViewProjection()) };
-		DirectX::XMFLOAT4X4 matrix{};
-		DirectX::XMStoreFloat4x4(&matrix, transposed);
-		m_cbPerObject->Update({ matrix });
+		m_cbPerObject->Update({ DirectX::XMMatrixTranspose(m_Meshes.at(i)->Matrix * m_WorldMatrix * pCamera->GetViewProjection()), DirectX::XMMatrixTranspose(m_WorldMatrix) });
+		D3D::g_CommandList.Get()->SetGraphicsRootConstantBufferView(0, m_cbPerObject->GetBuffer()->GetGPUVirtualAddress());
 		
 		//m_cbPerObject->Update({ XMMatrixTranspose(m_Meshes.at(i)->Matrix * m_WorldMatrix * pCamera->GetViewProjection()),
 		//						XMMatrixTranspose(m_WorldMatrix) }, frameIndex);
-		//D3D::g_CommandList.Get()->SetGraphicsRootConstantBufferView(0, m_cbPerObject->GetBuffer(frameIndex)->GetGPUVirtualAddress());
 
 		//auto currentMaterial{ m_Materials.at(i) };
 
