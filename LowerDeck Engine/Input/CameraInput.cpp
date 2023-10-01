@@ -28,12 +28,11 @@ void CameraInput::ProcessInputs(Camera* pCamera, float DeltaTime)
 
 	constexpr int state{ 0x80 };
 
+	// ESC to exit
 	if (keyboardState.at(DIK_ESCAPE) & state)
-	{
-		// TODO: Add closing fullscreen state here later
-		::PostMessage(Window::GetHwnd(), WM_QUIT, 0, 0);
-	}
-
+		Window::bShouldQuit = true;
+	
+	// If RMB is not held - skip mouse and keyboard camera controls
 	if (!mouseState.rgbButtons[1])
 	{
 		Window::ShowCursor();

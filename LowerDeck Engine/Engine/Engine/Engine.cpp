@@ -46,32 +46,36 @@ void Engine::Run()
 
 	MSG msg{};
 
-	while (msg.message != WM_QUIT)
+	while (bShouldQuit != true)
 	{
-		// Process messages
-		if (::PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		if (msg.message != WM_QUIT)
 		{
-			::TranslateMessage(&msg);
-			::DispatchMessage(&msg);
-		}
-		else
-		{
-			m_EngineTimer->Tick();
-			m_EngineTimer->GetFrameStats();
-			
-			if (!bAppPaused)
+			// Process messages
+			if (::PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 			{
-				m_SceneCameraInputs->ProcessInputs(m_SceneCamera.get(), m_EngineTimer->DeltaTime());
-
-				m_Renderer->Update();
-				m_Renderer->Render();
-
-				m_SceneCamera->Update();
+				::TranslateMessage(&msg);
+				::DispatchMessage(&msg);
 			}
 			else
-				::Sleep(100);
+			{
+				m_EngineTimer->Tick();
+				m_EngineTimer->GetFrameStats();
+
+				if (!bAppPaused)
+				{
+					m_SceneCameraInputs->ProcessInputs(m_SceneCamera.get(), m_EngineTimer->DeltaTime());
+
+					m_Renderer->Update();
+					m_Renderer->Render();
+
+					m_SceneCamera->Update();
+				}
+				else
+					::Sleep(100);
+			}
 		}
 	}
+	m_Renderer->Idle();
 }
 
 void Engine::OnResize()

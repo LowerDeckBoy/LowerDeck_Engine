@@ -43,14 +43,16 @@ public:
 		float	 AspectRatio;
 	} m_Resolution;
 
+	inline static bool bShouldQuit{ false };
+
 protected:
 	static HINSTANCE m_hInstance;
 	static HWND		 m_hWnd;
 
 	RECT m_WindowRect{};
 
-	LPCWSTR m_WindowClass{ L"D3D12 Engine" };
-	LPCWSTR m_WindowName { L"D3D12 Engine" };
+	LPCWSTR m_WindowClass{ L"LowerDeck" };
+	LPCWSTR m_WindowName { L"LowerDeck" };
 
 	bool bInitialized{ false };
 
@@ -62,4 +64,6 @@ protected:
 	bool bMinimized { false };
 	bool bMaximized { false };
 	bool bIsResizing{ false };
+
+	
 };
