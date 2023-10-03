@@ -3,21 +3,21 @@
 
 struct DeferredInput
 {
-	float3 Position : POSITION;
-	float2 TexCoord : TEXCOORD;
-	float3 Normal : NORMAL;
-	float3 Tangent : TANGENT;
-	float3 Bitangent : BITANGENT;
+	float3 Position		: POSITION;
+	float2 TexCoord		: TEXCOORD;
+	float3 Normal		: NORMAL;
+	float3 Tangent		: TANGENT;
+	float3 Bitangent	: BITANGENT;
 };
 
 struct DeferredOutput
 {
-	float4 Position : SV_POSITION;
-	float4 WorldPosition : WORLD_POSITION;
-	float2 TexCoord : TEXCOORD;
-	float3 Normal : NORMAL;
-	float3 Tangent : TANGENT;
-	float3 Bitangent : BITANGENT;
+	float4 Position			: SV_POSITION;
+	float4 WorldPosition	: WORLD_POSITION;
+	float2 TexCoord			: TEXCOORD;
+	float3 Normal			: NORMAL;
+	float3 Tangent			: TANGENT;
+	float3 Bitangent		: BITANGENT;
 };
 
 struct GBuffer_Output
@@ -38,8 +38,7 @@ struct MaterialIndices
 	int EmissiveIndex;
 };
 
-//ConstantBuffer<MaterialIndices> Indices : register(b0, space2);
-//Texture2D<float4> bindless_textures[] : register(t0, space1);
+ConstantBuffer<MaterialIndices> Indices : register(b2, space0);
 //Texture2D<float4> DepthTexture : register(t4, space0);
 
 SamplerState texSampler : register(s0, space0);

@@ -1,5 +1,5 @@
-#ifndef DEFERRED_OUTPUT_VS_HLSL
-#define DEFERRED_OUTPUT_VS_HLSL
+#ifndef DEFERRED_OUTPUT_HLSL
+#define DEFERRED_OUTPUT_HLSL
 
 #include "Deferred_Common.hlsli"
 
@@ -13,4 +13,4 @@ ScreenQuadOutput main(ScreenQuadInput vin)
 	return output;
 }
 
-#endif // DEFERRED_OUTPUT_VS_HLSL
+#endif // DEFERRED_OUTPUTx_HLSL
