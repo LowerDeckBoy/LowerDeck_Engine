@@ -120,13 +120,19 @@
     <ClCompile Include="Engine\Scene\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Graphics\RenderTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Graphics\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Logger.cpp">
+    <ClCompile Include="Engine\Utility\Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\TextureUtility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Utility\FileSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\TextureManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -281,13 +287,19 @@
     <ClInclude Include="Engine\Scene\Scene.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\RenderTexture.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Graphics\Texture.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Logger.hpp">
+    <ClInclude Include="Engine\Utility\Logger.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\TextureUtility.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\ECS\Entity.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\TextureManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -301,8 +313,8 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Default_Forward.hlsl" />
-    <FxCompile Include="Shaders\Deferred\DeferredOutput_VS.hlsl" />
-    <FxCompile Include="Shaders\Deferred\DeferredOutput_PS.hlsl" />
+    <FxCompile Include="Shaders\Deferred\Deferred_Output.hlsl" />
+    <FxCompile Include="Shaders\Test\Mesh.hlsl" />
     <FxCompile Include="Shaders\Deferred\GBuffer.hlsl" />
   </ItemGroup>
 </Project>

@@ -3,7 +3,7 @@
     "version-string": "0.1.1",
     "dependencies": [
         "assimp",
-        "entt",
+        "directxtk12",
         {
             "name": "directxtex",
             "features": ["dx12"]

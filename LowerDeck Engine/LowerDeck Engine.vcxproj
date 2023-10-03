@@ -16,7 +16,12 @@
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{fb1b5032-455e-4512-b46b-80899341a764}</ProjectGuid>
     <RootNamespace>LowerDeckEngine</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <PropertyGroup Label="Globals" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Microsoft_Direct3D_D3D12_SkipLibraryCopy>true</Microsoft_Direct3D_D3D12_SkipLibraryCopy>
+    <Microsoft_Direct3D_D3D12_SkipDebugLayerCopy>true</Microsoft_Direct3D_D3D12_SkipDebugLayerCopy>
+    <Microsoft_Direct3D_D3D12_SkipIncludeDir>true</Microsoft_Direct3D_D3D12_SkipIncludeDir>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -60,7 +65,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
@@ -137,24 +142,27 @@
     <ClCompile Include="Engine\D3D\D3D12Viewport.cpp" />
     <ClCompile Include="Engine\Render\Model\Importer.cpp" />
     <ClCompile Include="Engine\Render\Model\Model.cpp" />
+    <ClCompile Include="Engine\Utility\FileSystem.cpp" />
     <ClCompile Include="Engine\Window\Window.cpp" />
     <ClCompile Include="Dependencies\ImGui\imgui.cpp">
       <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</GenerateXMLDocumentationFiles>
     </ClCompile>
     <ClCompile Include="Engine\Render\Deferred\GBufferPass.cpp" />
     <ClCompile Include="Input\CameraInput.cpp" />
-    <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="Engine\Utility\Logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Engine\Renderer.cpp" />
     <ClCompile Include="Engine\ECS\World.cpp" />
     <ClCompile Include="Engine\Graphics\ShaderManager.cpp" />
     <ClCompile Include="Engine\Render\Deferred\ScreenOutput.cpp" />
     <ClCompile Include="Engine\Scene\Scene.cpp" />
-    <ClCompile Include="Engine\Graphics\RenderTexture.cpp" />
     <ClCompile Include="Engine\Graphics\Texture.cpp" />
+    <ClCompile Include="Engine\Graphics\TextureUtility.cpp" />
+    <ClCompile Include="Engine\Graphics\TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dependencies\EnTT\entt.hpp" />
+    <ClInclude Include="Engine\ECS\Entity.hpp" />
     <ClInclude Include="Engine\Graphics\Buffer\Buffer.hpp" />
     <ClInclude Include="Engine\Graphics\Buffer\BufferUtility.hpp" />
     <ClInclude Include="Engine\Graphics\Buffer\ConstantBuffer.hpp" />
@@ -204,16 +212,19 @@
     <ClInclude Include="Engine\Graphics\Shader5.hpp" />
     <ClInclude Include="Engine\Render\Deferred\ScreenOutput.hpp" />
     <ClInclude Include="Engine\Scene\Scene.hpp" />
-    <ClInclude Include="Engine\Graphics\RenderTexture.hpp" />
     <ClInclude Include="Engine\Graphics\Texture.hpp" />
-    <ClInclude Include="Logger.hpp" />
+    <ClInclude Include="Engine\Utility\Logger.hpp" />
+    <ClInclude Include="Engine\Graphics\TextureUtility.hpp" />
+    <ClInclude Include="Engine\Graphics\TextureManager.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Shaders\Deferred\Deferred_Common.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="Shaders\Deferred\GBuffer.hlsli" />
+    <None Include="Shaders\Deferred\GBuffer.hlsli">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Font Include="Assets\Fonts\CascadiaCode-Bold.ttf">
@@ -228,18 +239,26 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </EntryPointName>
     </FxCompile>
-    <FxCompile Include="Shaders\Deferred\DeferredOutput_PS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.0</ShaderModel>
-    </FxCompile>
-    <FxCompile Include="Shaders\Deferred\DeferredOutput_VS.hlsl">
+    <FxCompile Include="Shaders\Deferred\Deferred_Output.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="Shaders\Deferred\GBuffer.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </EntryPointName>
+    </FxCompile>
+    <FxCompile Include="Shaders\Test\Mesh.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </EntryPointName>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.0</ShaderModel>
     </FxCompile>
   </ItemGroup>

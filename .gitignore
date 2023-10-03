@@ -365,3 +365,4 @@ FodyWeavers.xsd
 # Project dependencies and assets
 vcpkg_installed/
 LowerDeck Engine/packages.config
+/LowerDeck Engine/Assets/glTF
