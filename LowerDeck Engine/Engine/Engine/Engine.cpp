@@ -172,6 +172,7 @@ LRESULT Engine::WindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	case WM_CLOSE:
 	case WM_DESTROY:
 	{
+		bShouldQuit = true;
 		::PostQuitMessage(0);
 		return 0;
 	}

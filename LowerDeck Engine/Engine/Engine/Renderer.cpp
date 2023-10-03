@@ -4,6 +4,8 @@
 #include "../Window/Window.hpp"
 #include "../Utility/Utility.hpp"
 
+bool Renderer::bVsync = true;
+
 Renderer::Renderer(Camera* pCamera)
 {
 	m_SceneCamera = pCamera;
@@ -31,8 +33,9 @@ void Renderer::Initialize()
 	CreateRootSignatures();
 	CreatePipelines();
 
-	m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/DamagedHelmet/DamagedHelmet.gltf"));
-	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/sponza/Sponza.gltf"));
+	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/DamagedHelmet/DamagedHelmet.gltf", "DamagedHelmet"));
+	m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/SciFiHelmet/SciFiHelmet.gltf", "SciFiHelmet"));
+	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/sponza/Sponza.gltf", "Sponza"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/cube/Cube.gltf"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/mathilda/scene.gltf"));
 
@@ -43,16 +46,18 @@ void Renderer::Initialize()
 
 void Renderer::RecordCommandLists()
 {
+	// MUST be set before actual drawing in order to gain access to bindless resources
+	SetHeaps({ D3D::D3D12Context::GetMainHeap()->Heap() });
+
 	// Forward
 	//D3D::g_CommandList.Get()->SetPipelineState(m_DefaultPSO.Get());
 	//D3D::g_CommandList.Get()->SetGraphicsRootSignature(m_DefaultRootSignature.Get());
+	//SetViewport();
 	//SetRenderTarget();
 	//ClearRenderTarget();
 	//m_DepthStencil->Clear();
 	//for (auto& model : m_Models)
 	//	model->Draw(m_SceneCamera);
-
-	SetHeaps({ D3D::D3D12Context::GetMainHeap()->Heap() });
 
 	m_DeferredContext->PassGBuffer(m_SceneCamera, m_Models);
 
@@ -60,10 +65,13 @@ void Renderer::RecordCommandLists()
 	SetRenderTarget();
 	ClearRenderTarget();
 
-	ImGui::Begin("Render Targets", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
+	ImGui::Begin("GBuffer", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
 	m_DeferredContext->DrawGBuffers();
 	ImGui::End();
 
+	// TODO:
+	// Add ComboBox for selecting desired image to viewport
+	//ImGui::Combo("Render Target:")
 	// Output viewport window
 	ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
 	auto viewportSize{ ImGui::GetContentRegionAvail() };
@@ -80,6 +88,7 @@ void Renderer::RecordCommandLists()
 
 void Renderer::Update()
 {
+
 }
 
 void Renderer::Render()
@@ -92,7 +101,7 @@ void Renderer::Render()
 
 	D3D::ExecuteCommandLists(false);
 
-	ThrowIfFailed(D3D::g_SwapChain.Get()->Present(1, 0), "Failed to present frame!");
+	ThrowIfFailed(D3D::g_SwapChain.Get()->Present((bVsync ? 1 : 0), 0), "Failed to present frame!");
 
 	m_D3DContext->MoveToNextFrame();
 }
@@ -125,6 +134,8 @@ void Renderer::EndFrame()
 	ImGui::Begin("Camera");
 	m_SceneCamera->DrawGUI();
 	ImGui::End();
+
+	DrawGUI();
 
 	if (m_Editor)
 		m_Editor->OnFrameEnd();
@@ -170,6 +181,8 @@ void Renderer::ClearRenderTarget()
 
 void Renderer::DrawGUI()
 {
+	for (auto& model : m_Models)
+		model->DrawGUI();
 }
 
 void Renderer::Release()
@@ -177,7 +190,10 @@ void Renderer::Release()
 	m_DeferredContext.reset();
 
 	for (auto& model : m_Models)
+	{
 		model.reset();
+		model = nullptr;
+	}
 
 	m_DefaultRootSignature.Release();
 	m_DefaultPSO.Release();
@@ -234,4 +250,10 @@ void Renderer::CreatePipelines()
 
 	psoBuilder->Reset();
 	delete psoBuilder;
+}
+
+void Renderer::Idle()
+{
+	m_D3DContext->WaitForGPU();
+	m_D3DContext->FlushGPU();
 }

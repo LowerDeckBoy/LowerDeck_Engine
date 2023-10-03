@@ -48,6 +48,11 @@ public:
 	/// </summary>
 	void CreatePipelines();
 
+	/// <summary>
+	/// Called when render loops and to ensure that there are NO resource "in-flight".
+	/// </summary>
+	void Idle();
+
 protected:
 	/// <summary>
 	/// Change SwapChain RenderTargets to Render State.<br/>
@@ -98,4 +103,7 @@ private:
 
 	std::vector<std::unique_ptr<Model>> m_Models;
 
+public:
+	static bool bVsync;
+	
 };

@@ -53,15 +53,11 @@ void Editor::Initialize(Camera* pCamera, Timer* pEngineTimer)
 
 void Editor::OnFrameBegin()
 {
-	//m_ViewportWidth = Width;
-	//m_ViewportHeigth = Height;
-
 	ImGui_ImplWin32_NewFrame();
 	ImGui_ImplDX12_NewFrame();
 	ImGui::NewFrame();
 	ImGui::PushFont(m_MainFont);
 
-	// https://www.youtube.com/watch?v=UljMVrQ_zYY
 	m_MainViewport = ImGui::GetMainViewport();
 	ImGui::DockSpaceOverViewport(m_MainViewport);
 
@@ -77,7 +73,14 @@ void Editor::OnFrameEnd()
 	//}
 	{
 		ImGui::BeginMainMenuBar();
-		ImGui::MenuItem("File", nullptr, false);
+		if (ImGui::BeginMenu("File", true))
+		{
+			if (ImGui::MenuItem("Exit", nullptr, false))
+				Window::bShouldQuit = true;
+			
+			ImGui::EndMenu();
+		}
+		
 		ImGui::MenuItem("Window", nullptr, false);
 		ImGui::Separator();
 		// Performance data
@@ -97,13 +100,6 @@ void Editor::OnFrameEnd()
 	ImGui::Text("Window size: %.2f x %.2f", dims.x, dims.y);
 	ImGui::Text("Available size: %.2f x %.2f", avail.x, avail.y);
 	ImGui::End();
-
-
-	//{
-	//	ImGui::Begin("Camera");
-	//	m_Camera->DrawGUI();
-	//	ImGui::End();
-	//}
 
 	ImGui::Begin("Log", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
 	ImGui::Text("TODO");
