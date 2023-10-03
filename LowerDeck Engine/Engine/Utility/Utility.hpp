@@ -38,6 +38,21 @@
 
 namespace utility
 {
+	/// <summary> Debug Win32 API MessageBox pop up </summary>
+	inline void ErrorMessage(const std::string_view& Message)
+	{
+		::MessageBoxA(nullptr, Message.data(), "Error", MB_OK);
+	}
+
+	/// <summary> Debug Win32 API MessageBox pop up </summary>
+	inline void ErrorMessage(const std::wstring& Message)
+	{
+		::MessageBoxW(nullptr, Message.data(), L"Error", MB_OK);
+	}
+}
+
+namespace debug
+{
 	/// <summary> Print debug message </summary>
 	inline void Print(const std::string& Message)
 	{
@@ -50,15 +65,4 @@ namespace utility
 		::OutputDebugStringW(Message.data());
 	}
 
-	/// <summary> Debug Win32 API MessageBox pop up </summary>
-	inline void ErrorMessage(const std::string_view& Message)
-	{
-		::MessageBoxA(nullptr, Message.data(), "Error", MB_OK);
-	}
-
-	/// <summary> Debug Win32 API MessageBox pop up </summary>
-	inline void ErrorMessage(const std::wstring& Message)
-	{
-		::MessageBoxW(nullptr, Message.data(), L"Error", MB_OK);
-	}
 }
