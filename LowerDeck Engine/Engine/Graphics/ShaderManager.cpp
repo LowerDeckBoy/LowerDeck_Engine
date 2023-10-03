@@ -6,7 +6,7 @@
 #include <sstream>
 #include <vector>
 
-#pragma comment(lib, "dxcompiler.lib")
+//#pragma comment(lib, "dxcompiler.lib")
 
 namespace gfx
 {
@@ -27,10 +27,12 @@ namespace gfx
 
 		ThrowIfFailed(DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(m_Compiler.ReleaseAndGetAddressOf())), "Failed to create Dxc Compiler Instance!");
 		ThrowIfFailed(DxcCreateInstance(CLSID_DxcLibrary, IID_PPV_ARGS(m_Library.ReleaseAndGetAddressOf())), "Failed to create Dxc Library Instance!");
-		ThrowIfFailed(m_Library.Get()->CreateIncludeHandler(m_IncludeHandler.ReleaseAndGetAddressOf()), "Failed to create Dxc Include Handler!");
+
+		ThrowIfFailed(DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(m_DxcUtils.ReleaseAndGetAddressOf())), "Failed to create Dxc Utils Instance!");
+		ThrowIfFailed(m_DxcUtils->CreateDefaultIncludeHandler(m_IncludeHandler.ReleaseAndGetAddressOf()), "Failed to create Dxc Include Handler Instance!");
 	}
 
-	IDxcBlob* ShaderManager::CreateDXIL(const std::string_view& Filepath, ShaderType eType, LPCWSTR EntryPoint)
+	IDxcBlob* ShaderManager::CompileDXIL(const std::string_view& Filepath, ShaderType eType, LPCWSTR EntryPoint)
 	{
 		std::ifstream shaderFile(Filepath.data());
 		if (!shaderFile.good())
@@ -44,35 +46,40 @@ namespace gfx
 		strStream << shaderFile.rdbuf();
 		std::string shaderStr{ strStream.str() };
 
-		IDxcBlobEncoding* textBlob{};
-		ThrowIfFailed(m_Library.Get()->CreateBlobWithEncodingFromPinned(LPBYTE(shaderStr.c_str()), static_cast<uint32_t>(shaderStr.size()), 0, &textBlob));
-
-		IDxcOperationResult* result{};
+		IDxcBlobEncoding* sourceBlob{};
+		ThrowIfFailed(m_Library.Get()->CreateBlobWithEncodingFromPinned(LPBYTE(shaderStr.c_str()), static_cast<uint32_t>(shaderStr.size()), 0, &sourceBlob));
 
 		std::wstring wstr{ std::wstring(Filepath.begin(), Filepath.end()) };
 		LPCWSTR filepath{ wstr.c_str() };
 
-		ThrowIfFailed(m_Compiler.Get()->Compile(textBlob, filepath, EntryPoint, ShaderTypeToName(eType), nullptr, 0, nullptr, 0, m_IncludeHandler.Get(), &result), "Failed to compile shader 6.x!");
+		std::vector<LPCWSTR> arguments;
+		// Push entry point
+		arguments.push_back(L"-E");
+		arguments.push_back(EntryPoint);
 
-		HRESULT resultCode{};
-		ThrowIfFailed(result->GetStatus(&resultCode), "Failed to get shader 6.x Status!");
-		if (FAILED(resultCode))
+		// Push target
+		arguments.push_back(L"-T");
+		arguments.push_back(ShaderTypeToTarget(eType));
+
+		arguments.push_back(L"-Qstrip_debug");
+		arguments.push_back(L"-Qstrip_reflect");
+
+#if defined (_DEBUG)
+		arguments.push_back(DXC_ARG_DEBUG);
+		arguments.push_back(DXC_ARG_DEBUG_NAME_FOR_SOURCE);
+		arguments.push_back(DXC_ARG_SKIP_OPTIMIZATIONS);
+		//arguments.push_back(DXC_ARG_OPTIMIZATION_LEVEL0);
+#endif
+
+		DxcBuffer buffer{ sourceBlob->GetBufferPointer(), sourceBlob->GetBufferSize(), 0 };
+		IDxcResult* result{ nullptr };
+		ThrowIfFailed(m_Compiler.Get()->Compile(&buffer, arguments.data(), static_cast<uint32_t>(arguments.size()), m_IncludeHandler.Get(), IID_PPV_ARGS(&result)));
+		
+		IDxcBlobUtf8* errors{ nullptr };
+		result->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&errors), nullptr);
+		if (errors && errors->GetStringLength() > 0)
 		{
-			IDxcBlobEncoding* error{};
-			HRESULT hResult{ result->GetErrorBuffer(&error) };
-			if (FAILED(hResult))
-				throw std::runtime_error("Failed to get shader error code!");
-
-			std::vector<char> infoLog(error->GetBufferSize() + 1);
-			std::memcpy(infoLog.data(), error->GetBufferPointer(), error->GetBufferSize());
-			infoLog[error->GetBufferSize()] = 0;
-
-			utility::Print("Shader Compiler error:\n");
-			const auto errorMsg{ static_cast<char*>(error->GetBufferPointer()) };
-			utility::Print(errorMsg);
-
-			SAFE_DELETE(error);
-			::MessageBoxA(nullptr, "Failed to compile shader!", "ERROR", MB_OK);
+			utility::ErrorMessage((char*)errors->GetBufferPointer());
 			throw std::runtime_error("Failed to compile shader");
 		}
 
@@ -80,7 +87,7 @@ namespace gfx
 		ThrowIfFailed(result->GetResult(&blob), "Failed to get shader 6.x IDxcBlob*!");
 
 		SAFE_DELETE(result);
-		SAFE_DELETE(textBlob);
+		SAFE_DELETE(sourceBlob);
 
 		return blob;
 	}
@@ -89,6 +96,7 @@ namespace gfx
 	{
 		SAFE_RELEASE(m_IncludeHandler);
 		SAFE_RELEASE(m_Library);
+		SAFE_RELEASE(m_DxcUtils);
 		SAFE_RELEASE(m_Compiler);
 	}
 }
