@@ -2,6 +2,7 @@
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <d3dx12.h>
+#include <d3d12sdklayers.h>
 #include <D3D12MA/D3D12MemAlloc.h>
 #include <wrl/client.h>
 #include <cstdint>
@@ -26,8 +27,30 @@ namespace D3D
 	/// <summary> GPU Virtual Memory usage. </summary>
 	/// <returns> Current VRAM usage in MegaBytes. </returns>
 	uint32_t QueryAdapterMemory();
-	/// Release all Device related ComPtrs
+
+	/// <summary>
+	/// Make allocation from <c>D3D12MA::Allocator</c>.
+	/// </summary>
+	/// <param name="ppResource"> Target Resource. </param>
+	/// <param name="pAllocation"> Target Allocation. </param>
+	/// <param name="AllocationFlags"> D3D12MA Flags. </param>
+	/// <param name="HeapDesc"> Heap Desc. </param>
+	/// <param name="HeapType"> Desired Heap type. Defaults to <c>D3D12_HEAP_TYPE_UPLOAD</c>. </param>
+	/// <param name="HeapFlags"> Defaults to <c>D3D12_HEAP_FLAG_NONE</c>. </param>
+	void HeapAllocation(ID3D12Resource** ppResource, D3D12MA::Allocation** ppAllocation, const CD3DX12_RESOURCE_DESC& HeapDesc, 
+		D3D12MA::ALLOCATION_FLAGS AllocationFlags = D3D12MA::ALLOCATION_FLAGS::ALLOCATION_FLAG_STRATEGY_MIN_MEMORY, 
+		D3D12_HEAP_TYPE HeapType = D3D12_HEAP_TYPE_UPLOAD, 
+		D3D12_HEAP_FLAGS HeapFlags = D3D12_HEAP_FLAG_NONE);
+
+	/// <summary> 
+	/// Release all Device related ComPtrs.<br/>
+	/// Should return Refcount: 1 for ID3D12Device.<br/>
+	/// Otherwise some resources haven't been released, or were released incorrectly.
+	/// </summary>
 	void ReleaseDevice();
+
+	// TODO:
+	// Add GPU feature checking and asserting.
 
 	extern ComPtr<IDXGIFactory7> g_Factory;
 	extern ComPtr<IDXGIAdapter3> g_Adapter;

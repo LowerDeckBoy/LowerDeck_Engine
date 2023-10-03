@@ -16,7 +16,7 @@ namespace D3D
 	ComPtr<IDXGIDebug1>			g_DXGIDebug	 { nullptr };
 #endif 
 
-	D3D_FEATURE_LEVEL g_FeatureLevel = D3D_FEATURE_LEVEL_12_0;
+	D3D_FEATURE_LEVEL g_FeatureLevel = D3D_FEATURE_LEVEL_12_2;
 
 	bool InitializeDevice()
 	{
@@ -95,6 +95,27 @@ namespace D3D
 		g_Adapter.Get()->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &memoryInfo);
 
 		return static_cast<uint32_t>(memoryInfo.CurrentUsage / 1024 / 1024);
+	}
+
+	void HeapAllocation(ID3D12Resource** ppResource, 
+		D3D12MA::Allocation** ppAllocation, 
+		const CD3DX12_RESOURCE_DESC& HeapDesc, 
+		D3D12MA::ALLOCATION_FLAGS AllocationFlags,
+		D3D12_HEAP_TYPE HeapType,
+		D3D12_HEAP_FLAGS HeapFlags)
+	{
+		D3D12MA::ALLOCATION_DESC allocDesc{};
+		allocDesc.HeapType = HeapType;
+		allocDesc.Flags = AllocationFlags;
+		allocDesc.ExtraHeapFlags = HeapFlags;
+
+		D3D12_RESOURCE_STATES state{ D3D12_RESOURCE_STATE_GENERIC_READ };
+
+		if (HeapType == D3D12_HEAP_TYPE_DEFAULT)
+			state = D3D12_RESOURCE_STATE_COPY_DEST;
+
+		ThrowIfFailed(D3D::g_Allocator->CreateResource(&allocDesc, &HeapDesc, state, nullptr, ppAllocation, IID_PPV_ARGS(ppResource)));
+
 	}
 
 	void ReleaseDevice()

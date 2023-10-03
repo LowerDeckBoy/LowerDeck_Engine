@@ -5,20 +5,26 @@
 
 namespace D3D
 {
-	D3D12GraphicsPipelineState::D3D12GraphicsPipelineState(std::shared_ptr<gfx::ShaderManager> pShaderManager)
+	void D3D12PipelineState::Release()
+	{
+		SAFE_RELEASE(m_PipelineState);
+	}
+
+
+	D3D12GraphicsPipelineStateBuilder::D3D12GraphicsPipelineStateBuilder(std::shared_ptr<gfx::ShaderManager> pShaderManager)
 		: m_ShaderManager(pShaderManager)
 	{
 	}
 
-	D3D12GraphicsPipelineState::~D3D12GraphicsPipelineState()
+	D3D12GraphicsPipelineStateBuilder::~D3D12GraphicsPipelineStateBuilder()
 	{
 		Release();
 	}
 
-	void D3D12GraphicsPipelineState::Create(ID3D12PipelineState** ppPipelineState, ID3D12RootSignature* pRootSignature, LPCWSTR DebugName)
+	void D3D12GraphicsPipelineStateBuilder::Create(D3D12PipelineState& PSO, ID3D12RootSignature* pRootSignature, LPCWSTR DebugName)
 	{
-		if ((*(ppPipelineState)))
-			(*(ppPipelineState)) = nullptr;
+		if (PSO.Get())
+			PSO.Get()->Release();
 
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc{};
 		desc.pRootSignature = pRootSignature;
@@ -67,60 +73,52 @@ namespace D3D
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
 		else 
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		ThrowIfFailed(D3D::g_Device.Get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(PSO.GetAddressOf())), "Failed to create PipelineState!");
 
-		ThrowIfFailed(D3D::g_Device.Get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(ppPipelineState)), "Failed to create PipelineState!");
-
+		PSO.Usage = PipelineType::eGraphics;
 		if (DebugName)
-			(*ppPipelineState)->SetName(DebugName);
+			PSO.Get()->SetName(DebugName);
 	}
 
-	void D3D12GraphicsPipelineState::SetRanges(const std::span<CD3DX12_DESCRIPTOR_RANGE1>& Ranges)
+	void D3D12GraphicsPipelineStateBuilder::SetRenderTargetFormats(const std::span<DXGI_FORMAT>& Formats)
 	{
-		m_Ranges.clear();
-		m_Ranges.shrink_to_fit();
-		m_Ranges.insert(m_Ranges.begin(), Ranges.begin(), Ranges.end());
+		m_RenderTargetFormats.clear();
+		m_RenderTargetFormats.insert(m_RenderTargetFormats.begin(), Formats.begin(), Formats.end());
 	}
 
-	void D3D12GraphicsPipelineState::SetParameters(const std::span<CD3DX12_ROOT_PARAMETER1>& Parameters)
-	{
-		m_Parameters.clear();
-		m_Parameters.shrink_to_fit();
-		m_Parameters.insert(m_Parameters.begin(), Parameters.begin(), Parameters.end());
-	}
-
-	void D3D12GraphicsPipelineState::SetInputLayout(const std::span<D3D12_INPUT_ELEMENT_DESC>& InputLayout)
+	void D3D12GraphicsPipelineStateBuilder::SetInputLayout(const std::span<D3D12_INPUT_ELEMENT_DESC>& InputLayout)
 	{
 		m_InputLayout.clear();
 		m_InputLayout.shrink_to_fit();
 		m_InputLayout.insert(m_InputLayout.begin(), InputLayout.begin(), InputLayout.end());
 	}
 
-	void D3D12GraphicsPipelineState::SetVertexShader(const std::string_view& Filepath)
+	void D3D12GraphicsPipelineStateBuilder::SetVertexShader(const std::string_view& Filepath, LPCWSTR EntryPoint)
 	{
-		m_VertexShader = m_ShaderManager->CreateDXIL(Filepath, ShaderType::eVertex);
+		m_VertexShader = m_ShaderManager->CompileDXIL(Filepath, ShaderType::eVertex, EntryPoint);
 	}
 
-	void D3D12GraphicsPipelineState::SetPixelShader(const std::string_view& Filepath)
+	void D3D12GraphicsPipelineStateBuilder::SetPixelShader(const std::string_view& Filepath, LPCWSTR EntryPoint)
 	{
-		m_PixelShader = m_ShaderManager->CreateDXIL(Filepath, ShaderType::ePixel);
+		m_PixelShader = m_ShaderManager->CompileDXIL(Filepath, ShaderType::ePixel, EntryPoint);
 	}
 
-	void D3D12GraphicsPipelineState::SetGeometryShader(const std::string_view& Filepath)
+	void D3D12GraphicsPipelineStateBuilder::SetGeometryShader(const std::string_view& Filepath, LPCWSTR EntryPoint)
 	{
-		m_GeometryShader = m_ShaderManager->CreateDXIL(Filepath, ShaderType::eGeometry);
+		m_GeometryShader = m_ShaderManager->CompileDXIL(Filepath, ShaderType::eGeometry, EntryPoint);
 	}
 
-	void D3D12GraphicsPipelineState::SetHullShader(const std::string_view& Filepath)
+	void D3D12GraphicsPipelineStateBuilder::SetHullShader(const std::string_view& Filepath, LPCWSTR EntryPoint)
 	{
-		m_HullShader = m_ShaderManager->CreateDXIL(Filepath, ShaderType::eHull);
+		m_HullShader = m_ShaderManager->CompileDXIL(Filepath, ShaderType::eHull, EntryPoint);
 	}
 
-	void D3D12GraphicsPipelineState::SetDomainShader(const std::string_view& Filepath)
+	void D3D12GraphicsPipelineStateBuilder::SetDomainShader(const std::string_view& Filepath, LPCWSTR EntryPoint)
 	{
-		m_DomainShader = m_ShaderManager->CreateDXIL(Filepath, ShaderType::eDomain);
+		m_DomainShader = m_ShaderManager->CompileDXIL(Filepath, ShaderType::eDomain, EntryPoint);
 	}
 
-	void D3D12GraphicsPipelineState::Reset()
+	void D3D12GraphicsPipelineStateBuilder::Reset()
 	{
 		m_Ranges.clear();
 		m_Parameters.clear();
@@ -135,7 +133,7 @@ namespace D3D
 		m_DepthDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	}
 
-	void D3D12GraphicsPipelineState::Release()
+	void D3D12GraphicsPipelineStateBuilder::Release()
 	{
 		Reset();
 

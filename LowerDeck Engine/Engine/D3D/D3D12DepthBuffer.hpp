@@ -18,17 +18,27 @@ namespace D3D
 		/// <summary> Initializes underlaying resource. </summary>
 		/// <param name="Viewport"> Needed to determine DepthStencil dimensions. </param>
 		/// <param name="Format"> Default. </param>
-		D3D12DepthBuffer(D3D12DescriptorHeap* pDepthHeap, D3D12Viewport Viewport, DXGI_FORMAT Format = DXGI_FORMAT_D32_FLOAT, bool bSRV = false);
+		D3D12DepthBuffer(D3D12DescriptorHeap* pDepthHeap, D3D12Viewport* pViewport, DXGI_FORMAT Format = DXGI_FORMAT_D32_FLOAT, bool bSRV = false);
 		/// <summary>
 		/// Calls <c>Release()</c> if haven't been called manually. 
 		/// </summary>
 		~D3D12DepthBuffer();
 
 		/// <summary>
-		/// 
+		/// Initialize.
 		/// </summary>
 		/// <param name="Viewport"> Needed to determine DepthStencil dimensions. </param>
-		void Create(D3D12DescriptorHeap* pDepthHeap, D3D12Viewport Viewport, bool bSRV = false);
+		void Create(D3D12DescriptorHeap* pDepthHeap, D3D12Viewport* pViewport, bool bSRV = false);
+
+		/// <summary>
+		/// Calls ClearDepthStencilView for underlaying resource.
+		/// </summary>
+		void Clear();
+
+		/// <summary>
+		/// As it says.
+		/// </summary>
+		void OnResize(D3D12DescriptorHeap* pDepthHeap, D3D12Viewport* pViewport, bool bSRV = false);
 
 		/// <summary> Getter for DSV Descriptor. </summary>
 		/// <returns></returns>

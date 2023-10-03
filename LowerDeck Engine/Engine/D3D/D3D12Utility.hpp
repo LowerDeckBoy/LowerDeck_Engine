@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdint>
 #include <wrl/client.h>
+#include <D3D12MA/D3D12MemAlloc.h>
 
 enum class ShaderType : uint8_t;
 
@@ -36,6 +37,22 @@ namespace D3D
 	public:
 
 		/// <summary>
+		/// Heap Desc in <b>Upload</b> state for D3D12MA usage.
+		/// </summary>
+		/// <param name="bComitted"> Indicates whether to set <c>ALLOCATION_FLAG_COMMITTED</c>. </param>
+		/// <returns></returns>
+		static D3D12MA::ALLOCATION_DESC UploadHeap(bool bComitted = false);
+
+		/// <summary>
+		/// D3D12_HEAP_TYPE_DEFAULT
+		/// </summary>
+		inline static const CD3DX12_HEAP_PROPERTIES HeapDefault{ CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT) };
+		/// <summary>
+		/// D3D12_HEAP_TYPE_UPLOAD
+		/// </summary>
+		inline static const CD3DX12_HEAP_PROPERTIES HeapUpload{ CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD) };
+
+		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="ShaderRegister"></param>
@@ -50,33 +67,20 @@ namespace D3D
 		// ============================================= INPUT LAYOUTS =============================================
 		/// <summary> 3D Model layout. </summary>
 		/// <returns>
-		/// Array of:
-		/// XMFLOAT3 Position, 
-		/// XMFLOAT2 TexCoord, 
-		/// XMFLOAT3 Normal,
-		/// XMFLOAT3 Tangent, 
-		/// XMFLOAT3 Bitangent
+		/// Array of: XMFLOAT3 Position, XMFLOAT2 TexCoord, XMFLOAT3 Normal,XMFLOAT3 Tangent, XMFLOAT3 Bitangent
 		/// </returns>
 		static std::array<D3D12_INPUT_ELEMENT_DESC, 5> GetModelInputLayout();
 
 		/// <summary>
 		/// Plain skybox and Image Based Lighting usage.
 		/// </summary>
-		/// <returns>
-		/// Array of:
-		/// XMFLOAT3 Position,
-		/// XMFLOAT3 TexCoord
-		/// </returns>
+		/// <returns> Array of: XMFLOAT3 Position, XMFLOAT3 TexCoord </returns>
 		static std::array<D3D12_INPUT_ELEMENT_DESC, 2> GetSkyInputLayout();
 
 		/// <summary>
 		/// Used for deferred rendering screen output (aka screen quad).
 		/// </summary>
-		/// <returns>
-		/// Array of:
-		/// XMFLOAT3 Position,
-		/// XMFLOAT2 TexCoord
-		///</returns>
+		/// <returns> Array of: XMFLOAT3 Position, XMFLOAT2 TexCoord </returns>
 		static std::array<D3D12_INPUT_ELEMENT_DESC, 2> GetScreenOutputInputLayout();
 
 	};
@@ -88,7 +92,7 @@ namespace gfx
 	/// <summary>
 	/// Converts ShaderType enum value to LPCWSTR for shader creation usage.
 	/// </summary>
-	/// <param name="TypeOf"></param>
+	/// <param name="TypeOf"> Enum type. </param>
 	/// <returns></returns>
-	LPCWSTR ShaderTypeToName(ShaderType TypeOf);
+	LPCWSTR ShaderTypeToTarget(ShaderType TypeOf);
 }

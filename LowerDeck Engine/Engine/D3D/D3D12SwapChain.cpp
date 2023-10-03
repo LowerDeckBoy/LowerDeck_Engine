@@ -26,7 +26,7 @@ namespace D3D
 
 	bool InitializeSwapChain(D3D12Viewport Viewport)
 	{
-		g_RenderTargetHeap = std::make_unique<D3D12DescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, FRAME_COUNT, L"Render Target Descriptor Heap");
+		g_RenderTargetHeap = std::make_unique<D3D12DescriptorHeap>(HeapUsage::eRTV, FRAME_COUNT, L"Render Target Descriptor Heap");
 
 		CreateFence();
 		CreateSwapChain(Viewport);

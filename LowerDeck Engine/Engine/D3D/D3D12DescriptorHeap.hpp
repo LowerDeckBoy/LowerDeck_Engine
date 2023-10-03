@@ -7,6 +7,13 @@ class D3D12Descriptor;
 
 namespace D3D
 {
+	enum class HeapUsage : uint8_t
+	{
+		eSRV_CBV_UAV = 0x00,
+		eRTV,
+		eDSV
+	};
+
 	/// <summary>
 	/// Unfinished solution
 	/// </summary>
@@ -14,7 +21,7 @@ namespace D3D
 	{
 	public:
 		D3D12DescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC& Desc, const LPCWSTR& DebugName = L"");
-		D3D12DescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE Type, uint32_t MaxCount, const LPCWSTR& DebugName = L"");
+		D3D12DescriptorHeap(HeapUsage Usage, uint32_t MaxCount, const LPCWSTR& DebugName = L"");
 		D3D12DescriptorHeap(const D3D12DescriptorHeap&) = delete;
 		D3D12DescriptorHeap(const D3D12DescriptorHeap&&) = delete;
 		D3D12DescriptorHeap operator=(const D3D12DescriptorHeap&) = delete;
@@ -54,10 +61,14 @@ namespace D3D
 	private:
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_Heap;
 		D3D12_DESCRIPTOR_HEAP_TYPE m_Type{ D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV };
-		uint32_t m_DescriptorSize{ sizeof(m_Type) };
+		uint32_t m_DescriptorSize{ 32 };
 		uint32_t m_MaxDescriptors{ 0 };
 		uint32_t m_Allocated{ 0 };
 
+		/// <summary>
+		/// Can allocate only when count of currently allocated descriptors is less then max available.
+		/// </summary>
+		/// <returns> <b>True</b> is allocation is possible. </returns>
 		inline bool CanAllocate() const { return (m_Allocated < m_MaxDescriptors); }
 	};
 }

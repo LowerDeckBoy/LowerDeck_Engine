@@ -1,5 +1,8 @@
 #include "D3D12Command.hpp"
 #include "D3D12Device.hpp"
+#include "D3D12Types.hpp"
+#include "D3D12RootSignature.hpp"
+#include "D3D12GraphicsPipelineState.hpp"
 #include "../Utility/Utility.hpp"
 
 namespace D3D
@@ -11,7 +14,7 @@ namespace D3D
 
     std::array<ComPtr<ID3D12CommandAllocator>, FRAME_COUNT> g_CommandAllocators;
 
-    bool InitializeCommands()
+    void InitializeCommands()
     {
         // Create ID3D12CommandAllocator for each frame
         for (uint32_t i = 0; i < FRAME_COUNT; i++)
@@ -43,7 +46,6 @@ namespace D3D
         ThrowIfFailed(g_Device.Get()->CreateCommandQueue(&desc, IID_PPV_ARGS(g_CommandComputeQueue.ReleaseAndGetAddressOf())), "Failed to create Command Compute Queue!");
         g_CommandComputeQueue.Get()->SetName(L"Compute Command Queue");
 
-        return true;
     }
 
     void ExecuteCommandLists(bool bResetAllocator)
@@ -61,6 +63,25 @@ namespace D3D
     {
         ThrowIfFailed(GetCommandAllocator()->Reset(), "Failed to Reset Command Allocator!");
         ThrowIfFailed(g_CommandList.Get()->Reset(GetCommandAllocator(), nullptr), "Failed to Reset Command List!");
+    }
+
+    void SetRootSignature(D3D12RootSignature& RootSignature, PipelineType Usage)
+    {
+        if (Usage == PipelineType::eGraphics)
+            g_CommandList.Get()->SetGraphicsRootSignature(RootSignature.Get());
+        else
+            g_CommandList.Get()->SetComputeRootSignature(RootSignature.Get());
+    }
+
+    void SetPSO(D3D12PipelineState& PSO)
+    {
+        g_CommandList.Get()->SetPipelineState(PSO.Get());
+    }
+
+    void TransitResource(ID3D12Resource* pResource, D3D12_RESOURCE_STATES Before, D3D12_RESOURCE_STATES After)
+    {
+        const auto barrier{ CD3DX12_RESOURCE_BARRIER::Transition(pResource, Before, After) };
+        g_CommandList.Get()->ResourceBarrier(1, &barrier);
     }
 
     void ReleaseCommands()

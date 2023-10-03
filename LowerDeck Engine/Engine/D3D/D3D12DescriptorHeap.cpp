@@ -20,15 +20,32 @@ namespace D3D
 		m_MaxDescriptors = Desc.NumDescriptors;
 	}
 
-	D3D12DescriptorHeap::D3D12DescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE Type, uint32_t MaxCount, const LPCWSTR& DebugName)
+	D3D12DescriptorHeap::D3D12DescriptorHeap(HeapUsage Usage, uint32_t MaxCount, const LPCWSTR& DebugName)
 	{
 		D3D12_DESCRIPTOR_HEAP_DESC desc{};
 		desc.NumDescriptors = MaxCount;
-		desc.Type = Type;
-		if (Type & D3D12_DESCRIPTOR_HEAP_TYPE_RTV || Type & D3D12_DESCRIPTOR_HEAP_TYPE_DSV)
-			desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-		else
-			desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+
+		switch (Usage)
+		{
+		case HeapUsage::eSRV_CBV_UAV:
+		{
+			desc.Type	= D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+			desc.Flags	= D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+			break;
+		}
+		case HeapUsage::eRTV:
+		{
+			desc.Type	= D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+			desc.Flags	= D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+			break;
+		}
+		case HeapUsage::eDSV:
+		{
+			desc.Type	= D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+			desc.Flags	= D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+			break;
+		}
+		}
 
 		ThrowIfFailed(g_Device.Get()->CreateDescriptorHeap(
 			&desc, IID_PPV_ARGS(m_Heap.ReleaseAndGetAddressOf())),
@@ -37,7 +54,7 @@ namespace D3D
 			m_Heap.Get()->SetName(DebugName);
 
 		m_Type = desc.Type;
-		m_DescriptorSize = g_Device.Get()->GetDescriptorHandleIncrementSize(Type);
+		m_DescriptorSize = g_Device.Get()->GetDescriptorHandleIncrementSize(desc.Type);
 		m_MaxDescriptors = desc.NumDescriptors;
 	}
 
@@ -73,7 +90,8 @@ namespace D3D
 	void D3D12DescriptorHeap::Override(D3D12Descriptor& TargetDescriptor)
 	{
 		TargetDescriptor.SetCPU(GetCPUptr(TargetDescriptor.Index));
-		TargetDescriptor.SetGPU(GetGPUptr(TargetDescriptor.Index));
+		if (m_Type != D3D12_DESCRIPTOR_HEAP_TYPE_DSV && m_Type != D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
+			TargetDescriptor.SetGPU(GetGPUptr(TargetDescriptor.Index));
 	}
 
 	void D3D12DescriptorHeap::Release()

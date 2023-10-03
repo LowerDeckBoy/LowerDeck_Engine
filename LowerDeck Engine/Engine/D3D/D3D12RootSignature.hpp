@@ -7,7 +7,7 @@
 namespace D3D
 {
 	/// <summary>
-	/// 
+	/// Wrapper for Graphics Root Signatures.
 	/// </summary>
 	class D3D12RootSignature
 	{
@@ -22,7 +22,7 @@ namespace D3D
 		/// <param name="DebugName"> Optional. </param>
 		D3D12RootSignature(const std::span<CD3DX12_ROOT_PARAMETER1>& Parameters, const std::span<D3D12_STATIC_SAMPLER_DESC>& Samplers, const D3D12_ROOT_SIGNATURE_FLAGS& RootFlags, LPCWSTR DebugName = L"");
 		/// <summary>
-		/// Calls Release() if it haven't been called manually.
+		/// Calls <c>Release()</c> if it haven't been called manually.
 		/// </summary>
 		~D3D12RootSignature();
 

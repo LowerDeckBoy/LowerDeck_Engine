@@ -5,7 +5,18 @@ uint32_t FRAME_INDEX{ 0 };
 
 namespace D3D
 {
+	D3D12MA::ALLOCATION_DESC Utility::UploadHeap(bool bComitted)
+	{
+		D3D12MA::ALLOCATION_DESC desc{};
+		desc.HeapType = D3D12_HEAP_TYPE_UPLOAD;
+		desc.Flags = D3D12MA::ALLOCATION_FLAGS::ALLOCATION_FLAG_STRATEGY_MIN_MEMORY | D3D12MA::ALLOCATION_FLAGS::ALLOCATION_FLAG_STRATEGY_BEST_FIT;
+		desc.ExtraHeapFlags = D3D12_HEAP_FLAG_NONE;
 
+		if (bComitted)
+			desc.Flags |= D3D12MA::ALLOCATION_FLAGS::ALLOCATION_FLAG_COMMITTED;
+
+		return desc;
+	}
 	D3D12_STATIC_SAMPLER_DESC Utility::CreateStaticSampler(uint32_t ShaderRegister, uint32_t RegisterSpace, D3D12_FILTER Filter, D3D12_TEXTURE_ADDRESS_MODE AddressMode, D3D12_COMPARISON_FUNC ComparsionFunc, D3D12_SHADER_VISIBILITY Visibility)
 	{
 		D3D12_STATIC_SAMPLER_DESC desc{};
@@ -55,25 +66,29 @@ namespace D3D
 
 namespace gfx
 {
-	LPCWSTR ShaderTypeToName(ShaderType TypeOf)
+	LPCWSTR ShaderTypeToTarget(ShaderType TypeOf)
 	{
 		switch (TypeOf)
 		{
 		case ShaderType::eVertex:
-			return L"vs_6_0";
+			return L"vs_6_6";
 		case ShaderType::ePixel:
-			return L"ps_6_0";
+			return L"ps_6_6";
 		case ShaderType::eCompute:
-			return L"cs_6_0";
+			return L"cs_6_6";
 		case ShaderType::eLibrary:
 		case ShaderType::eRayTracing:
-			return L"lib_6_3";
+			return L"lib_6_6";
+		case ShaderType::eMesh:
+			return L"ms_6_6";
+		case ShaderType::eAmplification:
+			return L"as_6_6";
 		case ShaderType::eGeometry:
-			return L"gs_6_0";
+			return L"gs_6_6";
 		case ShaderType::eHull:
-			return L"hs_6_0";
+			return L"hs_6_6";
 		case ShaderType::eDomain:
-			return L"ds_6_0";
+			return L"ds_6_6";
 		}
 
 		throw std::exception("Invalid shader type!");
