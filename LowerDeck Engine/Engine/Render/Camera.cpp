@@ -1,6 +1,7 @@
 #include "Camera.hpp"
 #include <imgui/imgui.h>
 
+
 void Camera::Initialize(float AspectRatio)
 {
 	// Defaulting positions on startup
@@ -34,7 +35,6 @@ void Camera::Update()
 	right = XMVector3TransformCoord(XMLoadFloat3(&m_DefaultRight), rotation);
 	up = XMVector3TransformCoord(XMLoadFloat3(&m_Up), rotation);
 
-
 	position += (MoveForwardBack * forward);
 	position += (MoveRightLeft * right);
 	position += (MoveUpDown * up);
@@ -59,8 +59,13 @@ void Camera::Update()
 
 void Camera::SetPosition(const std::array<float, 3> NewPosition) noexcept
 {
-	//m_Position = XMFLOAT3(NewPosition.at(0), NewPosition.at(1), NewPosition.at(2));
-	m_Position = { NewPosition.at(0), NewPosition.at(1), NewPosition.at(2) };
+	m_Position = XMFLOAT3(NewPosition.at(0), NewPosition.at(1), NewPosition.at(2));
+}
+
+inline void Camera::ResetFieldOfView() noexcept
+{
+	m_FieldOfView = 45.0f;
+	XMStoreFloat4x4(&m_Projection, XMMatrixPerspectiveFovLH(XMConvertToRadians(m_FieldOfView), m_AspectRatio, m_zNear, m_zFar));
 }
 
 void Camera::ResetCamera() noexcept
@@ -68,8 +73,7 @@ void Camera::ResetCamera() noexcept
 	ResetPitch();
 	ResetYaw();
 	ResetFieldOfView();
-
-	// Reset Position
+	ResetPosition();
 }
 
 void Camera::DrawGUI()
@@ -81,12 +85,11 @@ void Camera::DrawGUI()
 	}
 
 	ImGui::SliderFloat("Speed", &CameraSpeed, 1.0f, 500.0f, "%.2f");
-	//if (ImGui::SliderFloat("FoV", &m_FieldOfView, 1.0f, 160.0f, "%.2f"))
-	//	m_Projection = XMMatrixPerspectiveFovLH(XMConvertToRadians(m_FieldOfView), m_AspectRatio, m_zNear, m_zFar);
+	if (ImGui::SliderFloat("FoV", &m_FieldOfView, 1.0f, 160.0f, "%.2f"))
+		XMStoreFloat4x4(&m_Projection, XMMatrixPerspectiveFovLH(XMConvertToRadians(m_FieldOfView), m_AspectRatio, m_zNear, m_zFar));
 
 	if (ImGui::Button("Reset"))
 	{
-		ResetFieldOfView();
 		ResetCamera();
 		Update();
 	}
@@ -95,5 +98,5 @@ void Camera::DrawGUI()
 void Camera::OnAspectRatioChange(float NewAspectRatio) noexcept
 {
 	m_AspectRatio = NewAspectRatio;
-	XMStoreFloat4x4(&m_Projection, XMMatrixPerspectiveFovLH(XMConvertToRadians(m_FieldOfView), m_AspectRatio, m_zNear, m_zFar));
+	XMStoreFloat4x4(&m_Projection, XMMatrixPerspectiveFovLH(XMConvertToRadians(m_FieldOfView), NewAspectRatio, m_zNear, m_zFar));
 }

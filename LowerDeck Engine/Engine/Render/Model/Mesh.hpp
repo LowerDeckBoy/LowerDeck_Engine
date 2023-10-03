@@ -1,35 +1,18 @@
 #pragma once
-//#include "../../Graphics/Texture.hpp"
+#include "../../Graphics/Texture.hpp"
 #include "../../Graphics/Buffer/Vertex.hpp"
 #include <DirectXMath.h>
-using namespace DirectX;
 
 namespace model 
 {
 	struct Material
 	{
-		XMFLOAT4 BaseColorFactor{ XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) };
-		XMFLOAT4 EmissiveFactor	{ XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) };
+		DirectX::XMFLOAT4 BaseColorFactor{ DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) };
+		DirectX::XMFLOAT4 EmissiveFactor { DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) };
 
 		float MetallicFactor	{ 1.0f };
 		float RoughnessFactor	{ 1.0f };
 		float AlphaCutoff		{ 0.5f };
-		alignas(4) bool bDoubleSided{ false };
-
-		//Texture* BaseColorTexture			{ nullptr };
-		//Texture* NormalTexture				{ nullptr };
-		//Texture* MetallicRoughnessTexture	{ nullptr };
-		//Texture* EmissiveTexture			{ nullptr };
-	};
-
-	struct MaterialData
-	{
-		XMFLOAT4 BaseColorFactor{ XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) };
-		XMFLOAT4 EmissiveFactor { XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) };
-
-		float MetallicFactor { 1.0f };
-		float RoughnessFactor{ 1.0f };
-		float AlphaCutoff	 { 0.5f };
 		alignas(4) bool bDoubleSided{ false };
 
 		int32_t BaseColorIndex			{ -1 };
@@ -38,6 +21,7 @@ namespace model
 		int32_t EmissiveIndex			{ -1 };
 	};
 
+	// Redundant
 	// Meant for pushing constants
 	// -1 equals lack of index
 	struct MaterialIndices
@@ -51,7 +35,7 @@ namespace model
 	struct Mesh
 	{
 		std::string Name;
-		XMMATRIX Matrix{ XMMatrixIdentity() };
+		DirectX::XMMATRIX Matrix{ DirectX::XMMatrixIdentity() };
 
 		uint32_t FirstIndexLocation{ 0 };
 		uint32_t BaseVertexLocation{ 0 };
@@ -60,7 +44,6 @@ namespace model
 		uint32_t VertexCount{ 0 };
 		uint32_t StartVertexLocation{ 0 };
 		bool bHasIndices{ false };
-
 	};
 
 	struct Node
@@ -69,9 +52,9 @@ namespace model
 		std::vector<Node*> Children;
 		std::string Name;
 
-		XMMATRIX Matrix{ XMMatrixIdentity() };
-		XMFLOAT3 Translation{ XMFLOAT3(0.0f, 0.0f, 0.0f) };
-		XMFLOAT4 Rotation{ XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
-		XMFLOAT3 Scale{ XMFLOAT3(1.0f, 1.0f, 1.0f) };
+		DirectX::XMMATRIX Matrix{ DirectX::XMMatrixIdentity() };
+		DirectX::XMFLOAT3 Translation{ DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f) };
+		DirectX::XMFLOAT4 Rotation{ DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
+		DirectX::XMFLOAT3 Scale{ DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f) };
 	};
 }

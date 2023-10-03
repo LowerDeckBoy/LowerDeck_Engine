@@ -29,10 +29,9 @@ namespace gfx
 			{
 				m_Data.at(i) = pData;
 				// D3D12MA::ALLOCATION_FLAGS::ALLOCATION_FLAG_COMMITTED | 
-				const auto flags = D3D12MA::ALLOCATION_FLAGS::ALLOCATION_FLAG_STRATEGY_MIN_MEMORY;
+				const auto flags = D3D12MA::ALLOCATION_FLAGS::ALLOCATION_FLAG_COMMITTED | D3D12MA::ALLOCATION_FLAGS::ALLOCATION_FLAG_STRATEGY_MIN_MEMORY;
 				D3D12MA::Allocation* allocation{ nullptr };
 				D3D::HeapAllocation(&m_Buffers.at(i), &allocation, bufferDesc, flags, D3D12_HEAP_TYPE_UPLOAD);
-
 				//auto heap{ D3D::Utility::UploadHeap(false) };
 				//ThrowIfFailed(D3D::g_Allocator->CreateResource(&heap, &bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, &allocation, IID_PPV_ARGS(m_Buffers.at(i).ReleaseAndGetAddressOf())));
 
@@ -55,6 +54,8 @@ namespace gfx
 			*m_Data.at(FRAME_INDEX) = Updated;
 			std::memcpy(pDataBegin.at(FRAME_INDEX), &Updated, sizeof(T));
 		}
+
+		ID3D12Resource* GetBuffer() { return m_Buffers.at(FRAME_INDEX).Get(); }
 
 		void Release()
 		{

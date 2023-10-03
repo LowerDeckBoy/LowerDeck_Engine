@@ -5,6 +5,8 @@
 #include <memory>
 #include <array>
 
+using namespace DirectX;
+
 class DeviceContext;
 class Camera;
 
@@ -28,12 +30,12 @@ protected:
 	// Constant Buffers
 	std::unique_ptr<gfx::ConstantBuffer<gfx::cbPerObject>> m_cbPerObject;
 	gfx::cbPerObject m_cbPerObjectData{};
+	//std::unique_ptr<gfx::ConstantBuffer<gfx::cbMaterialIndices>> m_cbMaterial;
+	//gfx::cbMaterial m_cbMaterialData{};
 	//std::unique_ptr<ConstantBuffer<cbPerObject>> m_cbPerObject;
 	//std::unique_ptr<ConstantBuffer<cbCamera>> m_cbCamera;
 	//cbCamera m_cbCameraData{};
 	// Data for light shading
-	//std::unique_ptr<ConstantBuffer<cbMaterial>> m_cbMaterial;
-	//cbMaterial m_cbMaterialData{};
 
 	// Transforms
 	void UpdateWorld() noexcept;

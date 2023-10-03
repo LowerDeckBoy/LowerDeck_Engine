@@ -33,12 +33,11 @@ public:
 	/// <summary>
 	/// Temporal.
 	/// </summary>
-	void PassGBuffer(Camera* pCamera, std::vector<std::unique_ptr<Model>>& Models);
+	void PassGBuffer(Camera* pCamera, const std::vector<std::unique_ptr<Model>>& Models);
 
 	void DrawGBuffers();
 
 	std::array<ComPtr<ID3D12Resource>, RenderTargetsCount> m_RenderTargets;
-	//std::array<D3D::D3D12Descriptor, RenderTargetsCount> m_RenderDescs;
 	std::array<CD3DX12_CPU_DESCRIPTOR_HANDLE, RenderTargetsCount> m_RenderDescs;
 	std::array<D3D::D3D12Descriptor, RenderTargetsCount> m_ShaderDescs;
 
@@ -72,7 +71,7 @@ private:
 	D3D::D3D12DepthBuffer* m_SceneDepth;
 
 	/// <summary>
-	/// 
+	/// Used for creating deferred-based RTV descriptors.
 	/// </summary>
 	std::unique_ptr<D3D::D3D12DescriptorHeap> m_DeferredHeap;
 
@@ -82,6 +81,9 @@ private:
 	D3D::D3D12RootSignature m_OutputRootSignature;
 	D3D::D3D12PipelineState m_OutputPSO;
 
+	/// <summary>
+	/// 
+	/// </summary>
 	std::array<DXGI_FORMAT, RenderTargetsCount> m_RenderTargetFormats{
 		DXGI_FORMAT_R8G8B8A8_UNORM,			// Depth
 		DXGI_FORMAT_R8G8B8A8_UNORM,			// Base Color

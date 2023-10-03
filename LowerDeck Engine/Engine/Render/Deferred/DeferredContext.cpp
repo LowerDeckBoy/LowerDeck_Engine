@@ -55,7 +55,7 @@ void DeferredContext::Release()
 		SAFE_RELEASE(target);
 }
 
-void DeferredContext::PassGBuffer(Camera* pCamera, std::vector<std::unique_ptr<Model>>& Models)
+void DeferredContext::PassGBuffer(Camera* pCamera, const std::vector<std::unique_ptr<Model>>& Models)
 {
 	// Render Targets to Render State
 	// Clear Targets
@@ -97,14 +97,14 @@ void DeferredContext::DrawGBuffers()
 	auto viewportSize{ ImGui::GetContentRegionAvail() };
 	//viewportSize = ImVec2{ viewportSize.x /(float)RenderTargetsCount, viewportSize.y / (float)RenderTargetsCount };
 	//viewportSize.y /= (float)RenderTargetsCount;
+	//static int32_t selected{ 0 };
+	//ImGui::Combo("Current GBuffer", &selected, m_)
 
 	ImGui::Image(reinterpret_cast<ImTextureID>(depth), viewportSize);
 	ImGui::Image(reinterpret_cast<ImTextureID>(baseColor), viewportSize);
 	ImGui::Image(reinterpret_cast<ImTextureID>(normal), viewportSize);
 	ImGui::Image(reinterpret_cast<ImTextureID>(metalRoughness), viewportSize);
 	ImGui::Image(reinterpret_cast<ImTextureID>(worldPosition), viewportSize);
-	//ImGui::SameLine();
-	//if (m_DeviceCtx->GetDepthDescriptor().bIsValid())
 
 	//ImGui::End();
 }
@@ -176,15 +176,19 @@ void DeferredContext::CreateRootSignatures()
 {
 	// GBuffer
 	{
-		D3D12_ROOT_SIGNATURE_FLAGS rootFlags{ D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT };
+		D3D12_ROOT_SIGNATURE_FLAGS rootFlags{ D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |						D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED | 
+					D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED };
 		//
-		std::vector<CD3DX12_DESCRIPTOR_RANGE1> ranges;
+		std::vector<CD3DX12_DESCRIPTOR_RANGE1> ranges(2);
+		//ranges.at(0) = CD3DX12_DESCRIPTOR_RANGE1(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1024, 2, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE, OFFSET)
 
-		std::vector<CD3DX12_ROOT_PARAMETER1> parameters(2);
+		std::vector<CD3DX12_ROOT_PARAMETER1> parameters(3);
 		// Per Object Matrices
 		parameters.at(0).InitAsConstantBufferView(0, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_VERTEX);
 		// Camera Buffer
 		parameters.at(1).InitAsConstantBufferView(1, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_ALL);
+		// Material indices
+		parameters.at(2).InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
 
 		std::vector<D3D12_STATIC_SAMPLER_DESC> samplers(1);
 		samplers.at(0) = D3D::Utility::CreateStaticSampler(0, 0, D3D12_FILTER_ANISOTROPIC, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_COMPARISON_FUNC_LESS_EQUAL);

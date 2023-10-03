@@ -53,6 +53,11 @@ namespace gfx
 				D3D::TransitResource(m_Buffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_INDEX_BUFFER);
 				break;
 			}
+			case BufferType::eStructured:
+			{
+				D3D::TransitResource(m_Buffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+				break;
+			}
 			default: 
 			{
 				uploadHeapAllocation->Release();

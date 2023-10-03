@@ -87,6 +87,9 @@ namespace gfx
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_UploadBuffer;
 		D3D12MA::Allocation* m_Allocation{ nullptr };
 
+		/// <summary>
+		/// Mainly for SRV use for StructureBuffer type.
+		/// </summary>
 		D3D::D3D12Descriptor m_Descriptor;
 
 		BufferData m_BufferData{};

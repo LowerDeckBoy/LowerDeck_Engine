@@ -5,9 +5,27 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/GltfMaterial.h>
+#include "../../Utility/Utility.hpp"
+
 
 Importer::Importer(std::string_view Filepath)
 {
+	m_ModelPath = Filepath;
+}
+
+Importer::~Importer()
+{
+	for (auto& texture : m_Textures)
+		delete texture;
+
+	m_Textures.clear();
+
+	for (auto& mesh : m_Meshes)
+		delete mesh;
+
+	for (auto& material : m_Materials)
+		delete material;
+
 }
 
 bool Importer::Import(std::string_view Filepath)
@@ -18,25 +36,25 @@ bool Importer::Import(std::string_view Filepath)
 		aiProcess_ConvertToLeftHanded |
 		aiProcess_JoinIdenticalVertices |
 		aiProcess_PreTransformVertices |
-		aiProcess_ValidateDataStructure
+		aiProcess_ValidateDataStructure |
+		aiProcess_CalcTangentSpace
 	};
 	importer.SetExtraVerbose(true);
 	const aiScene* scene{ importer.ReadFile(Filepath.data(), loadFlags) };
 	
 	if (!scene || !scene->mRootNode || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
 	{
+		utility::ErrorMessage(importer.GetErrorString());
 		throw std::runtime_error(importer.GetErrorString());
 	}
 
-	m_ModelPath = Filepath;
-
 	ProcessNode(scene, scene->mRootNode, nullptr, XMMatrixIdentity());
 	
-	//if (scene->HasMaterials())
-	//	m_Materials.reserve(scene->mNumMaterials);
-	//
-	//if (scene->HasTextures())
-	//	m_Textures.reserve(scene->mNumTextures);
+	if (scene->HasMaterials())
+		m_Materials.reserve(scene->mNumMaterials);
+	
+	if (scene->HasTextures())
+		m_Textures.reserve(scene->mNumTextures);
 	
 	// TODO:
 	if (scene->HasAnimations())
@@ -80,9 +98,9 @@ void Importer::ProcessNode(const aiScene* pScene, const aiNode* pNode, model::No
 		}
 		else
 		{
-			aiVector3D translation;
-			aiQuaternion rotation;
-			aiVector3D scale;
+			aiVector3D		translation;
+			aiQuaternion	rotation;
+			aiVector3D		scale;
 
 			pNode->mTransformation.Decompose(scale, rotation, translation);
 			newNode->Translation = XMFLOAT3(translation.x, translation.y, translation.z);
@@ -92,7 +110,6 @@ void Importer::ProcessNode(const aiScene* pScene, const aiNode* pNode, model::No
 		};
 	transform();
 	
-
 	XMMATRIX local{ XMMatrixScalingFromVector(XMLoadFloat3(&newNode->Scale)) * XMMatrixRotationQuaternion(XMLoadFloat4(&newNode->Rotation)) * XMMatrixTranslationFromVector(XMLoadFloat3(&newNode->Translation))  };
 	XMMATRIX next{ local * ParentMatrix };
 
@@ -105,11 +122,14 @@ void Importer::ProcessNode(const aiScene* pScene, const aiNode* pNode, model::No
 	if (pNode->mMeshes)
 	{
 		for (uint32_t i = 0; i < pNode->mNumMeshes; i++)
-			m_Meshes.emplace_back(ProcessMesh(pScene, pScene->mMeshes[pNode->mMeshes[i]], next));
+		{
+			m_Meshes.emplace_back(ProcessMesh(pScene->mMeshes[pNode->mMeshes[i]], next));
+			ProcessMaterials(pScene, pScene->mMeshes[pNode->mMeshes[i]]);
+		}
 	}
 }
 
-model::Mesh* Importer::ProcessMesh(const aiScene* pScene, const aiMesh* pMesh, XMMATRIX Matrix)
+model::Mesh* Importer::ProcessMesh(const aiMesh* pMesh, XMMATRIX Matrix)
 {
 	std::vector<XMFLOAT3> positions;
 	std::vector<XMFLOAT2> uvs;
@@ -178,14 +198,12 @@ model::Mesh* Importer::ProcessMesh(const aiScene* pScene, const aiMesh* pMesh, X
 
 	newMesh->IndexCount = static_cast<uint32_t>(indexCount);
 
-	//ProcessMaterials(pScene, pMesh);
-
 	return newMesh;
 }
-/*
+
 void Importer::ProcessMaterials(const aiScene* pScene, const aiMesh* pMesh)
 {
-	model::MaterialData* newMaterial{ new model::MaterialData() };
+	model::Material* newMaterial{ new model::Material() };
 
 	if (pMesh->mMaterialIndex < 0)
 	{
@@ -201,17 +219,15 @@ void Importer::ProcessMaterials(const aiScene* pScene, const aiMesh* pMesh)
 			aiString materialPath;
 			if (material->GetTexture(aiTextureType_DIFFUSE, i, &materialPath) == aiReturn_SUCCESS)
 			{
-				auto texPath{ files::glTF::GetTexturePath(m_ModelPath.data(), std::string(materialPath.C_Str())) };
-				Texture* BaseColorTexture = new Texture(m_Device, texPath);
-				m_Textures.push_back(BaseColorTexture);
-				newMaterial->BaseColorIndex = BaseColorTexture->m_Descriptor.Index;
+				auto texPath{ utility::glTF::GetTexturePath(m_ModelPath.data(), std::string(materialPath.C_Str())) };
+				Texture* baseColorTexture = new Texture(texPath);
+				m_Textures.emplace_back(baseColorTexture);
+				newMaterial->BaseColorIndex = baseColorTexture->SRV().Index;
 
 				aiColor4D colorFactor{};
 				aiGetMaterialColor(material, AI_MATKEY_BASE_COLOR, &colorFactor);
 				newMaterial->BaseColorFactor = XMFLOAT4(colorFactor.r, colorFactor.g, colorFactor.b, colorFactor.a);
 			}
-			else
-				Logger::Log("Failed to get Diffuse texture!");
 		}
 	}
 	
@@ -220,13 +236,11 @@ void Importer::ProcessMaterials(const aiScene* pScene, const aiMesh* pMesh)
 		aiString materialPath;
 		if (material->GetTexture(aiTextureType_NORMALS, i, &materialPath) == aiReturn_SUCCESS)
 		{
-			auto texPath{ files::glTF::GetTexturePath(m_ModelPath.data(), std::string(materialPath.C_Str())) };
-			Texture* NormalTexture = new Texture(m_Device, texPath);
-			m_Textures.push_back(NormalTexture);
-			newMaterial->NormalIndex = NormalTexture->m_Descriptor.Index;
-		}
-		else
-			Logger::Log("Failed to get Normal texture!", LogType::eError);
+			auto texPath{ utility::glTF::GetTexturePath(m_ModelPath.data(), std::string(materialPath.C_Str())) };
+			Texture* NormalTexture = new Texture(texPath);
+			m_Textures.emplace_back(NormalTexture);
+			newMaterial->NormalIndex = NormalTexture->SRV().Index;
+		}	
 	}
 
 	for (uint32_t i = 0; i < material->GetTextureCount(aiTextureType_METALNESS); ++i)
@@ -234,16 +248,14 @@ void Importer::ProcessMaterials(const aiScene* pScene, const aiMesh* pMesh)
 		aiString materialPath{};
 		if (material->GetTexture(aiTextureType_METALNESS, i, &materialPath) == aiReturn_SUCCESS)
 		{
-			auto texPath{ files::glTF::GetTexturePath(m_ModelPath.data(), std::string(materialPath.C_Str())) };
-			Texture* MetallicRoughnessTexture = new Texture(m_Device, texPath);
-			m_Textures.push_back(MetallicRoughnessTexture);
-			newMaterial->MetallicRoughnessIndex = MetallicRoughnessTexture->m_Descriptor.Index;
+			auto texPath{ utility::glTF::GetTexturePath(m_ModelPath.data(), std::string(materialPath.C_Str())) };
+			Texture* metallicRoughnessTexture = new Texture(texPath);
+			m_Textures.emplace_back(metallicRoughnessTexture);
+			newMaterial->MetallicRoughnessIndex = metallicRoughnessTexture->SRV().Index;
 
 			aiGetMaterialFloat(material, AI_MATKEY_METALLIC_FACTOR, &newMaterial->MetallicFactor);
 			aiGetMaterialFloat(material, AI_MATKEY_ROUGHNESS_FACTOR, &newMaterial->RoughnessFactor);
 		}
-		else
-			Logger::Log("Failed to get MetalRoughness texture!", LogType::eError);
 	}
 
 	for (uint32_t i = 0; i < material->GetTextureCount(aiTextureType_EMISSIVE); ++i)
@@ -251,26 +263,24 @@ void Importer::ProcessMaterials(const aiScene* pScene, const aiMesh* pMesh)
 		aiString materialPath{};
 		if (material->GetTexture(aiTextureType_EMISSIVE, i, &materialPath) == aiReturn_SUCCESS)
 		{
-			auto texPath{ files::glTF::GetTexturePath(m_ModelPath.data(), std::string(materialPath.C_Str())) };
-			Texture* EmissiveTexture = new Texture(m_Device, texPath);
-			m_Textures.push_back(EmissiveTexture);
-			newMaterial->EmissiveIndex = EmissiveTexture->m_Descriptor.Index;
+			auto texPath{ utility::glTF::GetTexturePath(m_ModelPath.data(), std::string(materialPath.C_Str())) };
+			Texture* emissiveTexture = new Texture(texPath);
+			m_Textures.emplace_back(emissiveTexture);
+			newMaterial->EmissiveIndex = emissiveTexture->SRV().Index;
 
 			aiColor4D colorFactor{};
 			aiGetMaterialColor(material, AI_MATKEY_COLOR_EMISSIVE, &colorFactor);
 			newMaterial->EmissiveFactor = XMFLOAT4(colorFactor.r, colorFactor.g, colorFactor.b, colorFactor.a);
 		}
-		else
-			Logger::Log("Failed to get Emissive texture!", LogType::eError);
 	}
-
+	
 	aiGetMaterialFloat(material, AI_MATKEY_GLTF_ALPHACUTOFF, &newMaterial->AlphaCutoff);
 
 	m_Materials.emplace_back(newMaterial);
 }
-*/
 
-void Importer::ProcessAnimations(const aiScene* pScene)
+
+void Importer::ProcessAnimations(const aiScene*)
 {
 	// TODO: ...
 }

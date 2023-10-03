@@ -32,12 +32,12 @@ namespace gfx
 
 		if (error != nullptr)
 		{
-			utility::Print(static_cast<char*>(error->GetBufferPointer()));
+			debug::Print(static_cast<char*>(error->GetBufferPointer()));
 		}
 
 		if (FAILED(hResult) || Blob == nullptr)
 		{
-			utility::Print("Failed to compile shader!\n");
+			debug::Print("Failed to compile shader!\n");
 			throw std::exception();
 		}
 
