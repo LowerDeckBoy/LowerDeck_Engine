@@ -7,14 +7,14 @@ namespace D3D
 	std::unique_ptr<D3D12DescriptorHeap> D3D12Context::m_MainHeap = nullptr;
 	std::unique_ptr<D3D12DescriptorHeap> D3D12Context::m_DepthHeap = nullptr;
 
-	D3D12Context::SupportedFeatures D3D12Context::FeatureSet = {};
+	D3D12Context::FeatureSupport D3D12Context::FeatureSet = {};
 
 	D3D12Context::~D3D12Context()
 	{
 		ReleaseD3D();
 	}
 
-	bool D3D12Context::InitializeD3D()
+	void D3D12Context::InitializeD3D()
 	{
 		if (IsInitialized())
 		{
@@ -33,28 +33,6 @@ namespace D3D
 		CheckFeatures();
 
 		bInitialized = true;
-		return true;
-	}
-
-	bool D3D12Context::InitializeD3D(uint32_t Width, uint32_t Height)
-	{
-		if (IsInitialized())
-		{
-			// warning log
-			//return false;
-		}
-
-		m_Viewport = new D3D12Viewport();
-		m_Viewport->Set(Width, Height);
-
-		D3D::InitializeDevice();
-		D3D::InitializeCommands();
-		D3D::InitializeSwapChain(*m_Viewport);
-
-		InitializeHeaps();
-
-		bInitialized = true;
-		return true;
 	}
 
 	void D3D12Context::InitializeHeaps()
@@ -178,23 +156,23 @@ namespace D3D
 			{
 #if defined(NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB)
 				shaderModel.HighestShaderModel = D3D_SHADER_MODEL_6_6;
-				utility::Print("HLSL Shader Model 6.6 is supported.\n");
+				debug::Print("HLSL Shader Model 6.6 is supported.\n");
 				FeatureSet.ShaderModel = D3D_SHADER_MODEL_6_6;
 #elif defined(NTDDI_WIN10_19H1) && (NTDDI_VERSION >= NTDDI_WIN10_19H1)
 				FeatureSet.ShaderModel = D3D_SHADER_MODEL_6_5;
-				utility::Print("Highest HLSL Shader: Model 6.5.\n");
+				debug::Print("Highest HLSL Shader: Model 6.5.\n");
 #elif defined(NTDDI_WIN10_RS5) && (NTDDI_VERSION >= NTDDI_WIN10_RS5)
 				FeatureSet.ShaderModel = D3D_SHADER_MODEL_6_4;
-				utility::Print("Highest HLSL Shader Model: 6.4.\n");
+				debug::Print("Highest HLSL Shader Model: 6.4.\n");
 #elif defined(NTDDI_WIN10_RS4) && (NTDDI_VERSION >= NTDDI_WIN10_RS4)
 				FeatureSet.ShaderModel = D3D_SHADER_MODEL_6_2;
-				utility::Print("Highest HLSL Shader: Model 6.2.\n");
+				debug::Print("Highest HLSL Shader: Model 6.2.\n");
 #elif defined(NTDDI_WIN10_RS3) && (NTDDI_VERSION >= NTDDI_WIN10_RS3)
 				FeatureSet.ShaderModel = D3D_SHADER_MODEL_6_1;
-				utility::Print("Highest HLSL Shader: Model 6.1.\n");
+				debug::Print("Highest HLSL Shader: Model 6.1.\n");
 #else
 				FeatureSet.ShaderModel = D3D_SHADER_MODEL_6_0;
-				utility::Print("Highest HLSL Shader: Model 6.0.\n");
+				debug::Print("Highest HLSL Shader: Model 6.0.\n");
 #endif
 			}
 			};
@@ -210,13 +188,13 @@ namespace D3D
 			{
 			case D3D12_RESOURCE_HEAP_TIER_2:
 			{
-				utility::Print("D3D12 Resource Heap Tier 2 is supported.\n");
+				debug::Print("D3D12 Resource Heap Tier 2 is supported.\n");
 				FeatureSet.HeapTier = D3D12_RESOURCE_HEAP_TIER_2;
 				break;
 			}
 			case D3D12_RESOURCE_HEAP_TIER_1:
 			{
-				utility::Print("D3D12 Resource Heap Tier 1 is supported.\n");
+				debug::Print("D3D12 Resource Heap Tier 1 is supported.\n");
 				FeatureSet.HeapTier = D3D12_RESOURCE_HEAP_TIER_1;
 				break;
 			}
@@ -229,19 +207,19 @@ namespace D3D
 			{
 			case D3D12_RESOURCE_BINDING_TIER_3:
 			{
-				utility::Print("D3D12 Resource Binding Tier 3 is supported.\n");
+				debug::Print("D3D12 Resource Binding Tier 3 is supported.\n");
 				FeatureSet.BindingTier = D3D12_RESOURCE_BINDING_TIER_3;
 				break;
 			}
 			case D3D12_RESOURCE_BINDING_TIER_2:
 			{
-				utility::Print("D3D12 Resource Binding Tier 2 is supported.\n");
+				debug::Print("D3D12 Resource Binding Tier 2 is supported.\n");
 				FeatureSet.BindingTier = D3D12_RESOURCE_BINDING_TIER_2;
 				break;
 			}
 			case D3D12_RESOURCE_BINDING_TIER_1:
 			{
-				utility::Print("D3D12 Resource Binding Tier 1 is supported.\n");
+				debug::Print("D3D12 Resource Binding Tier 1 is supported.\n");
 				FeatureSet.BindingTier = D3D12_RESOURCE_BINDING_TIER_1;
 				break;
 			}
@@ -254,31 +232,31 @@ namespace D3D
 			{
 			case D3D12_TILED_RESOURCES_TIER_4:
 			{
-				utility::Print("D3D12 Tiled Resource Tier 4 is supported.\n");
+				debug::Print("D3D12 Tiled Resource Tier 4 is supported.\n");
 				FeatureSet.TiledResourcesTier = D3D12_TILED_RESOURCES_TIER_4;
 				break;
 			}
 			case D3D12_TILED_RESOURCES_TIER_3:
 			{
-				utility::Print("D3D12 Tiled Resource Tier 3 is supported.\n");
+				debug::Print("D3D12 Tiled Resource Tier 3 is supported.\n");
 				FeatureSet.TiledResourcesTier = D3D12_TILED_RESOURCES_TIER_3;
 				break;
 			}
 			case D3D12_TILED_RESOURCES_TIER_2:
 			{
-				utility::Print("D3D12 Tiled Resource Tier 2 is supported.\n");
+				debug::Print("D3D12 Tiled Resource Tier 2 is supported.\n");
 				FeatureSet.TiledResourcesTier = D3D12_TILED_RESOURCES_TIER_2;
 				break;
 			}
 			case D3D12_TILED_RESOURCES_TIER_1:
 			{
-				utility::Print("D3D12 Tiled Resource Tier 1 is supported.\n");
+				debug::Print("D3D12 Tiled Resource Tier 1 is supported.\n");
 				FeatureSet.TiledResourcesTier = D3D12_TILED_RESOURCES_TIER_1;
 				break;
 			}
 			default:
 			{
-				utility::Print("D3D12 Tiled Resource is NOT supported.\n");
+				debug::Print("D3D12 Tiled Resource is NOT supported.\n");
 				FeatureSet.TiledResourcesTier = D3D12_TILED_RESOURCES_TIER_NOT_SUPPORTED;
 				break;
 			}
@@ -292,48 +270,49 @@ namespace D3D
 		{
 			if (dataArchitecture.TileBasedRenderer == TRUE)
 			{ 
-				utility::Print("D3D12 Tile Based Renderer available.\n");
+				debug::Print("D3D12 Tile Based Renderer available.\n");
 				FeatureSet.bTileBasedRenderer = TRUE;
 			}
 			else
 			{
-				utility::Print("D3D12 Tile Based Renderer NOT available.\n");
+				debug::Print("D3D12 Tile Based Renderer NOT available.\n");
 				FeatureSet.bTileBasedRenderer = FALSE;
 			}
 
 			if (dataArchitecture.UMA == TRUE)
 			{
-				utility::Print("D3D12 UMA available.\n");
+				debug::Print("D3D12 UMA available.\n");
 				FeatureSet.bUMA = TRUE;
 			}
 			else
 			{
-				utility::Print("D3D12 UMA NOT available.\n");
+				debug::Print("D3D12 UMA NOT available.\n");
 				FeatureSet.bUMA = FALSE;
 			}
 		}
 
 		D3D12_FEATURE_DATA_D3D12_OPTIONS5 featuresSupport5{};
 		ThrowIfFailed(g_Device.Get()->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &featuresSupport5, sizeof(featuresSupport5)), "Failed to enumerate D3D12_FEATURE_DATA_D3D12_OPTIONS5!\n");
+
 		// RenderPasses
 		{
 			switch (featuresSupport5.RenderPassesTier)
 			{
 			case D3D12_RENDER_PASS_TIER_2:
 			{
-				utility::Print("D3D12 Render Pass Tier 2 is supported.\n");
+				debug::Print("D3D12 Render Pass Tier 2 is supported.\n");
 				FeatureSet.RenderPassTier = D3D12_RENDER_PASS_TIER_2;
 				break;
 			}
 			case D3D12_RENDER_PASS_TIER_1:
 			{
-				utility::Print("D3D12 Render Pass Tier 1 is supported.\n");
+				debug::Print("D3D12 Render Pass Tier 1 is supported.\n");
 				FeatureSet.RenderPassTier = D3D12_RENDER_PASS_TIER_1;
 				break;
 			}
 			case D3D12_RENDER_PASS_TIER_0:
 			{
-				utility::Print("D3D12 Render Pass is NOT supported.\n");
+				debug::Print("D3D12 Render Pass is NOT supported.\n");
 				FeatureSet.RenderPassTier = D3D12_RENDER_PASS_TIER_0;
 				break;
 			}
@@ -342,22 +321,18 @@ namespace D3D
 
 		D3D12_FEATURE_DATA_D3D12_OPTIONS7 featuresSupport7{};
 		ThrowIfFailed(g_Device.Get()->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS7, &featuresSupport7, sizeof(featuresSupport7)));
+
 		// Mesh shaders
 		{
-			switch (featuresSupport7.MeshShaderTier)
+			if (featuresSupport7.MeshShaderTier == D3D12_MESH_SHADER_TIER_1)
 			{
-			case D3D12_MESH_SHADER_TIER_1:
-			{
-				utility::Print("D3D12 Mesh Shader Tier 1 is supported.\n");
+				debug::Print("D3D12 Mesh Shader Tier 1 is supported.\n");
 				FeatureSet.MeshShaderTier = D3D12_MESH_SHADER_TIER_1;
-				break;
 			}
-			default:
+			else
 			{
-				utility::Print("D3D12 Mesh Shader is NOT supported.\n");
+				debug::Print("D3D12 Mesh Shader is NOT supported.\n");
 				FeatureSet.MeshShaderTier = D3D12_MESH_SHADER_TIER_NOT_SUPPORTED;
-				break;
-			}
 			}
 		}
 

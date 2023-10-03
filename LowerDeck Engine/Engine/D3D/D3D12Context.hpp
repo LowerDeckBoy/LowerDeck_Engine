@@ -22,9 +22,19 @@ namespace D3D
 		D3D12Context operator=(const D3D12Context&) = delete;
 		~D3D12Context();
 
-		bool InitializeD3D();
-		bool InitializeD3D(uint32_t Width, uint32_t Height);
+		/// <summary>
+		/// Initialize D3D12 related context:<br/>
+		/// - Device,<br/>
+		/// - Command lists and allocators,<br/>
+		/// - SwapChain,<br/>
+		/// - Descriptor Heaps,<br/>
+		/// - Check GPU features
+		/// </summary>
+		void InitializeD3D();
 
+		/// <summary>
+		/// Main shader resource and scene depth heap.
+		/// </summary>
 		void InitializeHeaps();
 
 		/// <summary>
@@ -58,21 +68,15 @@ namespace D3D
 		/// <returns> <b>True</b> if was already initialized. </returns>
 		bool IsInitialized();
 
-		/// <summary>
-		/// 
-		/// </summary>
+		/// <summary> </summary>
 		/// <returns> Pointer to SRV/CBV/UAV Descriptor Heap. </returns>
 		[[nodiscard]] inline static D3D12DescriptorHeap* GetMainHeap() { return m_MainHeap.get(); }
 
-		/// <summary>
-		/// 
-		/// </summary>
+		/// <summary> </summary>
 		/// <returns> Pointer to general use DSV Descriptor Heap. </returns>
 		[[nodiscard]] inline static D3D12DescriptorHeap* GetDepthHeap() { return m_DepthHeap.get(); }
 
-		/// <summary>
-		/// 
-		/// </summary>
+		/// <summary> </summary>
 		/// <returns> Pointer to Scene Viewport. </returns>
 		D3D12Viewport* GetSceneViewport() const { return m_Viewport; }
 
@@ -110,50 +114,21 @@ namespace D3D
 		static std::unique_ptr<D3D12DescriptorHeap> m_DepthHeap;
 
 		/// <summary>
-		/// Supported and desired Device features
+		/// Indicates if listed features are supported or are not.
 		/// </summary>
-		struct SupportedFeatures
+		struct FeatureSupport
 		{
-			/// <summary>
-			/// Highest supported shader model.<br/>
-			/// Desired level: 6.6.
-			/// </summary>
-			D3D_SHADER_MODEL ShaderModel;
-			/// <summary>
-			/// 
-			/// </summary>
-			D3D12_MESH_SHADER_TIER MeshShaderTier;
-			/// <summary>
-			/// 
-			/// </summary>
-			D3D12_RESOURCE_HEAP_TIER HeapTier;
-			/// <summary>
-			/// 
-			/// </summary>
+			D3D_SHADER_MODEL			ShaderModel;
+			D3D12_MESH_SHADER_TIER		MeshShaderTier;
+			D3D12_RESOURCE_HEAP_TIER	HeapTier;
 			D3D12_RESOURCE_BINDING_TIER BindingTier;
-			/// <summary>
-			/// 
-			/// </summary>
-			D3D12_TILED_RESOURCES_TIER TiledResourcesTier;
-			/// <summary>
-			/// 
-			/// </summary>
-			D3D12_RENDER_PASS_TIER RenderPassTier;
-			/// <summary>
-			/// 
-			/// </summary>
-			BOOL bTileBasedRenderer;
-			/// <summary>
-			/// 
-			/// </summary>
-			BOOL bUMA;
-
-			DXGI_FORMAT DisplayFormat;
+			D3D12_TILED_RESOURCES_TIER	TiledResourcesTier;
+			D3D12_RENDER_PASS_TIER		RenderPassTier;
+			BOOL						bTileBasedRenderer;
+			BOOL						bUMA;
 		};
 		
-		static SupportedFeatures FeatureSet;
+		static FeatureSupport FeatureSet;
 
 	};
 }
-
-
