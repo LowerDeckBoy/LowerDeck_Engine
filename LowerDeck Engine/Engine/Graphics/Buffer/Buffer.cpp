@@ -38,4 +38,14 @@ namespace gfx
 		View.SizeInBytes	= static_cast<uint32_t>(Buffer::GetData().Size);
 		Count				= Buffer::GetData().ElementsCount;
 	}
+
+	StructureBuffer::StructureBuffer(BufferData Data, bool bSRV)
+	{
+		Create(Data, bSRV);
+	}
+
+	void StructureBuffer::Create(BufferData Data, bool bSRV)
+	{
+		Buffer::Create(Data, BufferType::eStructured, bSRV);
+	}
 }

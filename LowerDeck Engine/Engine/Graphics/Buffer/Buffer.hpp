@@ -87,4 +87,18 @@ namespace gfx
 		void SetView();
 	};
 
+	/// <summary>
+	/// Buffer that is meant to be accessed (read-only) by shader.
+	/// </summary>
+	class StructureBuffer : public Buffer
+	{
+	public:
+		StructureBuffer() = default;
+		StructureBuffer(BufferData Data, bool bSRV = true);
+
+		void Create(BufferData Data, bool bSRV = true);
+
+		D3D::D3D12Descriptor GetDescriptor() { return m_Descriptor; }
+	};
+
 }
