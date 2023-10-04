@@ -73,40 +73,11 @@ void DeferredContext::PassGBuffer(Camera* pCamera, const std::vector<std::unique
 	D3D::g_CommandList.Get()->OMSetRenderTargets(RenderTargetsCount, m_RenderDescs.data(), false, &depthHandle);
 
 	for (const auto& model : Models)
-	{
 		model->Draw(pCamera);
-	}
-
 
 	// Render Targets to Generic Read
 	for (auto& renderTarget : m_RenderTargets)
 		D3D::TransitResource(renderTarget.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ);
-}
-
-void DeferredContext::DrawGBuffers()
-{
-	//ImGui::Begin("Render Targets");
-
-	const auto& depth{ m_ShaderDescs.at(0).GetGPU().ptr };
-	const auto& baseColor{ m_ShaderDescs.at(1).GetGPU().ptr };
-	const auto& normal{ m_ShaderDescs.at(2).GetGPU().ptr };
-	const auto& metalRoughness{ m_ShaderDescs.at(3).GetGPU().ptr };
-	const auto& worldPosition{ m_ShaderDescs.at(4).GetGPU().ptr };
-
-	//const auto viewportSize{ ImGui::GetContentRegionAvail() };
-	auto viewportSize{ ImGui::GetContentRegionAvail() };
-	//viewportSize = ImVec2{ viewportSize.x /(float)RenderTargetsCount, viewportSize.y / (float)RenderTargetsCount };
-	//viewportSize.y /= (float)RenderTargetsCount;
-	//static int32_t selected{ 0 };
-	//ImGui::Combo("Current GBuffer", &selected, m_)
-
-	ImGui::Image(reinterpret_cast<ImTextureID>(depth), viewportSize);
-	ImGui::Image(reinterpret_cast<ImTextureID>(baseColor), viewportSize);
-	ImGui::Image(reinterpret_cast<ImTextureID>(normal), viewportSize);
-	ImGui::Image(reinterpret_cast<ImTextureID>(metalRoughness), viewportSize);
-	ImGui::Image(reinterpret_cast<ImTextureID>(worldPosition), viewportSize);
-
-	//ImGui::End();
 }
 
 void DeferredContext::CreateRenderTargets()
@@ -187,8 +158,13 @@ void DeferredContext::CreateRootSignatures()
 		parameters.at(0).InitAsConstantBufferView(0, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_VERTEX);
 		// Camera Buffer
 		parameters.at(1).InitAsConstantBufferView(1, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_ALL);
-		// Material indices
-		parameters.at(2).InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
+		// Material indices + material data
+		parameters.at(2).InitAsConstants(20, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
+		//parameters.at(2).InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
+		// Material data
+		//parameters.at(3).InitAsConstants(16, 3, 0, D3D12_SHADER_VISIBILITY_ALL);
+
+
 
 		std::vector<D3D12_STATIC_SAMPLER_DESC> samplers(1);
 		samplers.at(0) = D3D::Utility::CreateStaticSampler(0, 0, D3D12_FILTER_ANISOTROPIC, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_COMPARISON_FUNC_LESS_EQUAL);

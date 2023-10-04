@@ -35,8 +35,6 @@ public:
 	/// </summary>
 	void PassGBuffer(Camera* pCamera, const std::vector<std::unique_ptr<Model>>& Models);
 
-	void DrawGBuffers();
-
 	std::array<ComPtr<ID3D12Resource>, RenderTargetsCount> m_RenderTargets;
 	std::array<CD3DX12_CPU_DESCRIPTOR_HANDLE, RenderTargetsCount> m_RenderDescs;
 	std::array<D3D::D3D12Descriptor, RenderTargetsCount> m_ShaderDescs;
