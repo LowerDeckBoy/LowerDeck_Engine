@@ -48,6 +48,5 @@ void Texture::Create(const std::string_view& Filepath)
 
 void Texture::Release()
 {
-	//SAFE_RELEASE(m_UploadResource);
 	SAFE_RELEASE(m_Resource);
 }

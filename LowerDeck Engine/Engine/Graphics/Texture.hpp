@@ -23,7 +23,6 @@ public:
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> m_Resource;
-	//Microsoft::WRL::ComPtr<ID3D12Resource> m_UploadResource;
 
 	D3D::D3D12Descriptor m_SRV;
 	//D3D::D3D12Descriptor m_UAV;
