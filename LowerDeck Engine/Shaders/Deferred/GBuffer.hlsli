@@ -38,7 +38,24 @@ struct MaterialIndices
 	int EmissiveIndex;
 };
 
-ConstantBuffer<MaterialIndices> Indices : register(b2, space0);
+struct MaterialData
+{
+	float4 BaseColorFactor;
+	float4 EmissiveFactor;
+	
+	float MetallicFactor;
+	float RoughnessFactor;
+	float AlphaCutoff;
+	bool bDoubleSided;
+
+	int BaseColorIndex;
+	int NormalIndex;
+	int MetallicRoughnessIndex;
+	int EmissiveIndex;
+};
+
+//ConstantBuffer<MaterialIndices> Indices : register(b2, space0);
+ConstantBuffer<MaterialData> Material : register(b2, space0);
 //Texture2D<float4> DepthTexture : register(t4, space0);
 
 SamplerState texSampler : register(s0, space0);

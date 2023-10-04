@@ -54,21 +54,30 @@ void Model::Draw(Camera* pCamera)
 		
 		auto currentMaterial{ m_Materials.at(i) };
 
-		//m_cbMaterial->Update({
-		//					pCamera->GetPositionFloat(),
-		//					currentMaterial->BaseColorFactor,
-		//					currentMaterial->EmissiveFactor,
-		//					currentMaterial->MetallicFactor,
-		//					currentMaterial->RoughnessFactor,
-		//					currentMaterial->AlphaCutoff,
-		//					currentMaterial->bDoubleSided);
+		// Texture indices
+		//const model::MaterialIndices indices{	currentMaterial->BaseColorIndex, 
+		//										currentMaterial->NormalIndex, 
+		//										currentMaterial->MetallicRoughnessIndex, 
+		//										currentMaterial->EmissiveIndex };
 
-		//D3D::g_CommandList.Get()->SetGraphicsRootConstantBufferView(2, m_cbMaterial->GetBuffer(frameIndex)->GetGPUVirtualAddress());
-		const model::MaterialIndices indices{	currentMaterial->BaseColorIndex, 
-												currentMaterial->NormalIndex, 
-												currentMaterial->MetallicRoughnessIndex, 
-												currentMaterial->EmissiveIndex };
-		D3D::g_CommandList.Get()->SetGraphicsRoot32BitConstants(2, sizeof(indices) / sizeof(int32_t), &indices, 0);
+		XMFLOAT4 cameraPosition{};
+		XMStoreFloat4(&cameraPosition, pCamera->GetPosition());
+		//cameraPosition,
+		// Material data
+		const model::Material materialData{  currentMaterial->BaseColorFactor,
+											 currentMaterial->EmissiveFactor,
+											 currentMaterial->MetallicFactor,
+											 currentMaterial->RoughnessFactor,
+											 currentMaterial->AlphaCutoff,
+											 currentMaterial->bDoubleSided,
+											 // Indices
+											 currentMaterial->BaseColorIndex,
+											 currentMaterial->NormalIndex,
+											 currentMaterial->MetallicRoughnessIndex,
+											 currentMaterial->EmissiveIndex };
+
+		D3D::g_CommandList.Get()->SetGraphicsRoot32BitConstants(2, sizeof(materialData) / sizeof(int32_t), &materialData, 0);
+		//D3D::g_CommandList.Get()->SetGraphicsRoot32BitConstants(2, sizeof(indices) / sizeof(int32_t), &indices, 0);
 
 		if (m_Meshes.at(i)->bHasIndices)
 		{

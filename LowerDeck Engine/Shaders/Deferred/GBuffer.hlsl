@@ -30,19 +30,23 @@ GBuffer_Output PSmain(DeferredOutput pin)
 {
 	GBuffer_Output output = (GBuffer_Output) 0;
 	
-	if (Indices.BaseColorIndex > -1)
+	if (Material.BaseColorIndex > -1)
 	{
-		Texture2D<float4> baseColor = ResourceDescriptorHeap[Indices.BaseColorIndex];
-		output.Albedo = baseColor.Sample(texSampler, pin.TexCoord);
+		Texture2D<float4> baseColor = ResourceDescriptorHeap[Material.BaseColorIndex];
+		output.Albedo = baseColor.Sample(texSampler, pin.TexCoord) * Material.BaseColorFactor;
+
+		if (output.Albedo.a < Material.AlphaCutoff)
+			clip(output.Albedo.a - Material.AlphaCutoff);
+
 	}
 	else
 	{
 		output.Albedo = float4(0.5f, 0.5f, 0.5f, 1.0f);
 	}
 	
-	if (Indices.NormalIndex > -1)
+	if (Material.NormalIndex > -1)
 	{
-		Texture2D<float4> normalTexture = ResourceDescriptorHeap[Indices.NormalIndex];
+		Texture2D<float4> normalTexture = ResourceDescriptorHeap[Material.NormalIndex];
 		float4 normalMap = normalize(2.0f * normalTexture.Sample(texSampler, pin.TexCoord) - 1.0f);
 		float3 tangent = normalize(pin.Tangent - dot(pin.Tangent, pin.Normal) * pin.Normal);
 		float3 bitangent = cross(pin.Normal, tangent);
@@ -55,28 +59,28 @@ GBuffer_Output PSmain(DeferredOutput pin)
 		output.Normal = float4(pin.Normal, 1.0f);
 	}
 	
-	if (Indices.MetallicRoughnessIndex >= 0)
+	if (Material.MetallicRoughnessIndex >= 0)
 	{
-		Texture2D<float4> metalRoughnessTex = ResourceDescriptorHeap[Indices.MetallicRoughnessIndex];
+		Texture2D<float4> metalRoughnessTex = ResourceDescriptorHeap[Material.MetallicRoughnessIndex];
 		float4 metallic = metalRoughnessTex.Sample(texSampler, pin.TexCoord);
-		//metallic.b *= MetallicFactor;
-		//metallic.g *= RoughnessFactor;
-		output.Metallic = float4(0.0f, metallic.g, metallic.b, 1.0f);
+		metallic.b *= Material.MetallicFactor;
+		metallic.g *= Material.RoughnessFactor;
+		output.Metallic = metallic;
 	}
 	else
 	{
 		output.Metallic = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	}
 	
-	if (Indices.EmissiveIndex >= 0)
+	if (Material.EmissiveIndex >= 0)
 	{
-		Texture2D<float4> emissiveTex = ResourceDescriptorHeap[Indices.EmissiveIndex];
-		output.Albedo += emissiveTex.Sample(texSampler, pin.TexCoord);
+		Texture2D<float4> emissiveTex = ResourceDescriptorHeap[Material.EmissiveIndex];
+		output.Albedo += (emissiveTex.Sample(texSampler, pin.TexCoord) * Material.EmissiveFactor);
 	}
 
 	output.WorldPosition = pin.WorldPosition;
 	
-	float z = pin.Position.z / pin.Position.w;
+	const float z = pin.Position.z / pin.Position.w;
 	output.DepthMap = float4(z, z, z, 1.0f);
 
 	return output;
