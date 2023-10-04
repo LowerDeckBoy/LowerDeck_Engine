@@ -76,6 +76,14 @@ protected:
 
 	void DrawGUI();
 
+	/// <summary>
+	/// Set Render Target to GUI scene viewport output
+	/// </summary>
+	/// <param name="Selected"></param>
+	uint64_t GetViewportRenderTarget(int32_t Selected);
+
+	std::array<const char*, 6> m_OutputRenderTargets{ "Shaded", "Depth", "Base Color", "Normal", "Metal-Roughness", "World Position" };
+
 	uint32_t m_ViewportWidth{ 0 };
 	uint32_t m_ViewportHeight{ 0 };
 
@@ -105,5 +113,7 @@ private:
 
 public:
 	static bool bVsync;
+
+	static int32_t SelectedRenderTarget;
 	
 };

@@ -5,6 +5,7 @@
 #include "../Utility/Utility.hpp"
 
 bool Renderer::bVsync = true;
+int32_t Renderer::SelectedRenderTarget = 0;
 
 Renderer::Renderer(Camera* pCamera)
 {
@@ -33,8 +34,8 @@ void Renderer::Initialize()
 	CreateRootSignatures();
 	CreatePipelines();
 
-	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/DamagedHelmet/DamagedHelmet.gltf", "DamagedHelmet"));
-	m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/SciFiHelmet/SciFiHelmet.gltf", "SciFiHelmet"));
+	m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/DamagedHelmet/DamagedHelmet.gltf", "DamagedHelmet"));
+	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/SciFiHelmet/SciFiHelmet.gltf", "SciFiHelmet"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/sponza/Sponza.gltf", "Sponza"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/cube/Cube.gltf"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/mathilda/scene.gltf"));
@@ -65,25 +66,14 @@ void Renderer::RecordCommandLists()
 	SetRenderTarget();
 	ClearRenderTarget();
 
-	ImGui::Begin("GBuffer", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
-	m_DeferredContext->DrawGBuffers();
-	ImGui::End();
-
-	// TODO:
-	// Add ComboBox for selecting desired image to viewport
-	//ImGui::Combo("Render Target:")
 	// Output viewport window
 	ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
 	auto viewportSize{ ImGui::GetContentRegionAvail() };
 	m_ViewportWidth		= static_cast<uint32_t>(viewportSize.x);
 	m_ViewportHeight	= static_cast<uint32_t>(viewportSize.y);
-	ImGui::Image(reinterpret_cast<ImTextureID>(m_DeferredContext->m_ShaderDescs.at(2).GetGPU().ptr), { viewportSize.x, viewportSize.y });
+	ImGui::Image(reinterpret_cast<ImTextureID>(GetViewportRenderTarget(SelectedRenderTarget)), { viewportSize.x, viewportSize.y });
 	ImGui::End();
 
-	// Debug
-	ImGui::Begin("Viewport dims");
-	ImGui::Text("Viewport size: %.2f x %.2f\nAspect Ratio: %.2f", viewportSize.x, viewportSize.y, (viewportSize.x / viewportSize.y));
-	ImGui::End();
 }
 
 void Renderer::Update()
@@ -181,8 +171,42 @@ void Renderer::ClearRenderTarget()
 
 void Renderer::DrawGUI()
 {
+	ImGui::Begin("Scene properties");
+	ImGui::Checkbox("V-sync", &bVsync);
+	ImGui::NewLine();
+	ImGui::Text("Render Target:");
+	ImGui::ListBox("G-Buffer", &SelectedRenderTarget, m_OutputRenderTargets.data(), static_cast<uint32_t>(m_OutputRenderTargets.size()));
+	ImGui::End();
+
 	for (auto& model : m_Models)
 		model->DrawGUI();
+}
+
+uint64_t Renderer::GetViewportRenderTarget(int32_t Selected)
+{
+	switch (Selected)
+	{
+	case 0:
+	{	
+		// TODO:
+		// return SHADED desc pointer
+		return m_DeferredContext->m_ShaderDescs.at(2).GetGPU().ptr;
+	}
+	case 1:
+		return m_DeferredContext->m_ShaderDescs.at(0).GetGPU().ptr;
+	case 2:
+		return m_DeferredContext->m_ShaderDescs.at(1).GetGPU().ptr;
+	case 3:
+		return m_DeferredContext->m_ShaderDescs.at(2).GetGPU().ptr;
+	case 4:
+		return m_DeferredContext->m_ShaderDescs.at(3).GetGPU().ptr;
+	case 5:
+		return m_DeferredContext->m_ShaderDescs.at(4).GetGPU().ptr;
+	}
+
+	// TODO:
+	// return SHADED desc pointer
+	return m_DeferredContext->m_ShaderDescs.at(0).GetGPU().ptr;
 }
 
 void Renderer::Release()
