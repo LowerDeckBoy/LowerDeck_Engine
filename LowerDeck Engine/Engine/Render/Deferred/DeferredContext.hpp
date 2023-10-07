@@ -6,9 +6,12 @@
 #include "../../D3D/D3D12GraphicsPipelineState.hpp"
 #include "../../D3D/D3D12DepthBuffer.hpp"
 #include "../../Graphics/ShaderManager.hpp"
+#include "../../Graphics/ImageBasedLighting.hpp"
 #include "ScreenOutput.hpp"
 
 class Model;
+//class ImageBasedLighting;
+class PointLights;
 
 // TEMPORAL
 // TODOs:
@@ -35,9 +38,14 @@ public:
 	/// </summary>
 	void PassGBuffer(Camera* pCamera, const std::vector<std::unique_ptr<Model>>& Models);
 
-	std::array<ComPtr<ID3D12Resource>, RenderTargetsCount> m_RenderTargets;
-	std::array<CD3DX12_CPU_DESCRIPTOR_HANDLE, RenderTargetsCount> m_RenderDescs;
-	std::array<D3D::D3D12Descriptor, RenderTargetsCount> m_ShaderDescs;
+	void PassLight(gfx::ConstantBuffer<gfx::cbCameraBuffer>* pCameraBuffer, PointLights* pPointLights, lde::ImageBasedLighting* pImageBasedLighting);
+	void PassLightEnd();
+
+	std::array<ComPtr<ID3D12Resource>, RenderTargetsCount>			m_RenderTargets;
+	std::array<CD3DX12_CPU_DESCRIPTOR_HANDLE, RenderTargetsCount>	m_RenderDescs;
+	std::array<D3D::D3D12Descriptor, RenderTargetsCount>			m_ShaderDescs;
+
+	const D3D::D3D12Descriptor& OutputDescriptor() const { return m_OutputDescriptor; }
 
 private:
 	/// <summary>
@@ -73,11 +81,16 @@ private:
 	/// </summary>
 	std::unique_ptr<D3D::D3D12DescriptorHeap> m_DeferredHeap;
 
+	// GBufferPass
 	D3D::D3D12RootSignature m_GBufferRootSignature;
 	D3D::D3D12PipelineState m_GBufferPSO;
 
+	// LightPass
 	D3D::D3D12RootSignature m_OutputRootSignature;
 	D3D::D3D12PipelineState m_OutputPSO;
+	ComPtr<ID3D12Resource>	m_OutputResource;
+	D3D::D3D12Descriptor	m_OutputDescriptor;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE m_OutputRTVDesc;
 
 	/// <summary>
 	/// 

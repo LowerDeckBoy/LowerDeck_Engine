@@ -6,6 +6,7 @@
 
 bool Renderer::bVsync = true;
 int32_t Renderer::SelectedRenderTarget = 0;
+bool Renderer::bDrawSky = true;
 
 Renderer::Renderer(Camera* pCamera)
 {
@@ -15,7 +16,7 @@ Renderer::Renderer(Camera* pCamera)
 
 Renderer::~Renderer()
 {
-	//Release();
+
 }
 
 void Renderer::Initialize()
@@ -34,14 +35,18 @@ void Renderer::Initialize()
 	CreateRootSignatures();
 	CreatePipelines();
 
+	m_cbCamera = std::make_shared<gfx::ConstantBuffer<gfx::cbCameraBuffer>>(&m_cbCameraData);
+
+	m_PointLights = std::make_unique<PointLights>();
+	m_ImageBasedLighting = std::make_unique<lde::ImageBasedLighting>("Assets/Textures/HDR/newport_loft.hdr");
+
 	m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/DamagedHelmet/DamagedHelmet.gltf", "DamagedHelmet"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/SciFiHelmet/SciFiHelmet.gltf", "SciFiHelmet"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/sponza/Sponza.gltf", "Sponza"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/cube/Cube.gltf"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/mathilda/scene.gltf"));
 
-	D3D::ExecuteCommandLists(false);
-	m_D3DContext->WaitForGPU();
+	D3D::ExecuteCommandLists();
 
 }
 
@@ -59,15 +64,20 @@ void Renderer::RecordCommandLists()
 	//m_DepthStencil->Clear();
 	//for (auto& model : m_Models)
 	//	model->Draw(m_SceneCamera);
-
+	//SetViewport();
 	m_DeferredContext->PassGBuffer(m_SceneCamera, m_Models);
+
+	// NOTE: Bad solution but temporarily gets the job done
+	m_DeferredContext->PassLight(m_cbCamera.get(), m_PointLights.get(), m_ImageBasedLighting.get());
+	DrawSkybox();
+	m_DeferredContext->PassLightEnd();
 
 	SetViewport();
 	SetRenderTarget();
 	ClearRenderTarget();
 
-	// Output viewport window
-	ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
+	// Output viewport window | ImGuiWindowFlags_NoMoveImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize
+	ImGui::Begin("Scene", nullptr);
 	auto viewportSize{ ImGui::GetContentRegionAvail() };
 	m_ViewportWidth		= static_cast<uint32_t>(viewportSize.x);
 	m_ViewportHeight	= static_cast<uint32_t>(viewportSize.y);
@@ -78,7 +88,18 @@ void Renderer::RecordCommandLists()
 
 void Renderer::Update()
 {
+	m_cbCameraData = {
+		m_SceneCamera->GetPositionFloat(),
+		m_SceneCamera->GetViewFloats(),
+		m_SceneCamera->GetProjectionFloats(),
+		XMMatrixInverse(nullptr, m_SceneCamera->GetView()),
+		XMMatrixInverse(nullptr, m_SceneCamera->GetProjection()),
+		m_SceneCamera->GetZNear(),
+		m_SceneCamera->GetZFar()
+	};
+	m_cbCamera->Update(m_cbCameraData);
 
+	m_PointLights->UpdateLights();
 }
 
 void Renderer::Render()
@@ -96,13 +117,24 @@ void Renderer::Render()
 	m_D3DContext->MoveToNextFrame();
 }
 
+void Renderer::DrawSkybox()
+{
+	if (!bDrawSky)
+		return;
+
+	D3D::SetRootSignature(m_SkyboxRS);
+	D3D::SetPSO(m_SkyboxPSO);
+	m_ImageBasedLighting->Draw(m_SceneCamera);
+
+}
+
 void Renderer::OnResize()
 {
 	m_D3DContext->OnResize();
 	m_DepthStencil->OnResize(m_D3DContext->GetDepthHeap(), m_D3DContext->GetSceneViewport());
 	m_DeferredContext->OnResize();
 
-	m_D3DContext->WaitForGPU();
+	D3D::WaitForGPU();
 	m_D3DContext->FlushGPU();
 }
 
@@ -173,10 +205,14 @@ void Renderer::DrawGUI()
 {
 	ImGui::Begin("Scene properties");
 	ImGui::Checkbox("V-sync", &bVsync);
+	ImGui::SameLine();
+	ImGui::Checkbox("Draw Sky", &bDrawSky);
 	ImGui::NewLine();
 	ImGui::Text("Render Target:");
 	ImGui::ListBox("G-Buffer", &SelectedRenderTarget, m_OutputRenderTargets.data(), static_cast<uint32_t>(m_OutputRenderTargets.size()));
 	ImGui::End();
+
+	m_PointLights->DrawGUI();
 
 	for (auto& model : m_Models)
 		model->DrawGUI();
@@ -187,11 +223,7 @@ uint64_t Renderer::GetViewportRenderTarget(int32_t Selected)
 	switch (Selected)
 	{
 	case 0:
-	{	
-		// TODO:
-		// return SHADED desc pointer
-		return m_DeferredContext->m_ShaderDescs.at(2).GetGPU().ptr;
-	}
+		return m_DeferredContext->OutputDescriptor().GetGPU().ptr;
 	case 1:
 		return m_DeferredContext->m_ShaderDescs.at(0).GetGPU().ptr;
 	case 2:
@@ -204,9 +236,7 @@ uint64_t Renderer::GetViewportRenderTarget(int32_t Selected)
 		return m_DeferredContext->m_ShaderDescs.at(4).GetGPU().ptr;
 	}
 
-	// TODO:
-	// return SHADED desc pointer
-	return m_DeferredContext->m_ShaderDescs.at(0).GetGPU().ptr;
+	return m_DeferredContext->OutputDescriptor().GetGPU().ptr;
 }
 
 void Renderer::Release()
@@ -219,6 +249,11 @@ void Renderer::Release()
 		model = nullptr;
 	}
 
+	m_cbCamera.reset();
+	m_ImageBasedLighting.reset();
+	m_SkyboxRS.Release();
+	m_SkyboxPSO.Release();
+
 	m_DefaultRootSignature.Release();
 	m_DefaultPSO.Release();
 
@@ -227,11 +262,10 @@ void Renderer::Release()
 	m_ShaderManager.reset();
 	m_ShaderManager = nullptr;
 
-	m_D3DContext->WaitForGPU();
+	D3D::WaitForGPU();
 	m_D3DContext->FlushGPU();
 
 	m_D3DContext->ReleaseD3D();
-	::CloseHandle(D3D::g_FenceEvent);
 }
 
 void Renderer::SetEditor(std::shared_ptr<Editor> pEditor)
@@ -241,19 +275,32 @@ void Renderer::SetEditor(std::shared_ptr<Editor> pEditor)
 
 void Renderer::CreateRootSignatures()
 {
-	D3D12_ROOT_SIGNATURE_FLAGS rootFlags{ D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT };
+	D3D12_ROOT_SIGNATURE_FLAGS rootFlags{ D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED | D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED };
 	//
-	std::vector<CD3DX12_DESCRIPTOR_RANGE1> ranges;
+	{
+		std::vector<CD3DX12_DESCRIPTOR_RANGE1> ranges;
 
-	std::vector<CD3DX12_ROOT_PARAMETER1> parameters(2);
-	// Per Object Matrices
-	parameters.at(0).InitAsConstantBufferView(0, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_VERTEX);
-	// Camera Buffer
-	parameters.at(1).InitAsConstantBufferView(1, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_ALL);
+		std::vector<CD3DX12_ROOT_PARAMETER1> parameters(2);
+		// Per Object Matrices
+		parameters.at(0).InitAsConstantBufferView(0, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_VERTEX);
+		// Camera Buffer
+		parameters.at(1).InitAsConstantBufferView(1, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_ALL);
 
-	std::vector<D3D12_STATIC_SAMPLER_DESC> samplers(1);
-	samplers.at(0) = D3D::Utility::CreateStaticSampler(0, 0, D3D12_FILTER_ANISOTROPIC, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_COMPARISON_FUNC_LESS_EQUAL);
-	m_DefaultRootSignature.Create(parameters, samplers, rootFlags, L"Default Root Signature");
+		std::vector<D3D12_STATIC_SAMPLER_DESC> samplers(1);
+		samplers.at(0) = D3D::Utility::CreateStaticSampler(0, 0, D3D12_FILTER_ANISOTROPIC, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_COMPARISON_FUNC_LESS_EQUAL);
+		m_DefaultRootSignature.Create(parameters, samplers, rootFlags, L"Default Root Signature");
+	}
+
+	// Image Based Lighting
+	{
+		std::vector<CD3DX12_ROOT_PARAMETER1> skyboxParams(2);
+		skyboxParams.at(0).InitAsConstantBufferView(0, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_VERTEX);
+		skyboxParams.at(1).InitAsConstants(1, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL);
+
+		std::vector<D3D12_STATIC_SAMPLER_DESC> samplers(1);
+		samplers.at(0) = D3D::Utility::CreateStaticSampler(0, 0, D3D12_FILTER_ANISOTROPIC, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_COMPARISON_FUNC_LESS_EQUAL);
+		m_SkyboxRS.Create(skyboxParams, samplers, rootFlags, L"Image Based Lighting Root Signature");
+	}
 
 }
 
@@ -269,7 +316,19 @@ void Renderer::CreatePipelines()
 		psoBuilder->SetPixelShader("Shaders/Default_Forward.hlsl", L"PSmain");
 
 		psoBuilder->Create(m_DefaultPSO, m_DefaultRootSignature.Get(), L"Default PSO");
+		psoBuilder->Reset();
+	}
 
+	// Image Based Lighting
+	{
+		auto layout{ D3D::Utility::GetSkyInputLayout() };
+		psoBuilder->SetInputLayout(layout);
+		psoBuilder->SetVertexShader("Shaders/Sky/Skybox.hlsl", L"VSmain");
+		psoBuilder->SetPixelShader("Shaders/Sky/Skybox.hlsl", L"PSmain");
+		psoBuilder->SetEnableDepth(true);
+		//psoBuilder->setcu
+		psoBuilder->Create(m_SkyboxPSO, m_SkyboxRS.Get(), L"Image Based Lighting PSO");
+		psoBuilder->Reset();
 	}
 
 	psoBuilder->Reset();
@@ -278,6 +337,6 @@ void Renderer::CreatePipelines()
 
 void Renderer::Idle()
 {
-	m_D3DContext->WaitForGPU();
+	D3D::WaitForGPU();
 	m_D3DContext->FlushGPU();
 }

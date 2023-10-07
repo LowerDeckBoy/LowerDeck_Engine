@@ -9,6 +9,10 @@
 #include "../Render/Model/Model.hpp"
 #include "../Render/Deferred/DeferredContext.hpp"
 
+#include "../Graphics/ImageBasedLighting.hpp"
+// Temporal
+#include "../Render/Lights/PointLights.hpp"
+
 class Camera;
 class Editor;
 class Scene;
@@ -33,6 +37,11 @@ public:
 	void RecordCommandLists();
 	void Update();
 	void Render();
+
+	/// <summary>
+	/// 
+	/// </summary>
+	void DrawSkybox();
 
 	void OnResize();
 	void Release();
@@ -91,11 +100,11 @@ private:
 	// Debug only
 	// Forward States
 	D3D::D3D12RootSignature m_DefaultRootSignature;
-	//
-	//ComPtr<ID3D12PipelineState> m_DefaultPSO;
 	D3D::D3D12PipelineState m_DefaultPSO;
 
-	//D3D::D3D12RootSignature m_GBufferRootSignature;
+	//
+	D3D::D3D12RootSignature m_SkyboxRS;
+	D3D::D3D12PipelineState m_SkyboxPSO;
 
 private:
 	std::unique_ptr<D3D::D3D12Viewport> m_SceneViewport;
@@ -110,10 +119,18 @@ private:
 	std::unique_ptr<DeferredContext> m_DeferredContext;
 
 	std::vector<std::unique_ptr<Model>> m_Models;
+	
+	std::shared_ptr<gfx::ConstantBuffer<gfx::cbCameraBuffer>> m_cbCamera;
+	gfx::cbCameraBuffer m_cbCameraData{};
+
+	std::unique_ptr<lde::ImageBasedLighting> m_ImageBasedLighting;
+	// Temporal
+	std::unique_ptr<PointLights> m_PointLights;
 
 public:
 	static bool bVsync;
 
 	static int32_t SelectedRenderTarget;
+	static bool bDrawSky;
 	
 };

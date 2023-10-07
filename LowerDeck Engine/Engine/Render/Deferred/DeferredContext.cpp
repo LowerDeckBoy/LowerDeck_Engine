@@ -1,6 +1,8 @@
 #include "../Model/Model.hpp"
 #include "../Camera.hpp"
+#include "../Lights/PointLights.hpp"
 #include "DeferredContext.hpp"
+#include "../../Graphics/TextureUtility.hpp"
 #include "../../D3D/D3D12Context.hpp"
 #include <ImGui/imgui.h>
 
@@ -22,7 +24,8 @@ DeferredContext::~DeferredContext()
 
 void DeferredContext::Initialize()
 {
-	m_DeferredHeap = std::make_unique<D3D::D3D12DescriptorHeap>(D3D::HeapUsage::eRTV, RenderTargetsCount, L"Deferred Render Target Heap");
+//RenderTargetsCount + 1
+	m_DeferredHeap = std::make_unique<D3D::D3D12DescriptorHeap>(D3D::HeapUsage::eRTV, 10, L"Deferred Render Target Heap");
 
 	ScreenOutput::Create();
 
@@ -30,6 +33,7 @@ void DeferredContext::Initialize()
 
 	CreateRootSignatures();
 	CreatePipelines();
+
 }
 
 void DeferredContext::OnResize()
@@ -46,6 +50,7 @@ void DeferredContext::Release()
 	m_GBufferRootSignature.Release();
 	m_GBufferPSO.Release();
 
+	SAFE_RELEASE(m_OutputResource);
 	m_OutputRootSignature.Release();
 	m_OutputPSO.Release();
 
@@ -57,8 +62,7 @@ void DeferredContext::Release()
 
 void DeferredContext::PassGBuffer(Camera* pCamera, const std::vector<std::unique_ptr<Model>>& Models)
 {
-	// Render Targets to Render State
-	// Clear Targets
+	// Render Targets to Render State and Clear Targets
 	for (size_t i = 0; i < RenderTargetsCount; i++)
 	{
 		D3D::TransitResource(m_RenderTargets.at(i).Get(), D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_RENDER_TARGET);
@@ -67,6 +71,7 @@ void DeferredContext::PassGBuffer(Camera* pCamera, const std::vector<std::unique
 	
 	D3D::SetPSO(m_GBufferPSO);
 	D3D::SetRootSignature(m_GBufferRootSignature);
+
 	auto depthHandle{ m_SceneDepth->DSV().GetCPU() };
 	D3D::g_CommandList->ClearDepthStencilView(depthHandle, D3D12_CLEAR_FLAG_DEPTH, D3D12_MAX_DEPTH, 0, 0, nullptr);
 
@@ -78,6 +83,62 @@ void DeferredContext::PassGBuffer(Camera* pCamera, const std::vector<std::unique
 	// Render Targets to Generic Read
 	for (auto& renderTarget : m_RenderTargets)
 		D3D::TransitResource(renderTarget.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ);
+}
+
+void DeferredContext::PassLight(gfx::ConstantBuffer<gfx::cbCameraBuffer>* pCameraBuffer, PointLights* pPointLights, lde::ImageBasedLighting* pImageBasedLighting)
+{
+	D3D::TransitResource(m_OutputResource.Get(), D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	D3D::TransitResource(m_SceneDepth->Get(), D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ);
+
+	D3D::SetPSO(m_OutputPSO);
+	D3D::SetRootSignature(m_OutputRootSignature);
+
+	auto depthHandle{ m_SceneDepth->DSV().GetCPU() };
+	D3D::g_CommandList.Get()->ClearRenderTargetView(m_OutputRTVDesc, m_ClearColor.data(), 0, nullptr);
+	D3D::g_CommandList.Get()->OMSetRenderTargets(1, &m_OutputRTVDesc, TRUE, &depthHandle);
+	//D3D::g_CommandList.Get()->OMSetRenderTargets(1, &m_OutputRTVDesc, TRUE, nullptr);
+
+	struct
+	{
+		int32_t gbuffer0;
+		int32_t gbuffer1;
+		int32_t gbuffer2;
+		int32_t gbuffer3;
+		int32_t gbuffer4;
+		//
+		int32_t sky0;
+		int32_t sky1;
+		int32_t sky2;
+		int32_t sky3;
+	} indices;
+	indices = {
+		(int32_t)m_ShaderDescs.at(0).Index,
+		(int32_t)m_ShaderDescs.at(1).Index,
+		(int32_t)m_ShaderDescs.at(2).Index,
+		(int32_t)m_ShaderDescs.at(3).Index,
+		(int32_t)m_ShaderDescs.at(4).Index,
+		//
+		(int32_t)pImageBasedLighting->SkyboxDescriptor().Index,
+		(int32_t)pImageBasedLighting->IrradianceDescriptor().Index,
+		(int32_t)pImageBasedLighting->SpecularDescriptor().Index,
+		(int32_t)pImageBasedLighting->SpecularBRDFDescriptor().Index,
+		
+	};
+
+	D3D::g_CommandList.Get()->SetGraphicsRootConstantBufferView(0, pCameraBuffer->GetBuffer()->GetGPUVirtualAddress());
+	D3D::g_CommandList.Get()->SetGraphicsRoot32BitConstants(1, sizeof(indices) / sizeof(int32_t), &indices, 0);
+	D3D::g_CommandList.Get()->SetGraphicsRootConstantBufferView(2, pPointLights->m_cbPointLights->GetBuffer()->GetGPUVirtualAddress());
+
+	ScreenOutput::Draw();
+
+	//D3D::TransitResource(m_OutputResource.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ);
+	D3D::TransitResource(m_SceneDepth->Get(), D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+}
+
+void DeferredContext::PassLightEnd()
+{
+	D3D::TransitResource(m_OutputResource.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ);
+
 }
 
 void DeferredContext::CreateRenderTargets()
@@ -141,39 +202,75 @@ void DeferredContext::CreateRenderTargets()
 		D3D::D3D12Context::GetMainHeap()->Allocate(m_ShaderDescs.at(i));
 		D3D::g_Device.Get()->CreateShaderResourceView(m_RenderTargets.at(i).Get(), &srvDesc, m_ShaderDescs.at(i).GetCPU());
 	}
+
+	// Light Pass SRV
+	{
+		D3D12_RESOURCE_DESC outputDesc{};
+		outputDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		outputDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		outputDesc.MipLevels = 1;
+		outputDesc.DepthOrArraySize = 1;
+		outputDesc.Width = static_cast<uint64_t>(m_D3DContext->GetSceneViewport()->Viewport().Width);
+		outputDesc.Height = static_cast<uint32_t>(m_D3DContext->GetSceneViewport()->Viewport().Height);
+		outputDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+		outputDesc.SampleDesc = { 1, 0 };
+
+		clear.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+		ThrowIfFailed(D3D::g_Device.Get()->CreateCommittedResource(
+			&heapProps,
+			D3D12_HEAP_FLAG_NONE,
+			&outputDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			&clear,
+			IID_PPV_ARGS(m_OutputResource.ReleaseAndGetAddressOf())));
+		m_OutputResource.Get()->SetName(L"Deferred Light Pass Resource");
+
+		rtvHandle.Offset(1, 32);
+		//rtvHandle.InitOffsetted(m_DeferredHeap->GetCPUHandle(), 5, 32);
+		m_OutputRTVDesc = rtvHandle;
+		D3D::g_Device.Get()->CreateRenderTargetView(m_OutputResource.Get(), &rtvDesc, m_OutputRTVDesc);
+		TextureUtility::CreateSRV(m_OutputResource.GetAddressOf(), m_OutputDescriptor, 1);
+
+	}
+
 }
 
 void DeferredContext::CreateRootSignatures()
 {
+	// common flags
+	D3D12_ROOT_SIGNATURE_FLAGS rootFlags{ D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |						D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED | D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED };
 	// GBuffer
 	{
-		D3D12_ROOT_SIGNATURE_FLAGS rootFlags{ D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |						D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED | 
-					D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED };
-		//
-		std::vector<CD3DX12_DESCRIPTOR_RANGE1> ranges(2);
-		//ranges.at(0) = CD3DX12_DESCRIPTOR_RANGE1(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1024, 2, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE, OFFSET)
+		//std::vector<CD3DX12_DESCRIPTOR_RANGE1> ranges;
 
-		std::vector<CD3DX12_ROOT_PARAMETER1> parameters(3);
+		std::vector<CD3DX12_ROOT_PARAMETER1> parameters(2);
 		// Per Object Matrices
 		parameters.at(0).InitAsConstantBufferView(0, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_VERTEX);
-		// Camera Buffer
-		parameters.at(1).InitAsConstantBufferView(1, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_ALL);
 		// Material indices + material data
-		parameters.at(2).InitAsConstants(20, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
-		//parameters.at(2).InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
-		// Material data
-		//parameters.at(3).InitAsConstants(16, 3, 0, D3D12_SHADER_VISIBILITY_ALL);
-
-
+		parameters.at(1).InitAsConstants(20, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL);
+		// Camera Buffer
+		//parameters.at(1).InitAsConstantBufferView(1, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_ALL);
 
 		std::vector<D3D12_STATIC_SAMPLER_DESC> samplers(1);
 		samplers.at(0) = D3D::Utility::CreateStaticSampler(0, 0, D3D12_FILTER_ANISOTROPIC, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_COMPARISON_FUNC_LESS_EQUAL);
-		m_GBufferRootSignature.Create(parameters, samplers, rootFlags, L"Default Root Signature");
+		m_GBufferRootSignature.Create(parameters, samplers, rootFlags, L"Deferred GBuffer Root Signature");
 	}
 
 	// Output
 	{
+		std::vector<CD3DX12_ROOT_PARAMETER1> parameters(3);
+		// Camera buffer
+		parameters.at(0).InitAsConstantBufferView(0, 0, D3D12_ROOT_DESCRIPTOR_FLAG_DATA_VOLATILE);
+		// Texture indices: 0-4 gbuffers, 5-8 image based lighting
+		parameters.at(1).InitAsConstants(9, 1, 0);
+		// Lights data
+		parameters.at(2).InitAsConstantBufferView(0, 1, D3D12_ROOT_DESCRIPTOR_FLAG_DATA_STATIC, D3D12_SHADER_VISIBILITY_PIXEL);
 
+		std::vector<D3D12_STATIC_SAMPLER_DESC> samplers(2);
+		samplers.at(0) = D3D::Utility::CreateStaticSampler(0, 0, D3D12_FILTER_ANISOTROPIC, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_COMPARISON_FUNC_LESS_EQUAL);
+		samplers.at(1) = D3D::Utility::CreateStaticSampler(1, 0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL);
+		m_OutputRootSignature.Create(parameters, samplers, rootFlags, L"Deferred Light Pass Root Signature");
 	}
 
 }
@@ -185,17 +282,27 @@ void DeferredContext::CreatePipelines()
 	// GBuffer
 	{
 		auto layout{ D3D::Utility::GetModelInputLayout() };
+		builder->SetInputLayout(layout);
 		builder->SetVertexShader("Shaders/Deferred/GBuffer.hlsl", L"VSmain");
 		builder->SetPixelShader("Shaders/Deferred/GBuffer.hlsl", L"PSmain");
-		builder->SetInputLayout(layout);
 		builder->SetRenderTargetFormats(m_RenderTargetFormats);
 
 		builder->Create(m_GBufferPSO, m_GBufferRootSignature.Get(), L"GBuffer PSO");
+		builder->Reset();
 	}
 
 	// Deferred Output
+	// aka Light Pass
 	{
+		auto layout{ D3D::Utility::GetScreenOutputInputLayout() };
 
+		builder->SetInputLayout(layout);
+		builder->SetVertexShader("Shaders/Deferred/DeferredOutput.hlsl", L"VSmain");
+		builder->SetPixelShader("Shaders/Deferred/DeferredOutput.hlsl", L"PSmain");
+		builder->SetEnableDepth(false);
+		
+		builder->Create(m_OutputPSO, m_OutputRootSignature.Get(), L"Deferred Light Pass PSO");
+		builder->Reset();
 	}
 
 	builder->Reset();
