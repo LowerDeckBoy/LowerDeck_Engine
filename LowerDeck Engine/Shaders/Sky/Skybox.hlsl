@@ -50,7 +50,6 @@ float4 PSmain(VS_OUTPUT pin) : SV_TARGET
 	skyTexture = pow(skyTexture, gamma);
     
 	return float4(skyTexture, 1.0f);
-	//return float4(1.0f, 0.5f, 1.0f, 1.0f);
 }
 
 #endif // SKYBOX_HLSL

@@ -135,6 +135,18 @@
     <ClCompile Include="Engine\Graphics\TextureManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Render\Lights\PointLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\ImageBasedLighting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Render\Lights\PointLights.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\D3D\D3D12Buffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\D3D\D3D12Command.hpp">
@@ -302,19 +314,41 @@
     <ClInclude Include="Engine\Graphics\TextureManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Render\Lights\PointLight.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Render\Model\Meshlet.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\ImageBasedLighting.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Render\Lights\PointLights.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\D3D\D3D12Buffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Shaders\Deferred\Deferred_Common.hlsli" />
     <None Include="Shaders\Deferred\GBuffer.hlsli" />
+    <None Include="Shaders\Common.hlsli" />
+    <None Include="Shaders\Deferred\DeferredLighting.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Assets\Fonts\CascadiaCode-Bold.ttf" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Default_Forward.hlsl" />
-    <FxCompile Include="Shaders\Deferred\Deferred_Output.hlsl" />
+    <FxCompile Include="Shaders\Deferred\DeferredOutput.hlsl" />
     <FxCompile Include="Shaders\Test\Mesh.hlsl" />
     <FxCompile Include="Shaders\Deferred\GBuffer.hlsl" />
+    <FxCompile Include="Shaders\Sky\EquirectangularToCube_CS.hlsl" />
+    <FxCompile Include="Shaders\Sky\Skybox.hlsl" />
+    <FxCompile Include="Shaders\Sky\IrradianceMap_CS.hlsl" />
+    <FxCompile Include="Shaders\Sky\SpBRDF_LUT_CS.hlsl" />
+    <FxCompile Include="Shaders\Sky\SpecularMap_CS.hlsl" />
   </ItemGroup>
 </Project>

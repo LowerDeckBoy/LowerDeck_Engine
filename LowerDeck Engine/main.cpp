@@ -10,6 +10,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 		app->Initialize();
 		app->Run();
 		app->Release();
+		delete app;
 	}
 	catch (...)
 	{

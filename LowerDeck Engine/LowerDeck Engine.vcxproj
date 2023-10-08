@@ -18,11 +18,6 @@
     <RootNamespace>LowerDeckEngine</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
-  <PropertyGroup Label="Globals" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Microsoft_Direct3D_D3D12_SkipLibraryCopy>true</Microsoft_Direct3D_D3D12_SkipLibraryCopy>
-    <Microsoft_Direct3D_D3D12_SkipDebugLayerCopy>true</Microsoft_Direct3D_D3D12_SkipDebugLayerCopy>
-    <Microsoft_Direct3D_D3D12_SkipIncludeDir>true</Microsoft_Direct3D_D3D12_SkipIncludeDir>
-  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -104,6 +99,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\D3D\D3D12Buffer.cpp" />
     <ClCompile Include="Engine\Graphics\Buffer\Buffer.cpp" />
     <ClCompile Include="Engine\Graphics\Buffer\BufferUtility.cpp" />
     <ClCompile Include="Engine\Render\Deferred\DeferredContext.cpp" />
@@ -140,6 +136,7 @@
     <ClCompile Include="Engine\D3D\D3D12Device.cpp" />
     <ClCompile Include="Engine\D3D\D3D12SwapChain.cpp" />
     <ClCompile Include="Engine\D3D\D3D12Viewport.cpp" />
+    <ClCompile Include="Engine\Render\Lights\PointLights.cpp" />
     <ClCompile Include="Engine\Render\Model\Importer.cpp" />
     <ClCompile Include="Engine\Render\Model\Model.cpp" />
     <ClCompile Include="Engine\Utility\FileSystem.cpp" />
@@ -148,6 +145,7 @@
       <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</GenerateXMLDocumentationFiles>
     </ClCompile>
     <ClCompile Include="Engine\Render\Deferred\GBufferPass.cpp" />
+    <ClCompile Include="Engine\Graphics\ImageBasedLighting.cpp" />
     <ClCompile Include="Input\CameraInput.cpp" />
     <ClCompile Include="Engine\Utility\Logger.cpp" />
     <ClCompile Include="main.cpp" />
@@ -159,8 +157,10 @@
     <ClCompile Include="Engine\Graphics\Texture.cpp" />
     <ClCompile Include="Engine\Graphics\TextureUtility.cpp" />
     <ClCompile Include="Engine\Graphics\TextureManager.cpp" />
+    <ClCompile Include="Engine\Render\Lights\PointLight.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\D3D\D3D12Buffer.hpp" />
     <ClInclude Include="Dependencies\EnTT\entt.hpp" />
     <ClInclude Include="Engine\ECS\Entity.hpp" />
     <ClInclude Include="Engine\Graphics\Buffer\Buffer.hpp" />
@@ -194,8 +194,10 @@
     <ClInclude Include="Engine\D3D\D3D12Types.hpp" />
     <ClInclude Include="Engine\D3D\D3D12Utility.hpp" />
     <ClInclude Include="Engine\D3D\D3D12Viewport.hpp" />
+    <ClInclude Include="Engine\Render\Lights\PointLights.hpp" />
     <ClInclude Include="Engine\Render\Model\Importer.hpp" />
     <ClInclude Include="Engine\Render\Model\Mesh.hpp" />
+    <ClInclude Include="Engine\Render\Model\Meshlet.hpp" />
     <ClInclude Include="Engine\Render\Model\Model.hpp" />
     <ClInclude Include="Engine\Utility\FileSystem.hpp" />
     <ClInclude Include="Engine\Utility\MemoryUsage.hpp" />
@@ -205,6 +207,7 @@
     <ClInclude Include="Engine\Window\Window.hpp" />
     <ClInclude Include="Dependencies\ImGui\imgui.h" />
     <ClInclude Include="Engine\Render\Deferred\GBufferPass.hpp" />
+    <ClInclude Include="Engine\Graphics\ImageBasedLighting.hpp" />
     <ClInclude Include="Input\CameraInput.hpp" />
     <ClInclude Include="Engine\Engine\Renderer.hpp" />
     <ClInclude Include="Engine\ECS\World.hpp" />
@@ -216,9 +219,12 @@
     <ClInclude Include="Engine\Utility\Logger.hpp" />
     <ClInclude Include="Engine\Graphics\TextureUtility.hpp" />
     <ClInclude Include="Engine\Graphics\TextureManager.hpp" />
+    <ClInclude Include="Engine\Render\Lights\PointLight.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Shaders\Common.hlsli" />
+    <None Include="Shaders\Deferred\DeferredLighting.hlsli" />
     <None Include="Shaders\Deferred\Deferred_Common.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
@@ -243,15 +249,50 @@
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </EntryPointName>
     </FxCompile>
-    <FxCompile Include="Shaders\Deferred\Deferred_Output.hlsl">
+    <FxCompile Include="Shaders\Deferred\DeferredOutput.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </EntryPointName>
     </FxCompile>
     <FxCompile Include="Shaders\Deferred\GBuffer.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </EntryPointName>
+    </FxCompile>
+    <FxCompile Include="Shaders\Sky\EquirectangularToCube_CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </EntryPointName>
+    </FxCompile>
+    <FxCompile Include="Shaders\Sky\IrradianceMap_CS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Shaders\Sky\Skybox.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Shaders\Sky\SpBRDF_LUT_CS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Shaders\Sky\SpecularMap_CS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
     </FxCompile>
     <FxCompile Include="Shaders\Test\Mesh.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
