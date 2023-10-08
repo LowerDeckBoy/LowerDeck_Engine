@@ -25,11 +25,11 @@ Restructured and improved version of my other project: [**DirectX 12 Rendering**
 - [ ] **Mesh Shading**:
     - [ ] *Meshletizing*
     - [ ] Amplification/Tesselation
-- [ ] **Image Based Lighting**:
-    - [ ] Diffuse
+- [x] **Image Based Lighting**:
+    - [x] Diffuse
     - [ ] Specular
 - [ ] **Physically Based Rendering**:
-    - [ ] Epic's UE4 PBR Model
+    - [x] Epic's UE4 PBR Model
     - [ ] Disney's PBR
     - [ ] Sky reflections
 - [ ] **Model loading**:
@@ -71,3 +71,7 @@ Restructured and improved version of my other project: [**DirectX 12 Rendering**
 - **ESC** to exit app.
 
 ## **Sample screenshots**
+
+|         |         |
+|:-------:|:-------:|
+|![Screnshot](Media/deferred_scifi_helmet.png)|![Screnshot](Media/deferred_sponza.png)|
