@@ -8,8 +8,10 @@ bool Renderer::bVsync = true;
 int32_t Renderer::SelectedRenderTarget = 0;
 bool Renderer::bDrawSky = true;
 
-Renderer::Renderer(Camera* pCamera)
+Renderer::Renderer(std::shared_ptr<D3D::D3D12Context> pD3DContext, Camera* pCamera)
 {
+	m_D3DContext = pD3DContext;
+	//m_D3DContext = std::make_shared<D3D::D3D12Context>();
 	m_SceneCamera = pCamera;
 	Initialize();
 }
@@ -23,8 +25,8 @@ void Renderer::Initialize()
 {
 	m_SceneViewport = std::make_unique<D3D::D3D12Viewport>();
 
-	m_D3DContext = std::make_shared<D3D::D3D12Context>();
-	m_D3DContext->InitializeD3D();
+	//m_D3DContext = std::make_shared<D3D::D3D12Context>();
+	//m_D3DContext->InitializeD3D();
 
 	m_ShaderManager = std::make_shared<gfx::ShaderManager>();
 
@@ -41,6 +43,7 @@ void Renderer::Initialize()
 	m_ImageBasedLighting = std::make_unique<lde::ImageBasedLighting>("Assets/Textures/HDR/newport_loft.hdr");
 
 	m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/DamagedHelmet/DamagedHelmet.gltf", "DamagedHelmet"));
+	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/MetalRoughSpheres/MetalRoughSpheres.gltf", "ballz"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/SciFiHelmet/SciFiHelmet.gltf", "SciFiHelmet"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/sponza/Sponza.gltf", "Sponza"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/cube/Cube.gltf"));
@@ -241,6 +244,7 @@ uint64_t Renderer::GetViewportRenderTarget(int32_t Selected)
 
 void Renderer::Release()
 {
+	m_PointLights.reset();
 	m_DeferredContext.reset();
 
 	for (auto& model : m_Models)
@@ -261,11 +265,6 @@ void Renderer::Release()
 
 	m_ShaderManager.reset();
 	m_ShaderManager = nullptr;
-
-	D3D::WaitForGPU();
-	m_D3DContext->FlushGPU();
-
-	m_D3DContext->ReleaseD3D();
 }
 
 void Renderer::SetEditor(std::shared_ptr<Editor> pEditor)

@@ -21,7 +21,9 @@ void Engine::Initialize()
 	m_SceneCameraInputs = std::make_unique<CameraInput>();
 	m_SceneCameraInputs->Initialize();
 	
-	m_Renderer = std::make_unique<Renderer>(m_SceneCamera.get());
+	m_D3D12Context = std::make_shared<D3D::D3D12Context>();
+	m_D3D12Context->InitializeD3D();
+	m_Renderer = std::make_unique<Renderer>(m_D3D12Context, m_SceneCamera.get());
 
 	m_Editor = std::make_shared<Editor>();
 	m_Editor->Initialize(m_SceneCamera.get(), m_EngineTimer.get());
@@ -88,6 +90,10 @@ void Engine::Release()
 {
 	m_Editor->Release();
 	m_Renderer->Release();
+
+	D3D::WaitForGPU();
+	m_D3D12Context->FlushGPU();
+	m_D3D12Context->ReleaseD3D();
 }
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);

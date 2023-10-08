@@ -33,6 +33,11 @@ namespace utility
 		return std::filesystem::path(Filename).relative_path().string();
 	}
 
+	inline std::string GetParentPath(const std::string_view& Filepath)
+	{
+		return std::filesystem::path(Filepath).parent_path().string();
+	}
+
 	/// <summary>
 /// 
 /// </summary>

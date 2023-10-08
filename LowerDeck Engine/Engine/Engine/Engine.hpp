@@ -36,13 +36,13 @@ public:
 	void Release();
 
 private:
-	std::shared_ptr<Timer>			m_EngineTimer;
-	std::unique_ptr<Camera>			m_SceneCamera;
-	std::shared_ptr<CameraInput>	m_SceneCameraInputs;
-	std::shared_ptr<Editor>			m_Editor;
-	std::unique_ptr<Renderer>		m_Renderer;
+	std::shared_ptr<Timer>				m_EngineTimer;
+	std::unique_ptr<Camera>				m_SceneCamera;
+	std::shared_ptr<CameraInput>		m_SceneCameraInputs;
+	std::shared_ptr<Editor>				m_Editor;
+	std::shared_ptr<D3D::D3D12Context>	m_D3D12Context;
+	std::unique_ptr<Renderer>			m_Renderer;
 
-	//std::shared_ptr<D3D::D3D12Context> m_D3D12Context;
 
 };
 

@@ -36,4 +36,17 @@ namespace gfx
 		int32_t MetalRoughnessIndex { - 1 };
 		int32_t EmissiveIndex { - 1 };
 	};
+
+	// TEMPORAL
+	struct cbCameraBuffer
+	{
+		alignas(16) DirectX::XMFLOAT3 CameraPosition;
+		DirectX::XMFLOAT4X4 View;
+		DirectX::XMFLOAT4X4 Projection;
+		DirectX::XMMATRIX InversedView;
+		DirectX::XMMATRIX InversedProjection;
+		float zNear;
+		float zFar;
+		//DirectX::XMFLOAT2 ScreenDimension
+	};
 }

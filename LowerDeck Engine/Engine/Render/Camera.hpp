@@ -28,6 +28,10 @@ public:
 	const XMMATRIX GetProjection() const noexcept	{ return XMLoadFloat4x4(&m_Projection); }
 	const XMMATRIX GetViewProjection() noexcept		{ return XMMatrixMultiply(XMLoadFloat4x4(&m_View), XMLoadFloat4x4(&m_Projection)); }
 
+	const XMFLOAT4X4 GetViewFloats() const noexcept { return m_View; }
+	const XMFLOAT4X4 GetProjectionFloats() const noexcept { return m_Projection; }
+
+	const XMFLOAT3 GetPositionFloat() const noexcept { return m_Position; }
 	const XMVECTOR GetPosition() const noexcept { return XMLoadFloat3(&m_Position); }
 	const XMVECTOR GetTarget() const noexcept	{ return XMLoadFloat3(&m_Target); }
 	const XMVECTOR GetUp() const noexcept		{ return XMLoadFloat3(&m_Up); }

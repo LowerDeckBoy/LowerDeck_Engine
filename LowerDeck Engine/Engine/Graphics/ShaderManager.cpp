@@ -2,11 +2,12 @@
 #include "ShaderManager.hpp"
 #include "../D3D/D3D12Utility.hpp"
 #include "../Utility/Utility.hpp"
+#include "../Utility/FileSystem.hpp"
 #include <fstream>
 #include <sstream>
 #include <vector>
 
-//#pragma comment(lib, "dxcompiler.lib")
+#pragma comment(lib, "dxcompiler.lib")
 
 namespace gfx
 {
@@ -30,6 +31,7 @@ namespace gfx
 
 		ThrowIfFailed(DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(m_DxcUtils.ReleaseAndGetAddressOf())), "Failed to create Dxc Utils Instance!");
 		ThrowIfFailed(m_DxcUtils->CreateDefaultIncludeHandler(m_IncludeHandler.ReleaseAndGetAddressOf()), "Failed to create Dxc Include Handler Instance!");
+
 	}
 
 	IDxcBlob* ShaderManager::CompileDXIL(const std::string_view& Filepath, ShaderType eType, LPCWSTR EntryPoint)
@@ -49,9 +51,6 @@ namespace gfx
 		IDxcBlobEncoding* sourceBlob{};
 		ThrowIfFailed(m_Library.Get()->CreateBlobWithEncodingFromPinned(LPBYTE(shaderStr.c_str()), static_cast<uint32_t>(shaderStr.size()), 0, &sourceBlob));
 
-		std::wstring wstr{ std::wstring(Filepath.begin(), Filepath.end()) };
-		LPCWSTR filepath{ wstr.c_str() };
-
 		std::vector<LPCWSTR> arguments;
 		// Push entry point
 		arguments.push_back(L"-E");
@@ -61,14 +60,22 @@ namespace gfx
 		arguments.push_back(L"-T");
 		arguments.push_back(ShaderTypeToTarget(eType));
 
+		// Push include paths
+		arguments.push_back(L"-I Shaders/");
+		std::wstring parentPath{ utility::ToWideString(utility::GetParentPath(Filepath)) };
+		arguments.push_back(L"-I");
+		arguments.push_back(parentPath.c_str());
+
 		arguments.push_back(L"-Qstrip_debug");
 		arguments.push_back(L"-Qstrip_reflect");
 
 #if defined (_DEBUG)
+		// Push debug flags
 		arguments.push_back(DXC_ARG_DEBUG);
 		arguments.push_back(DXC_ARG_DEBUG_NAME_FOR_SOURCE);
 		arguments.push_back(DXC_ARG_SKIP_OPTIMIZATIONS);
-		//arguments.push_back(DXC_ARG_OPTIMIZATION_LEVEL0);
+#else
+		arguments.push_back(DXC_ARG_OPTIMIZATION_LEVEL3)
 #endif
 
 		DxcBuffer buffer{ sourceBlob->GetBufferPointer(), sourceBlob->GetBufferSize(), 0 };
@@ -76,7 +83,8 @@ namespace gfx
 		ThrowIfFailed(m_Compiler.Get()->Compile(&buffer, arguments.data(), static_cast<uint32_t>(arguments.size()), m_IncludeHandler.Get(), IID_PPV_ARGS(&result)));
 		
 		IDxcBlobUtf8* errors{ nullptr };
-		result->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&errors), nullptr);
+		IDxcBlobUtf16* outputName{ nullptr };
+		result->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&errors), &outputName);
 		if (errors && errors->GetStringLength() > 0)
 		{
 			utility::ErrorMessage((char*)errors->GetBufferPointer());

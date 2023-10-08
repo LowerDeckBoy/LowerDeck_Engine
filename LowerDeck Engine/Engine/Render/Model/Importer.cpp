@@ -18,8 +18,6 @@ Importer::~Importer()
 	for (auto& texture : m_Textures)
 		delete texture;
 
-	m_Textures.clear();
-
 	for (auto& mesh : m_Meshes)
 		delete mesh;
 
@@ -37,7 +35,8 @@ bool Importer::Import(std::string_view Filepath)
 		aiProcess_JoinIdenticalVertices |
 		aiProcess_PreTransformVertices |
 		aiProcess_ValidateDataStructure |
-		aiProcess_CalcTangentSpace
+		aiProcess_CalcTangentSpace |
+		aiProcess_GenSmoothNormals
 	};
 	importer.SetExtraVerbose(true);
 	const aiScene* scene{ importer.ReadFile(Filepath.data(), loadFlags) };

@@ -38,6 +38,16 @@
 
 namespace utility
 {
+	/// <summary>
+	/// Convert given text to wide string.
+	/// </summary>
+	/// <param name="Text"></param>
+	/// <returns></returns>
+	inline std::wstring ToWideString(const std::string_view& Text)
+	{
+		return std::wstring(Text.begin(), Text.end());
+	}
+
 	/// <summary> Debug Win32 API MessageBox pop up </summary>
 	inline void ErrorMessage(const std::string_view& Message)
 	{

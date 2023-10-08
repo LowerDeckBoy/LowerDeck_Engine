@@ -1,8 +1,9 @@
 #ifndef GBUFFER_HLSL
 #define GBUFFER_HLSL
 
-//#include "GBuffer.hlsli"
-#include "Shaders/Deferred/GBuffer.hlsli"
+#include "GBuffer.hlsli"
+//#include "Deferred/GBuffer.hlsli"
+//#include "Shaders/Deferred/GBuffer.hlsli"
 
 // https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_6_DynamicResources.html#resourcedescriptorheap-and-samplerdescriptorheap
 // https://rtarun9.github.io/blogs/bindless_rendering/#using-sm66s-resourcedescriptorheap--samplerdescriptorheap
@@ -12,6 +13,8 @@ cbuffer cbPerObject : register(b0, space0)
 	row_major float4x4 WVP;
 	row_major float4x4 World;
 }
+
+ConstantBuffer<MaterialData> Material : register(b1, space0);
 
 DeferredOutput VSmain(DeferredInput vin)
 {
@@ -25,6 +28,8 @@ DeferredOutput VSmain(DeferredInput vin)
 
 	return output;
 }
+
+SamplerState texSampler : register(s0, space0);
 
 GBuffer_Output PSmain(DeferredOutput pin)
 {

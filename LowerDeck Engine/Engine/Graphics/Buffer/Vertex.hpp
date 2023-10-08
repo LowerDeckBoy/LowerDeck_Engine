@@ -21,7 +21,7 @@ namespace gfx
 	struct SkyVertex
 	{
 		DirectX::XMFLOAT3 Position;
-		DirectX::XMFLOAT3 TexCoord;
+		DirectX::XMFLOAT2 TexCoord;
 	};
 
 	/// <summary>

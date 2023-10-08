@@ -54,20 +54,6 @@ struct MaterialData
 	int EmissiveIndex;
 };
 
-//ConstantBuffer<MaterialIndices> Indices : register(b2, space0);
-ConstantBuffer<MaterialData> Material : register(b2, space0);
 //Texture2D<float4> DepthTexture : register(t4, space0);
-
-SamplerState texSampler : register(s0, space0);
-
-cbuffer cbCamera : register(b1, space0)
-{
-	float4 CameraPosition;
-	float4x4 View;
-	float4x4 Projection;
-	row_major float4x4 InversedView;
-	row_major float4x4 InversedProjection;
-	float2 ScreenDimension;
-}
 
 #endif // GBUFFER_HLSLI

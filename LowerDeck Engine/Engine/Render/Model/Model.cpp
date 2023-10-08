@@ -54,14 +54,8 @@ void Model::Draw(Camera* pCamera)
 		
 		auto currentMaterial{ m_Materials.at(i) };
 
-		// Texture indices
-		//const model::MaterialIndices indices{	currentMaterial->BaseColorIndex, 
-		//										currentMaterial->NormalIndex, 
-		//										currentMaterial->MetallicRoughnessIndex, 
-		//										currentMaterial->EmissiveIndex };
-
-		XMFLOAT4 cameraPosition{};
-		XMStoreFloat4(&cameraPosition, pCamera->GetPosition());
+		//XMFLOAT4 cameraPosition{};
+		//XMStoreFloat4(&cameraPosition, pCamera->GetPosition());
 		//cameraPosition,
 		// Material data
 		const model::Material materialData{  currentMaterial->BaseColorFactor,
@@ -76,7 +70,7 @@ void Model::Draw(Camera* pCamera)
 											 currentMaterial->MetallicRoughnessIndex,
 											 currentMaterial->EmissiveIndex };
 
-		D3D::g_CommandList.Get()->SetGraphicsRoot32BitConstants(2, sizeof(materialData) / sizeof(int32_t), &materialData, 0);
+		D3D::g_CommandList.Get()->SetGraphicsRoot32BitConstants(1, sizeof(materialData) / sizeof(int32_t), &materialData, 0);
 		//D3D::g_CommandList.Get()->SetGraphicsRoot32BitConstants(2, sizeof(indices) / sizeof(int32_t), &indices, 0);
 
 		if (m_Meshes.at(i)->bHasIndices)

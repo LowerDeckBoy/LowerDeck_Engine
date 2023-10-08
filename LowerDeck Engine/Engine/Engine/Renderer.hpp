@@ -23,8 +23,7 @@ class Scene;
 class Renderer
 {
 public:
-	explicit Renderer(Camera* pCamera);
-	//explicit Renderer(std::shared_ptr<Camera> pCamera);
+	Renderer(std::shared_ptr<D3D::D3D12Context> pD3DContext, Camera* pCamera);
 	Renderer(const Renderer&) = delete;
 	Renderer(const Renderer&&) = delete;
 	~Renderer();
@@ -109,6 +108,7 @@ private:
 private:
 	std::unique_ptr<D3D::D3D12Viewport> m_SceneViewport;
 	std::shared_ptr<D3D::D3D12Context> m_D3DContext;
+	//D3D::D3D12Context* m_D3DContext;
 	std::unique_ptr<D3D::D3D12DepthBuffer> m_DepthStencil;
 	Camera* m_SceneCamera;
 	//std::shared_ptr<Camera> m_SceneCamera;

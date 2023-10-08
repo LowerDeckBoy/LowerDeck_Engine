@@ -32,8 +32,6 @@ void Editor::Initialize(Camera* pCamera, Timer* pEngineTimer)
 	IO.ConfigFlags  |= ImGuiConfigFlags_DockingEnable;
 	//IO.ConfigFlags  |= ImGuiConfigFlags_ViewportsEnable;
 
-	
-
 	assert(ImGui_ImplWin32_Init(Window::GetHwnd()));
 	assert(ImGui_ImplDX12_Init(D3D::g_Device.Get(),
 		D3D::FRAME_COUNT,
@@ -90,15 +88,17 @@ void Editor::OnFrameEnd()
 		ImGui::Separator();
 		ImGui::Text("VRAM: %d MB", D3D::QueryAdapterMemory());
 
+		//ImGui::Checkbox("V-sync", Renderer::)
+
 		ImGui::EndMainMenuBar();
 	}
 
-	// DEBUG
-	ImGui::Begin("Properties", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
-	const auto dims{ ImGui::GetWindowSize() };
-	const auto avail{ ImGui::GetContentRegionAvail() };
-	ImGui::Text("Window size: %.2f x %.2f", dims.x, dims.y);
-	ImGui::Text("Available size: %.2f x %.2f", avail.x, avail.y);
+	// Side panel. Not meant for moving. 
+	ImGui::Begin("Properties", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize| ImGuiWindowFlags_NoMove);
+	//const auto dims{ ImGui::GetWindowSize() };
+	//const auto avail{ ImGui::GetContentRegionAvail() };
+	//ImGui::Text("Window size: %.2f x %.2f", dims.x, dims.y);
+	//ImGui::Text("Available size: %.2f x %.2f", avail.x, avail.y);
 	ImGui::End();
 
 	ImGui::Begin("Log", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
