@@ -153,11 +153,9 @@ namespace lde
 		D3D::D3D12Context::GetMainHeap()->Allocate(m_SkyboxDescriptor);
 		TextureUtility::CreateSRV(preTransformResource.GetAddressOf(), m_SkyboxDescriptor, 1, DXGI_FORMAT_R32G32B32A32_FLOAT);
 
-		//ID3D12Resource* uavTexture{ nullptr };
 		ComPtr<ID3D12Resource> uavTexture;
-		//uavTexture = TextureUtility::CreateResource(
 		TextureUtility::CreateResource(uavTexture.GetAddressOf(),
-			TextureData(1024, 1024, 6, DXGI_FORMAT_R16G16B16A16_FLOAT, 1),
+			TextureData(1024, 1024, 6, DXGI_FORMAT_R16G16B16A16_FLOAT),
 			TextureDesc(D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS));
 		// Temporal UAV Descriptor to hold post-transformed texture
 

@@ -217,7 +217,7 @@ void TextureUtility::CreateUAV(ID3D12Resource** ppResource, D3D::D3D12Descriptor
 		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
 		uavDesc.Texture2DArray.MipSlice = 0;
 		uavDesc.Texture2DArray.FirstArraySlice = 0;
-		uavDesc.Texture2DArray.ArraySize = 1;
+		uavDesc.Texture2DArray.ArraySize = Depth;
 	}
 
 	D3D::g_Device.Get()->CreateUnorderedAccessView((*ppResource), nullptr, &uavDesc, Descriptor.GetCPU());
