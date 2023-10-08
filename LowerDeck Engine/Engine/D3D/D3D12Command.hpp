@@ -4,10 +4,11 @@
 #include "D3D12Types.hpp"
 #include "../Utility/Utility.hpp"
 
-using Microsoft::WRL::ComPtr;
 
 namespace D3D
 {
+	using Microsoft::WRL::ComPtr;
+
 	class D3D12RootSignature;
 	class D3D12PipelineState;
 
@@ -25,6 +26,11 @@ namespace D3D
 	/// Safe release of <c>ComPtrs</c>.
 	/// </summary>
 	void ReleaseCommands();
+
+	/// <summary>
+	/// Wait until <c>Fence</c> event is complete.
+	/// </summary>
+	void WaitForGPU();
 
 	/// <summary> Execute content currently bound to ID3D12GraphicsCommandList4*. </summary>
 	/// <param name="bResetAllocator">: If true Close command list. False by default.</param>

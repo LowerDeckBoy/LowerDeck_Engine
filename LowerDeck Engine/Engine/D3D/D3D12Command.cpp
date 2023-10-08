@@ -1,5 +1,6 @@
 #include "D3D12Command.hpp"
 #include "D3D12Device.hpp"
+#include "D3D12SwapChain.hpp"
 #include "D3D12Types.hpp"
 #include "D3D12RootSignature.hpp"
 #include "D3D12GraphicsPipelineState.hpp"
@@ -48,6 +49,16 @@ namespace D3D
 
     }
 
+    void WaitForGPU()
+    {
+        ThrowIfFailed(g_CommandQueue.Get()->Signal(g_Fence.Get(), g_FenceValues.at(FRAME_INDEX)));
+
+        ThrowIfFailed(g_Fence.Get()->SetEventOnCompletion(g_FenceValues.at(FRAME_INDEX), g_FenceEvent));
+        ::WaitForSingleObjectEx(g_FenceEvent, INFINITE, FALSE);
+
+        g_FenceValues.at(FRAME_INDEX)++;
+    }
+
     void ExecuteCommandLists(bool bResetAllocator)
     {
         ThrowIfFailed(g_CommandList.Get()->Close(), "Failed to close ID3D12GraphicsCommandList!");
@@ -57,6 +68,8 @@ namespace D3D
     
         if (bResetAllocator)
             ThrowIfFailed(g_CommandList.Get()->Reset(GetCommandAllocator(), nullptr));
+
+        D3D::WaitForGPU();
     }
 
     void ResetCommandLists()

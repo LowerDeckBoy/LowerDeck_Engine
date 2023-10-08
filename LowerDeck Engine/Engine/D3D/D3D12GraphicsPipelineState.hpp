@@ -97,6 +97,24 @@ namespace D3D
 		void SetDomainShader(const std::string_view& Filepath, LPCWSTR EntryPoint = L"main");
 
 		/// <summary>
+		/// Whether to use Depth Buffer or not.
+		/// </summary>
+		/// <param name="bEnable"></param>
+		void SetEnableDepth(bool bEnable = true);
+
+		/// <summary>
+		/// Whether to use Wireframe mode.
+		/// </summary>
+		/// <param name="FillMode"></param>
+		void SetWireframeMode(bool bEnable = false);
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="CullMode"></param>
+		void SetCullMode(D3D12_CULL_MODE CullMode);
+
+		/// <summary>
 		/// <b>Sets all member to default states.</b><br/>
 		/// Use only when about to release <c>D3D12GraphicsPipelineState</c> object
 		/// or need to create PSO much different to previous ones.<br/>

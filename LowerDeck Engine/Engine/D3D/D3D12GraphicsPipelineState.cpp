@@ -73,6 +73,7 @@ namespace D3D
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
 		else 
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+
 		ThrowIfFailed(D3D::g_Device.Get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(PSO.GetAddressOf())), "Failed to create PipelineState!");
 
 		PSO.Usage = PipelineType::eGraphics;
@@ -118,8 +119,27 @@ namespace D3D
 		m_DomainShader = m_ShaderManager->CompileDXIL(Filepath, ShaderType::eDomain, EntryPoint);
 	}
 
+	void D3D12GraphicsPipelineStateBuilder::SetEnableDepth(bool bEnable)
+	{
+		m_DepthDesc.DepthEnable = bEnable;
+		m_RasterizerDesc.DepthClipEnable = bEnable;
+	}
+
+	void D3D12GraphicsPipelineStateBuilder::SetWireframeMode(bool bEnable)
+	{
+		m_FillMode = bEnable ? D3D12_FILL_MODE_WIREFRAME : D3D12_FILL_MODE_SOLID;
+	}
+
+	void D3D12GraphicsPipelineStateBuilder::SetCullMode(D3D12_CULL_MODE CullMode)
+	{
+		m_CullMode = CullMode;
+	}
+
 	void D3D12GraphicsPipelineStateBuilder::Reset()
 	{
+		m_RenderTargetFormats.clear();
+		m_RenderTargetFormats.shrink_to_fit();
+
 		m_Ranges.clear();
 		m_Parameters.clear();
 		m_InputLayout = {};

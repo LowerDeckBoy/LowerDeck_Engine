@@ -40,6 +40,8 @@ namespace D3D
 		/// </summary>
 		void OnResize(D3D12DescriptorHeap* pDepthHeap, D3D12Viewport* pViewport, bool bSRV = false);
 
+		ID3D12Resource* Get() { return m_Resource.Get(); }
+
 		/// <summary> Getter for DSV Descriptor. </summary>
 		/// <returns></returns>
 		inline D3D12Descriptor DSV() { return m_DSV; }

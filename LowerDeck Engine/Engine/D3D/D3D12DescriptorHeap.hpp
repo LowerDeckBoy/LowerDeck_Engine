@@ -42,7 +42,8 @@ namespace D3D
 		
 		/// <summary> Getter for underlaying ID3D12DescriptorHeap COM pointer. </summary>
 		/// <returns> ID3D12DescriptorHeap* </returns>
-		[[nodiscard]] inline ID3D12DescriptorHeap* Heap() { return m_Heap.Get(); }
+		[[nodiscard]] inline ID3D12DescriptorHeap*  Heap() { return m_Heap.Get(); }
+		[[nodiscard]] inline ID3D12DescriptorHeap** HeapAddressOf() { return m_Heap.GetAddressOf(); }
 
 		[[nodiscard]] inline D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle() { return m_Heap.Get()->GetCPUDescriptorHandleForHeapStart(); }
 		[[nodiscard]] inline D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle() { return m_Heap.Get()->GetGPUDescriptorHandleForHeapStart(); }

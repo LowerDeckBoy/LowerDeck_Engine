@@ -11,7 +11,7 @@ namespace D3D
 
 	D3D12Context::~D3D12Context()
 	{
-		ReleaseD3D();
+		//ReleaseD3D();
 	}
 
 	void D3D12Context::InitializeD3D()
@@ -42,16 +42,6 @@ namespace D3D
 
 		// DSV
 		m_DepthHeap = std::make_unique<D3D12DescriptorHeap>(HeapUsage::eDSV, 64, L"Main Depth Heap");
-	}
-
-	void D3D12Context::WaitForGPU()
-	{
-		ThrowIfFailed(g_CommandQueue.Get()->Signal(g_Fence.Get(), g_FenceValues.at(FRAME_INDEX)));
-
-		ThrowIfFailed(g_Fence.Get()->SetEventOnCompletion(g_FenceValues.at(FRAME_INDEX), g_FenceEvent));
-		::WaitForSingleObjectEx(g_FenceEvent, INFINITE, FALSE);
-
-		g_FenceValues.at(FRAME_INDEX)++;
 	}
 
 	void D3D12Context::MoveToNextFrame()
@@ -119,7 +109,7 @@ namespace D3D
 	{
 		WaitForGPU();
 		FlushGPU();
-
+		::CloseHandle(g_FenceEvent);
 		// Despite being a std::unique_ptr Heap is released manualy.
 		// Otherwise other structs are released before Heap causing to false-positive LIVE_DESCRIPTORHEAP.
 		m_DepthHeap.reset();

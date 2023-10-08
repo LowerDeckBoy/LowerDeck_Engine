@@ -38,10 +38,6 @@ namespace D3D
 		void InitializeHeaps();
 
 		/// <summary>
-		/// Wait until <c>Fence</c> event is complete.
-		/// </summary>
-		void WaitForGPU();
-		/// <summary>
 		/// Move to next <c>SwapChain Backbuffer</c><br/>.
 		/// If frame is not ready to be presented, wait until it is.
 		/// </summary>
