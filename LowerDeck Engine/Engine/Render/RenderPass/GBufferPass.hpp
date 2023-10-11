@@ -17,15 +17,20 @@ class GBufferPass
 {
 public:
 	/// <summary>
-	/// 
+	/// Initializes Resources and both SRV and RTV Descriptors.
 	/// </summary>
-	/// <param name="pViewport"></param>
-	/// <param name="pSceneDepth"></param>
-	/// <param name="pShaderManager"></param>
+	/// <param name="pViewport"> Scene Viewport to determine resource dimensions. </param>
+	/// <param name="pSceneDepth"> Scene Depth Buffer. </param>
+	/// <param name="pShaderManager"> Required to create States. </param>
 	GBufferPass(D3D::D3D12Viewport* pViewport, D3D::D3D12DepthBuffer* pSceneDepth, std::shared_ptr<gfx::ShaderManager> pShaderManager);
+	/// <summary>
+	/// Releases underlying resources.
+	/// </summary>
 	~GBufferPass();
 
-	/// <summary> Total number of GBuffers. </summary>
+	/// <summary> 
+	/// Total number of GBuffers: Depth, BaseColor, Normal, MetalRoughness, WorldPosition.
+	/// </summary>
 	static const uint32_t RenderTargetsCount{ 5 };
 
 	/// <summary>
@@ -41,9 +46,9 @@ public:
 	void EndPass();
 
 	/// <summary>
-	/// 
+	/// Releases and resizes Render Targets.
 	/// </summary>
-	/// <param name="pViewport"></param>
+	/// <param name="pViewport"> Pointer to Scene Viewport. </param>
 	void OnResize(D3D::D3D12Viewport* pViewport);
 
 	/// <summary>
@@ -52,24 +57,33 @@ public:
 	void Release();
 
 	/// <summary> </summary>
-	/// <returns></returns>
+	/// <returns> Array of RTV Descriptors. </returns>
 	std::array<D3D::D3D12Descriptor, RenderTargetsCount> GetGBuffers() { return m_SRVDescs; }
 
 	/// <summary> </summary>
-	/// <returns></returns>
+	/// <returns> Array of Render Target CPU Desriptor Handles. </returns>
 	std::array<CD3DX12_CPU_DESCRIPTOR_HANDLE, RenderTargetsCount> GetRenderDescs() { return m_RenderTargetDescs; }
 
 	/// <summary> </summary>
-	/// <returns></returns>
+	/// <returns> Array of Render Target Resources. </returns>
 	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, RenderTargetsCount> GetRenderTargets() { return m_RenderTargets; }
 
 private:
+	/// <summary>
+	/// Creates Resources and States.
+	/// </summary>
+	/// <param name="pViewport"> Pointer to Scene Viewport. </param>
+	/// <param name="pShaderManager"> Shared Pointer to ShaderManager object. </param>
 	void Initialize(D3D::D3D12Viewport* pViewport, std::shared_ptr<gfx::ShaderManager> pShaderManager);
+	/// <summary>
+	/// Used at initialization and <c>OnResize()</c>.
+	/// </summary>
+	/// <param name="pViewport"> Pointer to Scene Viewport. </param>
 	void CreateRenderTargets(D3D::D3D12Viewport* pViewport);
 
-	std::array<float, 4> m_ClearColor{ 0.5f, 0.5f, 1.0f, 1.0f };
 	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, RenderTargetsCount> m_RenderTargets;
 	std::array<CD3DX12_CPU_DESCRIPTOR_HANDLE, RenderTargetsCount> m_RenderTargetDescs{};
+	std::array<D3D::D3D12Descriptor, RenderTargetsCount> m_RTVDescs;
 	std::array<D3D::D3D12Descriptor, RenderTargetsCount> m_SRVDescs;
 
 	D3D::D3D12RootSignature m_RootSignature;
@@ -78,7 +92,7 @@ private:
 	D3D::D3D12DepthBuffer* m_SceneDepth{ nullptr };
 
 	/// <summary>
-	/// 
+	/// Desired formats for each Render Target.
 	/// </summary>
 	std::array<DXGI_FORMAT, RenderTargetsCount> m_RenderTargetFormats{
 		DXGI_FORMAT_R8G8B8A8_UNORM,			// Depth
