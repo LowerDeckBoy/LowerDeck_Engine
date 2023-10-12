@@ -72,6 +72,10 @@ namespace D3D
 		/// <returns> Pointer to general use DSV Descriptor Heap. </returns>
 		[[nodiscard]] inline static D3D12DescriptorHeap* GetDepthHeap() { return m_DepthHeap.get(); }
 
+		/// <summary></summary>
+		/// <returns> Pointer to Deferred based Render Target Heap. </returns>
+		[[nodiscard]] inline static D3D12DescriptorHeap* GetDeferredHeap() { return m_DeferredHeap.get(); }
+
 		/// <summary> </summary>
 		/// <returns> Pointer to Scene Viewport. </returns>
 		D3D12Viewport* GetSceneViewport() const { return m_Viewport; }
@@ -108,6 +112,11 @@ namespace D3D
 		/// DSV heap.
 		/// </summary>
 		static std::unique_ptr<D3D12DescriptorHeap> m_DepthHeap;
+
+		/// <summary>
+		/// Used to create Render Targets for Deferred Rendering passes.
+		/// </summary>
+		static std::unique_ptr<D3D12DescriptorHeap> m_DeferredHeap;
 
 		/// <summary>
 		/// Indicates if listed features are supported or are not.

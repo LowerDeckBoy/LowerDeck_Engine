@@ -4,8 +4,9 @@
 
 namespace D3D
 {
-	std::unique_ptr<D3D12DescriptorHeap> D3D12Context::m_MainHeap = nullptr;
-	std::unique_ptr<D3D12DescriptorHeap> D3D12Context::m_DepthHeap = nullptr;
+	std::unique_ptr<D3D12DescriptorHeap> D3D12Context::m_MainHeap	  = nullptr;
+	std::unique_ptr<D3D12DescriptorHeap> D3D12Context::m_DepthHeap	  = nullptr;
+	std::unique_ptr<D3D12DescriptorHeap> D3D12Context::m_DeferredHeap = nullptr;
 
 	D3D12Context::FeatureSupport D3D12Context::FeatureSet = {};
 
@@ -42,6 +43,9 @@ namespace D3D
 
 		// DSV
 		m_DepthHeap = std::make_unique<D3D12DescriptorHeap>(HeapUsage::eDSV, 64, L"Main Depth Heap");
+
+		// Deferred
+		m_DeferredHeap = std::make_unique<D3D12DescriptorHeap>(HeapUsage::eRTV, 12, L"Deferred Heap");
 	}
 
 	void D3D12Context::MoveToNextFrame()
@@ -112,6 +116,10 @@ namespace D3D
 		::CloseHandle(g_FenceEvent);
 		// Despite being a std::unique_ptr Heap is released manualy.
 		// Otherwise other structs are released before Heap causing to false-positive LIVE_DESCRIPTORHEAP.
+
+		m_DeferredHeap.reset();
+		m_DeferredHeap = nullptr;
+
 		m_DepthHeap.reset();
 		m_DepthHeap = nullptr;
 
