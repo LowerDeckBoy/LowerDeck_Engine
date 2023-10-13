@@ -6,7 +6,7 @@
 #include <ImGui/imgui.h>
 
 
-Model::Model(std::string_view Filepath, const std::string& ModelName) 
+Model::Model(std::string_view Filepath, const std::string& ModelName)
 	: Importer(Filepath)
 {
 	Create(Filepath);
@@ -20,18 +20,16 @@ Model::~Model()
 
 void Model::Create(std::string_view Filepath)
 {
-	if (!Import(Filepath)) 
+	if (!Import(Filepath))
 	{
+		// Log here
 		throw std::exception();
 	}
 
-	m_VertexBuffer	= std::make_unique<gfx::VertexBuffer>(gfx::BufferData(m_Vertices.data(), m_Vertices.size(), sizeof(m_Vertices.at(0)) * m_Vertices.size(), sizeof(m_Vertices.at(0))));
+	m_VertexBuffer	= std::make_unique<gfx::StructuredBuffer>(gfx::BufferData(m_Vertices.data(), m_Vertices.size(), sizeof(m_Vertices.at(0)) * m_Vertices.size(), sizeof(m_Vertices.at(0))));
 	m_IndexBuffer	= std::make_unique<gfx::IndexBuffer>(gfx::BufferData(m_Indices.data(), m_Indices.size(), sizeof(uint32_t) * m_Indices.size(), sizeof(uint32_t)));
 
 	m_cbPerObject	= std::make_unique<gfx::ConstantBuffer<gfx::cbPerObject>>(&m_cbPerObjectData);
-	//m_cbMaterial	= std::make_unique<gfx::ConstantBuffer<gfx::cbMaterial>>(&m_cbMaterialData);
-	//m_cbPerObject	= std::make_unique<ConstantBuffer<cbPerObject>>(pDevice, &m_cbPerObjectData);
-	//m_cbCamera		= std::make_unique<ConstantBuffer<cbCamera>>(pDevice, &m_cbCameraData);
 
 	m_Vertices.clear();
 	m_Vertices.shrink_to_fit();
@@ -44,7 +42,8 @@ void Model::Create(std::string_view Filepath)
 void Model::Draw(Camera* pCamera)
 {
 	D3D::g_CommandList.Get()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	D3D::g_CommandList.Get()->IASetVertexBuffers(0, 1, &m_VertexBuffer->View);
+	// Unnecessary when using bindless
+	//D3D::g_CommandList.Get()->IASetVertexBuffers(0, 1, &m_VertexBuffer->View);
 
 	for (size_t i = 0; i < m_Meshes.size(); i++)
 	{
@@ -54,9 +53,6 @@ void Model::Draw(Camera* pCamera)
 		
 		auto currentMaterial{ m_Materials.at(i) };
 
-		//XMFLOAT4 cameraPosition{};
-		//XMStoreFloat4(&cameraPosition, pCamera->GetPosition());
-		//cameraPosition,
 		// Material data
 		const model::Material materialData{  currentMaterial->BaseColorFactor,
 											 currentMaterial->EmissiveFactor,
@@ -71,12 +67,19 @@ void Model::Draw(Camera* pCamera)
 											 currentMaterial->EmissiveIndex };
 
 		D3D::g_CommandList.Get()->SetGraphicsRoot32BitConstants(1, sizeof(materialData) / sizeof(int32_t), &materialData, 0);
-		//D3D::g_CommandList.Get()->SetGraphicsRoot32BitConstants(2, sizeof(indices) / sizeof(int32_t), &indices, 0);
+		
+		struct vertex
+		{ 
+			uint32_t index; 
+			uint32_t offset; 
+		} vert{ m_VertexBuffer->GetDescriptor().Index, m_Meshes.at(i)->StartVertexLocation };
+		D3D::g_CommandList.Get()->SetGraphicsRoot32BitConstants(2, 2 * sizeof(uint32_t) / sizeof(uint32_t), &vert, 0);
 
 		if (m_Meshes.at(i)->bHasIndices)
 		{
 			D3D::g_CommandList.Get()->IASetIndexBuffer(&m_IndexBuffer->View);
-			D3D::g_CommandList.Get()->DrawIndexedInstanced(m_Meshes.at(i)->IndexCount, 1,
+			D3D::g_CommandList.Get()->DrawIndexedInstanced(
+				m_Meshes.at(i)->IndexCount, 1,
 				m_Meshes.at(i)->FirstIndexLocation,
 				m_Meshes.at(i)->BaseVertexLocation, 0);
 		}

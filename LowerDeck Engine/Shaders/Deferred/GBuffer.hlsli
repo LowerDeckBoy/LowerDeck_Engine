@@ -29,6 +29,22 @@ struct GBuffer_Output
 	float4 WorldPosition	: SV_Target4;
 };
 
+// Vertex Buffers
+struct VertexBuffer
+{
+	float3 Position;
+	float2 TexCoord;
+	float3 Normal;
+	float3 Tangent;
+	float3 Bitangent;
+};
+
+struct Vertex
+{
+	uint VertexIndex;
+	uint VertexOffset;
+};
+
 // Textures 
 struct MaterialIndices
 {

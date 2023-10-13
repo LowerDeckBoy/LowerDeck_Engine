@@ -39,12 +39,12 @@ namespace gfx
 		Count				= Buffer::GetData().ElementsCount;
 	}
 
-	StructureBuffer::StructureBuffer(BufferData Data, bool bSRV)
+	StructuredBuffer::StructuredBuffer(BufferData Data, bool bSRV)
 	{
 		Create(Data, bSRV);
 	}
 
-	void StructureBuffer::Create(BufferData Data, bool bSRV)
+	void StructuredBuffer::Create(BufferData Data, bool bSRV)
 	{
 		Buffer::Create(Data, BufferType::eStructured, bSRV);
 	}

@@ -2,8 +2,6 @@
 #define GBUFFER_HLSL
 
 #include "GBuffer.hlsli"
-//#include "Deferred/GBuffer.hlsli"
-//#include "Shaders/Deferred/GBuffer.hlsli"
 
 // https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_6_DynamicResources.html#resourcedescriptorheap-and-samplerdescriptorheap
 // https://rtarun9.github.io/blogs/bindless_rendering/#using-sm66s-resourcedescriptorheap--samplerdescriptorheap
@@ -14,18 +12,24 @@ cbuffer cbPerObject : register(b0, space0)
 	row_major float4x4 World;
 }
 
-ConstantBuffer<MaterialData> Material : register(b1, space0);
+ConstantBuffer<MaterialData> Material	: register(b1, space0);
+ConstantBuffer<Vertex> cbVertex			: register(b2, space0);
 
-DeferredOutput VSmain(DeferredInput vin)
+DeferredOutput VSmain(uint vertId : SV_VertexID)
 {
-	DeferredOutput output = (DeferredOutput) 0;
-	output.Position		 = mul(WVP, float4(vin.Position, 1.0f));
-	output.WorldPosition = mul(World, float4(vin.Position, 1.0f));
-	output.TexCoord		 = vin.TexCoord;
-	output.Normal		 = normalize(mul((float3x3) World, vin.Normal));
-	output.Tangent		 = normalize(mul((float3x3) World, vin.Tangent));
-	output.Bitangent	 = normalize(mul((float3x3) World, vin.Bitangent));
+	// Load buffer from it's index in descriptor
+	StructuredBuffer<VertexBuffer> vertexBuffer = ResourceDescriptorHeap[cbVertex.VertexIndex];
+	// Load current vertex from buffer
+	VertexBuffer vertex = vertexBuffer.Load((cbVertex.VertexOffset + vertId));
 
+	DeferredOutput output = (DeferredOutput) 0;
+	output.Position		 = mul(WVP, float4(vertex.Position, 1.0f));
+	output.WorldPosition = mul(World, float4(vertex.Position, 1.0f));
+	output.TexCoord		 = vertex.TexCoord;
+	output.Normal		 = normalize(mul((float3x3) World, vertex.Normal));
+	output.Tangent		 = normalize(mul((float3x3) World, vertex.Tangent));
+	output.Bitangent	 = normalize(mul((float3x3) World, vertex.Bitangent));
+	
 	return output;
 }
 

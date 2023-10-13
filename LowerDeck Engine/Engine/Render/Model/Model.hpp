@@ -23,7 +23,8 @@ public:
 
 	void Release();
 
-	std::unique_ptr<gfx::VertexBuffer> m_VertexBuffer;
+	// Bindless buffer
+	std::unique_ptr<gfx::StructuredBuffer> m_VertexBuffer;
 	std::unique_ptr<gfx::IndexBuffer> m_IndexBuffer;
 
 protected:

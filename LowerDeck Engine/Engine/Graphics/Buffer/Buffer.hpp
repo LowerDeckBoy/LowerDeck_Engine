@@ -88,16 +88,31 @@ namespace gfx
 	};
 
 	/// <summary>
-	/// Buffer that is meant to be accessed (read-only) by shader.
+	/// Buffer that is meant to be accessed (read-only) by shader.<br/>
+	/// Relates to Bindless rendering.
 	/// </summary>
-	class StructureBuffer : public Buffer
+	class StructuredBuffer : public Buffer
 	{
 	public:
-		StructureBuffer() = default;
-		StructureBuffer(BufferData Data, bool bSRV = true);
+		StructuredBuffer() = default;
+		/// <summary>
+		/// Initializes buffer.
+		/// </summary>
+		/// <param name="Data"> Buffer data. </param>
+		/// <param name="bSRV"> Defaults to <c>true</c> since it's meant for Bindless rendering. </param>
+		StructuredBuffer(BufferData Data, bool bSRV = true);
 
+		/// <summary>
+		/// Initializes buffer.
+		/// </summary>
+		/// <param name="Data"> Buffer data. </param>
+		/// <param name="bSRV"> Defaults to <c>true</c> since it's meant for Bindless rendering. </param>
 		void Create(BufferData Data, bool bSRV = true);
 
+		/// <summary>
+		/// Getter for underlying <c>SRV Descriptor</c>.
+		/// </summary>
+		/// <returns> <c>ShaderResourceView Descriptor</c> </returns>
 		D3D::D3D12Descriptor GetDescriptor() { return m_Descriptor; }
 	};
 
