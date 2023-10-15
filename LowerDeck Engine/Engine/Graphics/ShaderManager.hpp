@@ -27,16 +27,16 @@ namespace gfx
 	{
 	public:
 		/// <summary>
-		/// 
+		/// Initializes IDxc pointers.
 		/// </summary>
 		ShaderManager();
 		/// <summary>
-		/// 
+		/// Releases IDxc pointers.
 		/// </summary>
 		~ShaderManager();
 
 		/// <summary>
-		/// 
+		/// Initializes IDxc pointers.
 		/// </summary>
 		void Initialize();
 		/// <summary>
@@ -50,7 +50,7 @@ namespace gfx
 		/// <param name="Filepath"> Path to Shader. </param>
 		/// <param name="eType"> Type of shader used to fetch desired shader target. </param>
 		/// <param name="EntryPoint"> Defaults to <c>main</c>. Use different <c>EntryPoint</c> if using more then one shader inside a single file. </param>
-		/// <returns></returns>
+		/// <returns> Pointer to IDxcBlob. </returns>
 		IDxcBlob* CompileDXIL(const std::string_view& Filepath, ShaderType eType, LPCWSTR EntryPoint = L"main");
 
 	private:

@@ -3,8 +3,6 @@
 #include "../D3D/D3D12Utility.hpp"
 #include "../Utility/Utility.hpp"
 #include "../Utility/FileSystem.hpp"
-#include <fstream>
-#include <sstream>
 #include <vector>
 
 #pragma comment(lib, "dxcompiler.lib")
@@ -36,38 +34,23 @@ namespace gfx
 
 	IDxcBlob* ShaderManager::CompileDXIL(const std::string_view& Filepath, ShaderType eType, LPCWSTR EntryPoint)
 	{
-		std::ifstream shaderFile(Filepath.data());
-		if (!shaderFile.good())
-		{
-			std::string msg{ "Failed to read " + std::string(Filepath.begin(), Filepath.end()) + " shader file!\n" };
-			::MessageBoxA(nullptr, msg.c_str(), "Error", MB_OK);
-			throw std::runtime_error("Failed to read shader file!");
-		}
-
-		std::stringstream strStream;
-		strStream << shaderFile.rdbuf();
-		std::string shaderStr{ strStream.str() };
-
+		uint32_t codePage{ DXC_CP_ACP };
 		IDxcBlobEncoding* sourceBlob{};
-		ThrowIfFailed(m_Library.Get()->CreateBlobWithEncodingFromPinned(LPBYTE(shaderStr.c_str()), static_cast<uint32_t>(shaderStr.size()), 0, &sourceBlob));
+		ThrowIfFailed(m_DxcUtils->LoadFile(utility::ToWideString(Filepath).c_str(), &codePage, &sourceBlob));
 
-		std::vector<LPCWSTR> arguments;
-		// Push entry point
-		arguments.push_back(L"-E");
-		arguments.push_back(EntryPoint);
-
-		// Push target
-		arguments.push_back(L"-T");
-		arguments.push_back(ShaderTypeToTarget(eType));
-
-		// Push include paths
-		arguments.push_back(L"-I Shaders/");
 		std::wstring parentPath{ utility::ToWideString(utility::GetParentPath(Filepath)) };
-		arguments.push_back(L"-I");
-		arguments.push_back(parentPath.c_str());
-
-		arguments.push_back(L"-Qstrip_debug");
-		arguments.push_back(L"-Qstrip_reflect");
+		std::vector<LPCWSTR> arguments = {
+			// Entry point
+			L"-E", EntryPoint,
+			// Target (i.e. vs_6_0)
+			L"-T", ShaderTypeToTarget(eType),
+			// Include paths: without them, it can cause issues when trying to do includes inside hlsl
+			L"-I Shaders/", L"-I", parentPath.c_str(),
+			// HLSL version: 2021 is latest
+			L"-HV 2021",
+			// 	Strip debug information and strip reflection data from shader bytecode
+			L"-Qstrip_debug", L"-Qstrip_reflect",
+		};
 
 #if defined (_DEBUG)
 		// Push debug flags
@@ -78,7 +61,7 @@ namespace gfx
 		arguments.push_back(DXC_ARG_OPTIMIZATION_LEVEL3)
 #endif
 
-		DxcBuffer buffer{ sourceBlob->GetBufferPointer(), sourceBlob->GetBufferSize(), 0 };
+		DxcBuffer buffer{ sourceBlob->GetBufferPointer(), sourceBlob->GetBufferSize(), DXC_CP_ACP };
 		IDxcResult* result{ nullptr };
 		ThrowIfFailed(m_Compiler.Get()->Compile(&buffer, arguments.data(), static_cast<uint32_t>(arguments.size()), m_IncludeHandler.Get(), IID_PPV_ARGS(&result)));
 		
