@@ -4,14 +4,11 @@
 #include <wrl/client.h>
 #include <string_view>
 #include "../D3D/D3D12Types.hpp"
+#include "Shader.hpp"
 
 namespace gfx
 {
-	// TODO:
-	// IDxcBlob wrapper
-	class Shader
-	{
-	};
+
 
 	// TODO:
 	// Add checking if .cso files are available,
@@ -52,6 +49,7 @@ namespace gfx
 		/// <param name="EntryPoint"> Defaults to <c>main</c>. Use different <c>EntryPoint</c> if using more then one shader inside a single file. </param>
 		/// <returns> Pointer to IDxcBlob. </returns>
 		IDxcBlob* CompileDXIL(const std::string_view& Filepath, ShaderType eType, LPCWSTR EntryPoint = L"main");
+		//Shader CompileDXIL(const std::string_view& Filepath, ShaderType eType, LPCWSTR EntryPoint = L"main");
 
 	private:
 		Microsoft::WRL::ComPtr<IDxcCompiler3>		m_Compiler;

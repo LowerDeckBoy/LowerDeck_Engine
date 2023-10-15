@@ -31,7 +31,7 @@ namespace gfx
 		ThrowIfFailed(m_DxcUtils->CreateDefaultIncludeHandler(m_IncludeHandler.ReleaseAndGetAddressOf()), "Failed to create Dxc Include Handler Instance!");
 
 	}
-
+	//
 	IDxcBlob* ShaderManager::CompileDXIL(const std::string_view& Filepath, ShaderType eType, LPCWSTR EntryPoint)
 	{
 		uint32_t codePage{ DXC_CP_ACP };
@@ -81,6 +81,7 @@ namespace gfx
 		SAFE_DELETE(sourceBlob);
 
 		return blob;
+		//return Shader(blob);
 	}
 
 	void ShaderManager::Release()
