@@ -20,6 +20,9 @@ extern uint32_t FRAME_INDEX;
 #define SAFE_DELETE(_Ptr) { if (_Ptr) { _Ptr->Release(); _Ptr = nullptr; } }
 #endif
 
+// Clear color for Render Targets
+static const std::array<float, 4> ClearColor{ 0.0f, 0.0f, 0.0f, 0.0f };
+
 namespace D3D
 {
 	// Number of total frames used in SwapChain.
@@ -94,5 +97,5 @@ namespace gfx
 	/// </summary>
 	/// <param name="TypeOf"> Enum type. </param>
 	/// <returns></returns>
-	LPCWSTR ShaderTypeToTarget(ShaderType TypeOf);
+	LPCWSTR ShaderTypeToTarget(ShaderType eType);
 }
