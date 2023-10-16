@@ -3,9 +3,6 @@
 
 #include "GBuffer.hlsli"
 
-// https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_6_DynamicResources.html#resourcedescriptorheap-and-samplerdescriptorheap
-// https://rtarun9.github.io/blogs/bindless_rendering/#using-sm66s-resourcedescriptorheap--samplerdescriptorheap
-
 cbuffer cbPerObject : register(b0, space0)
 {
 	row_major float4x4 WVP;
@@ -15,20 +12,20 @@ cbuffer cbPerObject : register(b0, space0)
 ConstantBuffer<MaterialData> Material	: register(b1, space0);
 ConstantBuffer<Vertex> cbVertex			: register(b2, space0);
 
-DeferredOutput VSmain(uint vertId : SV_VertexID)
+DeferredOutput VSmain(uint VertexID : SV_VertexID)
 {
 	// Load buffer from it's index in descriptor
-	StructuredBuffer<VertexBuffer> vertexBuffer = ResourceDescriptorHeap[cbVertex.VertexIndex];
+	StructuredBuffer<VertexLayout> vertexBuffer = ResourceDescriptorHeap[cbVertex.VertexIndex];
 	// Load current vertex from buffer
-	VertexBuffer vertex = vertexBuffer.Load((cbVertex.VertexOffset + vertId));
+	VertexLayout vertex = vertexBuffer.Load((cbVertex.VertexOffset + VertexID));
 
 	DeferredOutput output = (DeferredOutput) 0;
-	output.Position		 = mul(WVP, float4(vertex.Position, 1.0f));
-	output.WorldPosition = mul(World, float4(vertex.Position, 1.0f));
-	output.TexCoord		 = vertex.TexCoord;
-	output.Normal		 = normalize(mul((float3x3) World, vertex.Normal));
-	output.Tangent		 = normalize(mul((float3x3) World, vertex.Tangent));
-	output.Bitangent	 = normalize(mul((float3x3) World, vertex.Bitangent));
+	output.Position		  = mul(WVP, float4(vertex.Position, 1.0f));
+	output.WorldPosition  = mul(World, float4(vertex.Position, 1.0f));
+	output.TexCoord		  = vertex.TexCoord;
+	output.Normal		  = normalize(mul((float3x3) World, vertex.Normal));
+	output.Tangent		  = normalize(mul((float3x3) World, vertex.Tangent));
+	output.Bitangent	  = normalize(mul((float3x3) World, vertex.Bitangent));
 	
 	return output;
 }
@@ -39,21 +36,23 @@ GBuffer_Output PSmain(DeferredOutput pin)
 {
 	GBuffer_Output output = (GBuffer_Output) 0;
 	
-	if (Material.BaseColorIndex > -1)
+	// Load BaseColor texture
+	if (Material.BaseColorIndex > INVALID_INDEX)
 	{
 		Texture2D<float4> baseColor = ResourceDescriptorHeap[Material.BaseColorIndex];
 		output.Albedo = baseColor.Sample(texSampler, pin.TexCoord) * Material.BaseColorFactor;
 
+		// Check alpha and cut if necessary
 		if (output.Albedo.a < Material.AlphaCutoff)
 			clip(output.Albedo.a - Material.AlphaCutoff);
-
 	}
 	else
 	{
 		output.Albedo = float4(0.5f, 0.5f, 0.5f, 1.0f);
 	}
 	
-	if (Material.NormalIndex > -1)
+	// Load and transform Normal texture
+	if (Material.NormalIndex > INVALID_INDEX)
 	{
 		Texture2D<float4> normalTexture = ResourceDescriptorHeap[Material.NormalIndex];
 		float4 normalMap = normalize(2.0f * normalTexture.Sample(texSampler, pin.TexCoord) - 1.0f);
@@ -68,7 +67,8 @@ GBuffer_Output PSmain(DeferredOutput pin)
 		output.Normal = float4(pin.Normal, 1.0f);
 	}
 	
-	if (Material.MetallicRoughnessIndex >= 0)
+	// Load MetalRoughness texture
+	if (Material.MetallicRoughnessIndex > INVALID_INDEX)
 	{
 		Texture2D<float4> metalRoughnessTex = ResourceDescriptorHeap[Material.MetallicRoughnessIndex];
 		float4 metallic = metalRoughnessTex.Sample(texSampler, pin.TexCoord);
@@ -81,16 +81,22 @@ GBuffer_Output PSmain(DeferredOutput pin)
 		output.Metallic = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	}
 	
-	if (Material.EmissiveIndex >= 0)
+	// Load Emissive texture.
+	// If available: add it's output right to BaseColor
+	if (Material.EmissiveIndex > INVALID_INDEX)
 	{
 		Texture2D<float4> emissiveTex = ResourceDescriptorHeap[Material.EmissiveIndex];
 		output.Albedo += (emissiveTex.Sample(texSampler, pin.TexCoord) * Material.EmissiveFactor);
 	}
 
-	output.WorldPosition = pin.WorldPosition;
-	
-	const float z = pin.Position.z / pin.Position.w;
-	output.DepthMap = float4(z, z, z, 1.0f);
+	// Depth Buffer and WorlPositions
+	{
+		const float z = pin.Position.z / pin.Position.w;
+		output.DepthMap = float4(z, z, z, 1.0f);
+		
+		output.WorldPosition = pin.WorldPosition;
+	}
+
 
 	return output;
 }

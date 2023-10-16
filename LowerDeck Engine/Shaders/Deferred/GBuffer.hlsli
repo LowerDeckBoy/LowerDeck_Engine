@@ -1,14 +1,7 @@
 #ifndef GBUFFER_HLSLI
 #define GBUFFER_HLSLI
 
-struct DeferredInput
-{
-	float3 Position		: POSITION;
-	float2 TexCoord		: TEXCOORD;
-	float3 Normal		: NORMAL;
-	float3 Tangent		: TANGENT;
-	float3 Bitangent	: BITANGENT;
-};
+#define INVALID_INDEX -1
 
 struct DeferredOutput
 {
@@ -20,7 +13,7 @@ struct DeferredOutput
 	float3 Bitangent		: BITANGENT;
 };
 
-struct GBuffer_Output
+struct GBufferOutput
 {
 	float4 DepthMap			: SV_Target0;
 	float4 Albedo			: SV_Target1;
@@ -29,8 +22,8 @@ struct GBuffer_Output
 	float4 WorldPosition	: SV_Target4;
 };
 
-// Vertex Buffers
-struct VertexBuffer
+// Vertex Buffer layout
+struct VertexLayout
 {
 	float3 Position;
 	float2 TexCoord;
@@ -69,7 +62,5 @@ struct MaterialData
 	int MetallicRoughnessIndex;
 	int EmissiveIndex;
 };
-
-//Texture2D<float4> DepthTexture : register(t4, space0);
 
 #endif // GBUFFER_HLSLI
