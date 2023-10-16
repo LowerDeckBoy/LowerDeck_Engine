@@ -1,0 +1,1354 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        "LowerDeck Engine"
+    </assembly>
+    <members>
+        <member name="T:utility.MemoryUsage">
+            <summary>
+Note: RAM usage output is NOT actually accurate.<br />
+Given output is higher, than actual usage.<br />
+Problem lays in VS itself.<br />
+TODO: to investigate...
+</summary>
+        </member>
+        <member name="M:ai_real_to_property_type_info(System.Single)">
+@file material.inl
+ *  @brief Defines the C++ getters for the material system
+
+</member>
+        <member name="T:_Min_max_element_t">
+@file matrix3x3.inl
+ *  @brief Inline implementation of the 3x3 matrix operators
+
+</member>
+        <member name="M:Scene.Dispose">
+            <summary>
+Self cleanup.
+</summary>
+        </member>
+        <member name="M:ecs.World.DestroyEntity(&lt;unknown type&gt;)">
+            <summary />
+            <param name="Entity" />
+        </member>
+        <member name="M:ecs.World.CreateEntity">
+            <summary />
+            <returns />
+        </member>
+        <member name="T:ecs.World">
+            <summary />
+        </member>
+        <member name="T:ecs.ScaleComponent">
+            <summary>
+XYZ
+</summary>
+        </member>
+        <member name="T:ecs.RotationComponent">
+            <summary>
+XYZW
+</summary>
+        </member>
+        <member name="T:ecs.TranslationComponent">
+            <summary>
+XYZ 
+</summary>
+        </member>
+        <member name="T:ecs.TransformComponent">
+            <summary>
+Transform matrix
+</summary>
+        </member>
+        <member name="M:Engine.Run">
+Render loop
+</member>
+        <member name="T:Engine">
+            <summary>
+Application entry point.<br />
+Responsbile for render-loop.<br /><c>Engine</c> inherits from Window class in order to
+override WinAPI Window Procedures and enable proper Resize logic.
+</summary>
+        </member>
+        <member name="M:Renderer.GetViewportRenderTarget(System.Int32)">
+            <summary>
+Set Render Target to GUI scene viewport output
+</summary>
+            <param name="Selected" />
+        </member>
+        <member name="M:Renderer.ClearRenderTarget">
+            <summary>Clear SwapChain Render Targets and Depth Stencil</summary>
+        </member>
+        <member name="M:Renderer.SetRenderTarget">
+            <summary>Set SwapChain Render Targets for frame presentation</summary>
+        </member>
+        <member name="M:Renderer.SetViewport">
+            <summary>
+Set actual Scene Viewport - SwapChain output.
+</summary>
+        </member>
+        <member name="M:Renderer.SetHeaps(std.vector&lt;ID3D12DescriptorHeap**,std.allocator&lt;ID3D12DescriptorHeap**&gt;&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary>
+Wrapper for setting desired <c>Descriptor Heaps</c> (SRV_UAV_CBV and Sampler Heaps).
+</summary>
+            <param name="Heaps"> Reference to vector of Heaps. </param>
+        </member>
+        <member name="M:Renderer.TransitToPresent(D3D12_RESOURCE_STATES)">
+            <summary>
+Change SwapChain RenderTargets to Present State.<br />
+Called at <c>EndFrame()</c>.
+</summary>
+            <param name="StateBefore" />
+        </member>
+        <member name="M:Renderer.TransitToRender">
+            <summary>
+Change SwapChain RenderTargets to Render State.<br />
+Called at <c>BeginFrame()</c>.
+</summary>
+        </member>
+        <member name="M:Renderer.Idle">
+            <summary>
+Called when render loops and to ensure that there are NO resource "in-flight".
+</summary>
+        </member>
+        <member name="M:Renderer.CreatePipelines">
+            <summary>
+Create PSOs to be used for rendering.
+</summary>
+        </member>
+        <member name="M:Renderer.CreateRootSignatures">
+            <summary>
+Create Root Signatures to be used for rendering.
+</summary>
+        </member>
+        <member name="M:Renderer.DrawSkybox">
+            <summary />
+        </member>
+        <member name="T:Renderer">
+            <summary>
+Render logic
+</summary>
+        </member>
+        <member name="M:LightPass.CreateTargets(D3D.D3D12Viewport*)">
+            <summary>
+Create Resources.<br />
+Called at construction and <c>OnResize()</c>.
+</summary>
+        </member>
+        <member name="M:LightPass.OutputDescriptor">
+            <summary>
+Getter for SRV Descriptor.
+</summary>
+        </member>
+        <member name="M:LightPass.Release">
+            <summary>
+Releases Resources.
+</summary>
+        </member>
+        <member name="M:LightPass.OnResize(D3D.D3D12Viewport*)">
+            <summary>
+Releases and resizes Resources.
+</summary>
+        </member>
+        <member name="M:LightPass.DrawData(std.array&lt;System.UInt32,0x05&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,std.array&lt;System.UInt32,0x04&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary>
+Sets texture indices.
+</summary>
+            <param name="GBufferIndices"> Indices for GBuffer SRV Textures. </param>
+            <param name="IBLIndices"> Indices for Image Based Lighting SRV Textures. </param>
+        </member>
+        <member name="M:LightPass.EndPass">
+            <summary>
+Transits States to GENERIC_READ.
+</summary>
+        </member>
+        <member name="M:LightPass.BeginPass">
+            <summary>
+Transits States.<br />
+Clears Render Targets.<br />
+Sets Render Targets.<br /></summary>
+        </member>
+        <member name="M:LightPass.Dispose">
+            <summary>
+Releases Resources.
+</summary>
+        </member>
+        <member name="M:LightPass.#ctor(D3D.D3D12Viewport*,D3D.D3D12DepthBuffer*,std.shared_ptr&lt;gfx.ShaderManager&gt;)">
+            <summary>
+Initializes Resources and Descriptors.
+</summary>
+            <param name="pViewport"> Pointer to Scene Viewport. </param>
+            <param name="pSceneDepth"> Pointer to Scene Depth Buffer. </param>
+            <param name="pShaderManager"> Shared Pointer to <c>ShaderManager</c> object. </param>
+        </member>
+        <member name="F:GBufferPass.m_RenderTargetFormats">
+            <summary>
+Desired formats for each Render Target.
+</summary>
+        </member>
+        <member name="M:GBufferPass.CreateRenderTargets(D3D.D3D12Viewport*)">
+            <summary>
+Used at initialization and <c>OnResize()</c>.
+</summary>
+            <param name="pViewport"> Pointer to Scene Viewport. </param>
+        </member>
+        <member name="M:GBufferPass.Initialize(D3D.D3D12Viewport*,std.shared_ptr&lt;gfx.ShaderManager&gt;)">
+            <summary>
+Creates Resources and States.
+</summary>
+            <param name="pViewport"> Pointer to Scene Viewport. </param>
+            <param name="pShaderManager"> Shared Pointer to ShaderManager object. </param>
+        </member>
+        <member name="M:GBufferPass.GetRenderTargets">
+            <summary />
+            <returns> Array of Render Target Resources. </returns>
+        </member>
+        <member name="M:GBufferPass.GetRenderDescs">
+            <summary />
+            <returns> Array of Render Target CPU Desriptor Handles. </returns>
+        </member>
+        <member name="M:GBufferPass.GetGBuffers">
+            <summary />
+            <returns> Array of RTV Descriptors. </returns>
+        </member>
+        <member name="M:GBufferPass.Release">
+            <summary>
+Release all GBuffers.
+</summary>
+        </member>
+        <member name="M:GBufferPass.OnResize(D3D.D3D12Viewport*)">
+            <summary>
+Releases and resizes Render Targets.
+</summary>
+            <param name="pViewport"> Pointer to Scene Viewport. </param>
+        </member>
+        <member name="M:GBufferPass.EndPass">
+            <summary>
+Transits RenderTargets to GENERIC_READ state.
+</summary>
+        </member>
+        <member name="M:GBufferPass.BeginPass">
+            <summary>
+Sets Render Targets to appropriate state.<br />
+Clears Render Targets.<br />
+Sets PSO and RootSignature for GBuffer.<br /></summary>
+        </member>
+        <member name="F:GBufferPass.RenderTargetsCount">
+            <summary> 
+Total number of GBuffers: Depth, BaseColor, Normal, MetalRoughness, WorldPosition.
+</summary>
+        </member>
+        <member name="M:GBufferPass.Dispose">
+            <summary>
+Releases underlying resources.
+</summary>
+        </member>
+        <member name="M:GBufferPass.#ctor(D3D.D3D12Viewport*,D3D.D3D12DepthBuffer*,std.shared_ptr&lt;gfx.ShaderManager&gt;)">
+            <summary>
+Initializes Resources and both SRV and RTV Descriptors.
+</summary>
+            <param name="pViewport"> Scene Viewport to determine resource dimensions. </param>
+            <param name="pSceneDepth"> Scene Depth Buffer. </param>
+            <param name="pShaderManager"> Required to create States. </param>
+        </member>
+        <member name="F:ScreenOutput.m_IndexBuffer">
+            <summary>
+Underlying Index Buffer.
+</summary>
+        </member>
+        <member name="F:ScreenOutput.m_VertexBuffer">
+            <summary>
+Underlying Vertex Buffer.
+</summary>
+        </member>
+        <member name="M:ScreenOutput.Release">
+            <summary>
+Releases buffers.
+</summary>
+        </member>
+        <member name="M:ScreenOutput.Draw">
+            <summary>
+Draws quad for deferred output.
+</summary>
+        </member>
+        <member name="M:ScreenOutput.Create">
+            <summary>
+Initializes buffers.
+</summary>
+        </member>
+        <member name="M:ScreenOutput.Dispose">
+            <summary> Releases object. </summary>
+        </member>
+        <member name="M:ScreenOutput.op_Assign(ScreenOutput!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary> Coping isn't allowed. </summary>
+            <param name="" />
+            <returns> Deleted. </returns>
+        </member>
+        <member name="M:ScreenOutput.#ctor(ScreenOutput!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary> Coping isn't allowed. </summary>
+            <param name=""> RHS </param>
+            <summary> Coping isn't allowed. </summary>
+            <param name=""> RHS </param>
+        </member>
+        <member name="M:ScreenOutput.#ctor">
+            <summary> Initializes object. </summary>
+        </member>
+        <member name="T:ScreenOutput">
+            <summary>
+Used to create screen quad for displaying deferred rendering output.
+</summary>
+        </member>
+        <member name="M:D3D.D3D12GraphicsPipelineStateBuilder.Release">
+            <summary>
+Called at destruction.
+</summary>
+        </member>
+        <member name="M:D3D.D3D12GraphicsPipelineStateBuilder.Reset">
+            <summary>
+                <b>Sets all member to default states.</b>
+                <br />
+Use only when about to release <c>D3D12GraphicsPipelineState</c> object
+or need to create PSO much different to previous ones.<br />
+Called at destructor.
+</summary>
+        </member>
+        <member name="M:D3D.D3D12GraphicsPipelineStateBuilder.SetCullMode(D3D12_CULL_MODE)">
+            <summary />
+            <param name="CullMode" />
+        </member>
+        <member name="M:D3D.D3D12GraphicsPipelineStateBuilder.SetWireframeMode(System.Boolean)">
+            <summary>
+Whether to use Wireframe mode.
+</summary>
+            <param name="FillMode" />
+        </member>
+        <member name="M:D3D.D3D12GraphicsPipelineStateBuilder.SetEnableDepth(System.Boolean)">
+            <summary>
+Whether to use Depth Buffer or not.
+</summary>
+            <param name="bEnable" />
+        </member>
+        <member name="M:D3D.D3D12GraphicsPipelineStateBuilder.SetDomainShader(std.basic_string_view&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte}&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,System.Char!System.Runtime.CompilerServices.IsConst*)">
+            <summary />
+            <param name="Filepath" />
+            <param name="EntryPoint" />
+        </member>
+        <member name="M:D3D.D3D12GraphicsPipelineStateBuilder.SetHullShader(std.basic_string_view&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte}&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,System.Char!System.Runtime.CompilerServices.IsConst*)">
+            <summary />
+            <param name="Filepath" />
+            <param name="EntryPoint" />
+        </member>
+        <member name="M:D3D.D3D12GraphicsPipelineStateBuilder.SetGeometryShader(std.basic_string_view&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte}&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,System.Char!System.Runtime.CompilerServices.IsConst*)">
+            <summary />
+            <param name="Filepath" />
+            <param name="EntryPoint" />
+        </member>
+        <member name="M:D3D.D3D12GraphicsPipelineStateBuilder.SetPixelShader(std.basic_string_view&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte}&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,System.Char!System.Runtime.CompilerServices.IsConst*)">
+            <summary />
+            <param name="Filepath" />
+            <param name="EntryPoint" />
+        </member>
+        <member name="M:D3D.D3D12GraphicsPipelineStateBuilder.SetVertexShader(std.basic_string_view&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte}&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,System.Char!System.Runtime.CompilerServices.IsConst*)">
+            <summary />
+            <param name="Filepath" />
+            <param name="EntryPoint" />
+        </member>
+        <member name="M:D3D.D3D12GraphicsPipelineStateBuilder.SetInputLayout(std.span&lt;D3D12_INPUT_ELEMENT_DESC,0xffffffffffffffff&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary>
+Set desired Input Layout
+</summary>
+            <param name="InputLayout"> Either std::vector or std::array. </param>
+        </member>
+        <member name="M:D3D.D3D12GraphicsPipelineStateBuilder.SetRenderTargetFormats(std.span&lt;DXGI_FORMAT,0xffffffffffffffff&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary>
+Set desired formats per each Render Target.<br />
+If not set: only <b>one</b> Render Target of type R8G8B8A8_UNORM is set.<br />
+Count of Render Targets to set is based on input Formats size.
+</summary>
+            <param name="Formats"> Either <c>std::array</c> or <c>std::vector</c> of type <c>DXGI_FORMAT</c>. </param>
+        </member>
+        <member name="M:D3D.D3D12GraphicsPipelineStateBuilder.Create(D3D.D3D12PipelineState*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,ID3D12RootSignature*,System.Char!System.Runtime.CompilerServices.IsConst*)">
+            <summary>
+Create Graphics Pipeline State Object based on given data.
+</summary>
+            <param name="ppPipelineState"> ID3D12PipelineState** so can be used with ComPtr </param>
+            <param name="pRootSignature"> Root Signature to associate with PSO. </param>
+            <param name="DebugName"> Optional debug name. </param>
+        </member>
+        <member name="M:D3D.D3D12GraphicsPipelineStateBuilder.Dispose">
+            <summary>
+Resets <c>ShaderManager</c> and deletes IDxcBlobs.<br />
+Calls <c>Reset()</c>.
+</summary>
+        </member>
+        <member name="M:D3D.D3D12GraphicsPipelineStateBuilder.#ctor(std.shared_ptr&lt;gfx.ShaderManager&gt;)">
+            <summary>
+Initializes <c>ShaderManager</c> at construction.
+</summary>
+            <param name="pShaderManager" />
+        </member>
+        <member name="T:D3D.D3D12GraphicsPipelineStateBuilder">
+            <summary>
+                <c>D3D12GraphicsPipelineStateBuilder</c> is a builder-like class 
+meant for creating multiple PSOs with reusable structure
+and single ShaderManger for creating HLSL shaders of model 6.x.
+</summary>
+        </member>
+        <member name="T:D3D.D3D12PipelineState">
+            <summary>
+Wrapper for Graphics Pipeline States.
+</summary>
+        </member>
+        <member name="F:D3D.D3D12DepthBuffer.m_SRV">
+            <summary> 
+Descriptor for allocating SharedResourceView usage.<br />
+Note: Use only when <c>D3D12DepthBuffer</c> is meant to be used in Shaders.
+</summary>
+        </member>
+        <member name="F:D3D.D3D12DepthBuffer.m_DSV">
+            <summary> Descriptor for allocating DepthStencilView usage. </summary>
+        </member>
+        <member name="F:D3D.D3D12DepthBuffer.m_Format">
+            <summary> Defaults to D32_FLOAT. </summary>
+        </member>
+        <member name="F:D3D.D3D12DepthBuffer.m_Resource">
+            <summary> Holds actual DepthStencil resource. </summary>
+        </member>
+        <member name="M:D3D.D3D12DepthBuffer.Release">
+            <summary>
+Safely releases underlaying resource.
+</summary>
+        </member>
+        <member name="M:D3D.D3D12DepthBuffer.SRV">
+            <summary>Getter for SRV Descriptor. </summary>
+            <returns />
+        </member>
+        <member name="M:D3D.D3D12DepthBuffer.DSV">
+            <summary> Getter for DSV Descriptor. </summary>
+            <returns />
+        </member>
+        <member name="M:D3D.D3D12DepthBuffer.OnResize(D3D.D3D12DescriptorHeap*,D3D.D3D12Viewport*)">
+            <summary>
+As it says.
+</summary>
+        </member>
+        <member name="M:D3D.D3D12DepthBuffer.Clear">
+            <summary>
+Calls ClearDepthStencilView for underlaying resource.
+</summary>
+        </member>
+        <member name="M:D3D.D3D12DepthBuffer.Create(D3D.D3D12DescriptorHeap*,D3D.D3D12Viewport*,System.Boolean)">
+            <summary>
+Initialize.
+</summary>
+            <param name="Viewport"> Needed to determine DepthStencil dimensions. </param>
+        </member>
+        <member name="M:D3D.D3D12DepthBuffer.Dispose">
+            <summary>
+Calls <c>Release()</c> if haven't been called manually. 
+</summary>
+        </member>
+        <member name="M:D3D.D3D12DepthBuffer.#ctor(D3D.D3D12DescriptorHeap*,D3D.D3D12Viewport*,DXGI_FORMAT,System.Boolean)">
+            <summary> Initializes underlaying resource. </summary>
+            <param name="Viewport"> Needed to determine DepthStencil dimensions. </param>
+            <param name="Format"> Default. </param>
+        </member>
+        <member name="T:D3D.D3D12DepthBuffer">
+            <summary>
+Holds <c>ID3D12Resource ComPtr</c> for DepthStencil usage.
+</summary>
+        </member>
+        <member name="M:gfx.ShaderManager.CompileDXIL(std.basic_string_view&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte}&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,&lt;unknown type&gt;,System.Char!System.Runtime.CompilerServices.IsConst*)">
+            <summary>
+Compiles shader file to <c>IDxcBlob</c> using <c>IDxcCompiler3</c>.
+</summary>
+            <param name="Filepath"> Path to Shader. </param>
+            <param name="eType"> Type of shader used to fetch desired shader target. </param>
+            <param name="EntryPoint"> Defaults to <c>main</c>. Use different <c>EntryPoint</c> if using more then one shader inside a single file. </param>
+            <returns> Pointer to IDxcBlob. </returns>
+        </member>
+        <member name="M:gfx.ShaderManager.Release">
+            <summary>
+Release IDxc pointers.
+</summary>
+        </member>
+        <member name="M:gfx.ShaderManager.Initialize">
+            <summary>
+Initializes IDxc pointers.
+</summary>
+        </member>
+        <member name="M:gfx.ShaderManager.Dispose">
+            <summary>
+Releases IDxc pointers.
+</summary>
+        </member>
+        <member name="M:gfx.ShaderManager.#ctor">
+            <summary>
+Initializes IDxc pointers.
+</summary>
+        </member>
+        <member name="T:gfx.ShaderManager">
+            <summary>
+Single instance for creating and compiling shader model 6.x.<br />
+DXIL Libraries require to create Compiler and Library
+so Manager role is to create them once instead of per shader basis.<br />
+Meant for <c><i>std::shared_ptr</i></c> usage.
+</summary>
+        </member>
+        <member name="M:gfx.Shader.Bytecode">
+            <summary> Wrapper for getting shader data for pipeline building. </summary>
+            <returns> Shader code and it's size. </returns>
+        </member>
+        <member name="M:gfx.Shader.Size">
+            <summary> Get size of a shader straight from <c>Dxc blob</c>. </summary>
+            <returns> Size of a shader bytecode. </returns>
+        </member>
+        <member name="M:gfx.Shader.Code">
+            <summary> Gets <c>void pointer</c> to shader data straight from <c>Dxc blob</c>.</summary>
+            <returns> Shader bytecode data. </returns>
+        </member>
+        <member name="M:gfx.Shader.Dispose">
+            <summary> Auto release. </summary>
+        </member>
+        <member name="M:gfx.Shader.#ctor(IDxcBlob*)">
+            <summary>Initialize with Shader Blob.</summary>
+            <param name="pDxc"> Pointer to <c>Dxc Shader Blob</c>. </param>
+        </member>
+        <member name="T:Timer">
+            <summary>
+Timer class used to determine whether application is either paused or running
+and to retrive application's Ticks and Delta Time.
+</summary>
+        </member>
+        <member name="F:Editor.m_ViewportHeigth">
+            <summary>Image output Viewport height</summary>
+        </member>
+        <member name="F:Editor.m_ViewportWidth">
+            <summary>Image output Viewport width</summary>
+        </member>
+        <member name="F:Editor.m_Timer">
+            <summary>
+Reference to Engine Timer object.
+</summary>
+        </member>
+        <member name="F:Editor.m_Camera">
+            <summary>
+Reference to Scene Camera object.
+</summary>
+        </member>
+        <member name="F:Editor.m_MainFont">
+            <summary>
+CascadiaCode Bold by default.
+</summary>
+        </member>
+        <member name="F:Editor.m_MainViewport">
+            <summary>
+Viewport area
+</summary>
+        </member>
+        <member name="M:Editor.OnFrameEnd">
+            <summary>
+Goes before making Barrier Resource Transition for Present state
+</summary>
+        </member>
+        <member name="M:Editor.OnFrameBegin">
+            <summary>
+Goes after reseting commend lists.
+</summary>
+        </member>
+        <member name="T:Editor">
+            <summary>
+                <b>ImGui</b> based.
+</summary>
+        </member>
+        <member name="M:utility.glTF.GetTexAbsolutePath(std.basic_string&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte},std.allocator&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte&gt;&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,std.basic_string&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte},std.allocator&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte&gt;&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary />
+        </member>
+        <member name="M:utility.glTF.GetTexturePath(std.basic_string&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte},std.allocator&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte&gt;&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,std.basic_string&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte},std.allocator&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte&gt;&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary />
+        </member>
+        <member name="M:utility.glTF.GetAbsolutePath(std.basic_string&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte},std.allocator&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte&gt;&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary />
+        </member>
+        <member name="M:utility.glTF.GetRelativePath(std.basic_string&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte},std.allocator&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte&gt;&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary />
+        </member>
+        <member name="M:utility.FileExtToEnum(std.basic_string_view&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte}&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary />
+            <param name="Filepath" />
+            <returns />
+        </member>
+        <member name="M:utility.FileExtToString(&lt;unknown type&gt;)">
+            <summary>
+Convert <c>FileExtension</c> enum to corresponding string.
+</summary>
+            <param name="Extension" />
+            <returns />
+        </member>
+        <member name="T:utility.FileExtension">
+            <summary />
+        </member>
+        <member name="M:utility.GetFileRelativePath(std.basic_string_view&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte}&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary>
+Fetch relative path to given file.
+</summary>
+            <param name="Filename" />
+            <returns />
+        </member>
+        <member name="M:utility.GetFileAbsolutePath(std.basic_string_view&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte}&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary>
+Fetch absolute path to given file.
+</summary>
+            <param name="Filename" />
+            <returns />
+        </member>
+        <member name="M:utility.GetFileExtension(std.basic_string_view&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte}&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary>
+Fetch given file extension.
+</summary>
+            <param name="Filename" />
+            <returns />
+        </member>
+        <member name="T:gfx.Shader5">
+            <summary>
+Shader Model 5.x usage only.
+</summary>
+        </member>
+        <member name="M:TextureUtility.CreateUAV(ID3D12Resource**,D3D.D3D12Descriptor*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,System.UInt16,DXGI_FORMAT)">
+            <summary>
+Create <c>UnorderedAccessView</c> for given <c>Texture Resource</c> and it's <c>Descriptor</c>.
+</summary>
+            <param name="ppResource"> Target Resource. Usually <c>ComPtr</c>. </param>
+            <param name="Descriptor"> Target Descriptor. </param>
+            <param name="Format"> Texture format. </param>
+        </member>
+        <member name="M:TextureUtility.CreateSRV(ID3D12Resource**,D3D.D3D12Descriptor*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,System.UInt16,DXGI_FORMAT,D3D12_SRV_DIMENSION)">
+            <summary>
+Create <c>ShaderResourceView</c> for given <c>Texture Resource</c> and it's <c>Descriptor</c>.
+</summary>
+            <param name="ppResource"> Target Resource. Usually <c>ComPtr</c>. </param>
+            <param name="Descriptor"> Target Descriptor. </param>
+            <param name="Mips"> Level of MipMap chain.</param>
+            <param name="Format"> Texture format. Note: not every format supports mipmap generation. </param>
+        </member>
+        <member name="M:TextureUtility.CreateFromWIC(std.basic_string_view&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte}&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,ID3D12Resource**,D3D.D3D12Descriptor*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary>
+Create <c>Texture</c> from JPG, JPEG or PNG files.<br />
+Generates MipMaps.
+</summary>
+            <param name="Filepath" />
+            <param name="ppResource" />
+            <param name="Descriptor" />
+        </member>
+        <member name="F:lde.ImageBasedLighting.m_SpBRDFDescriptor">
+            <summary>
+Descriptor for BRDF LUT.
+</summary>
+        </member>
+        <member name="F:lde.ImageBasedLighting.m_SpecularBRDF_LUT">
+            <summary>
+Specular BRDF LookUp Table texture.
+</summary>
+        </member>
+        <member name="F:lde.ImageBasedLighting.m_SpecularDescriptor">
+            <summary>
+Descriptor for SpecularMap usage.
+</summary>
+        </member>
+        <member name="F:lde.ImageBasedLighting.m_SpecularMap">
+            <summary>
+Specular Map for sky reflections.<br />
+Note: requires a fix (mipmapping issue)!
+</summary>
+        </member>
+        <member name="F:lde.ImageBasedLighting.m_IrradianceDescriptor">
+            <summary>
+Descriptor for Irradiance Map usage.
+</summary>
+        </member>
+        <member name="F:lde.ImageBasedLighting.m_IrradianceMap">
+            <summary>
+32x32 Irradiance Map.
+</summary>
+        </member>
+        <member name="F:lde.ImageBasedLighting.m_SkyboxDescriptor">
+            <summary>
+SRV Descriptor for post-transform equirectangular texture usage.
+</summary>
+        </member>
+        <member name="F:lde.ImageBasedLighting.m_Skybox">
+            <summary>
+Post-transformed equirectangular texture.<br />
+Used for drawing Skybox.
+</summary>
+        </member>
+        <member name="M:lde.ImageBasedLighting.CreateSpecularBRDF(ID3D12RootSignature*)">
+            <summary>
+Creates Texture2D as BDRF LookUp Table.
+</summary>
+            <param name="pComputeRoot"> Pointer to <c>Compute Root Signature</c>. </param>
+        </member>
+        <member name="M:lde.ImageBasedLighting.CreateSpecular(ID3D12RootSignature*)">
+            <summary>
+256x256 specular reflection map
+</summary>
+            <param name="pComputeRoot"> Pointer to <c>Compute Root Signature</c>. </param>
+        </member>
+        <member name="M:lde.ImageBasedLighting.CreateIrradiance(ID3D12RootSignature*)">
+            <summary>
+Create 32x32 Irradiance TextureCube.
+</summary>
+            <param name="pComputeRoot"> Pointer to <c>Compute Root Signature</c>. </param>
+        </member>
+        <member name="M:lde.ImageBasedLighting.CreateCubeTexture(ID3D12RootSignature*,std.basic_string_view&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte}&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary>
+Convert equirectangular HDR texture into TextureCube
+</summary>
+            <param name="pComputeRoot"> Pointer to <c>Compute Root Signature</c>. </param>
+            <param name="Filepath"> Path to HDR texture. </param>
+        </member>
+        <member name="M:lde.ImageBasedLighting.CreateBuffers">
+            <summary>
+Create Vertex and Index buffers for drawing Skybox.
+</summary>
+        </member>
+        <member name="M:lde.ImageBasedLighting.CreateTextures(std.basic_string_view&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte}&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary />
+            <param name="Filepath" />
+        </member>
+        <member name="M:lde.ImageBasedLighting.Release">
+            <summary>
+Release Textures.
+</summary>
+        </member>
+        <member name="M:lde.ImageBasedLighting.Draw(Camera*)">
+            <summary>
+Draw Skybox: plain texture.
+</summary>
+            <param name="pCamera"> Pointer to Scene Camera. </param>
+        </member>
+        <member name="M:lde.ImageBasedLighting.Create(std.basic_string_view&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte}&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary>
+Initialize texture from file.
+</summary>
+            <param name="Filepath" />
+        </member>
+        <member name="T:gfx.cbPerDraw">
+            <summary>
+Object data need to draw.
+</summary>
+        </member>
+        <member name="T:gfx.cbPerObject">
+            <summary>
+Object matrices.
+</summary>
+        </member>
+        <member name="M:gfx.StructuredBuffer.GetDescriptor">
+            <summary>
+Getter for underlying <c>SRV Descriptor</c>.
+</summary>
+            <returns>
+                <c>ShaderResourceView Descriptor</c>
+            </returns>
+        </member>
+        <member name="M:gfx.StructuredBuffer.Create(gfx.BufferData,System.Boolean)">
+            <summary>
+Initializes buffer.
+</summary>
+            <param name="Data"> Buffer data. </param>
+            <param name="bSRV"> Defaults to <c>true</c> since it's meant for Bindless rendering. </param>
+        </member>
+        <member name="M:gfx.StructuredBuffer.#ctor(gfx.BufferData,System.Boolean)">
+            <summary>
+Initializes buffer.
+</summary>
+            <param name="Data"> Buffer data. </param>
+            <param name="bSRV"> Defaults to <c>true</c> since it's meant for Bindless rendering. </param>
+        </member>
+        <member name="T:gfx.StructuredBuffer">
+            <summary>
+Buffer that is meant to be accessed (read-only) by shader.<br />
+Relates to Bindless rendering.
+</summary>
+        </member>
+        <member name="F:gfx.IndexBuffer.Count">
+            <summary>
+Number of total indices hold by this buffer.
+</summary>
+        </member>
+        <member name="F:gfx.IndexBuffer.View">
+            <summary />
+            <summary />
+        </member>
+        <member name="M:gfx.IndexBuffer.Create(gfx.BufferData,System.Boolean)">
+            <summary />
+            <param name="Data" />
+            <param name="bSRV">Indicates whether ShaderResourceView should be allocated.</param>
+        </member>
+        <member name="M:gfx.IndexBuffer.#ctor(gfx.BufferData,System.Boolean)">
+            <summary />
+            <param name="Data" />
+            <param name="bSRV">Indicates whether ShaderResourceView should be allocated.</param>
+        </member>
+        <member name="T:gfx.IndexBuffer">
+            <summary>
+Inherits from <c>Buffer</c> class.
+</summary>
+        </member>
+        <member name="F:gfx.VertexBuffer.View">
+            <summary />
+            <summary />
+        </member>
+        <member name="M:gfx.VertexBuffer.Create(gfx.BufferData,System.Boolean)">
+            <summary />
+            <summary />
+            <param name="Data" />
+            <param name="bSRV">Indicates whether ShaderResourceView should be allocated.</param>
+        </member>
+        <member name="M:gfx.VertexBuffer.#ctor(gfx.BufferData,System.Boolean)">
+            <summary />
+            <param name="Data" />
+            <param name="bSRV"> Indicates whether ShaderResourceView should be allocated. </param>
+        </member>
+        <member name="T:gfx.VertexBuffer">
+            <summary>
+Inherits from <see cref="T:gfx.Buffer" /> class.
+</summary>
+        </member>
+        <member name="T:gfx.ScreenOutputVertex">
+            <summary>
+Deferred Output.
+</summary>
+        </member>
+        <member name="T:gfx.SkyVertex">
+            <summary>
+Plain Skybox and Image Based Lighting usage.
+</summary>
+        </member>
+        <member name="T:gfx.Vertex">
+            <summary>
+Full Vertex type.<br /></summary>
+        </member>
+        <member name="F:D3D.D3D12RootSignature.m_RootSignature">
+            <summary> Actual RootSignature object. </summary>
+        </member>
+        <member name="M:D3D.D3D12RootSignature.SerializeAndCreate(CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,System.Char!System.Runtime.CompilerServices.IsConst*)">
+            <summary>
+Serializes versioned Root Signature.<br />
+Version defaults to <b>D3D_ROOT_SIGNATURE_VERSION_1_1</b>.
+</summary>
+            <param name="Desc" />
+            <param name="DebugName"> Optional. </param>
+        </member>
+        <member name="M:D3D.D3D12RootSignature.Release">
+            <summary>
+As the name implies.
+</summary>
+        </member>
+        <member name="M:D3D.D3D12RootSignature.Get">
+            <summary> Getter. </summary>
+            <returns> Underlaying ComPtr. </returns>
+        </member>
+        <member name="M:D3D.D3D12RootSignature.Create(std.span&lt;CD3DX12_ROOT_PARAMETER1,0xffffffffffffffff&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,std.span&lt;D3D12_STATIC_SAMPLER_DESC,0xffffffffffffffff&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,D3D12_ROOT_SIGNATURE_FLAGS!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,System.Char!System.Runtime.CompilerServices.IsConst*)">
+            <summary />
+            <param name="Parameters"> Either std::vector or std::array. </param>
+            <param name="Samplers"> Either std::vector or std::array. </param>
+            <param name="RootFlags"> Recommanded to use minimal access. </param>
+        </member>
+        <member name="M:D3D.D3D12RootSignature.Dispose">
+            <summary>
+Calls <c>Release()</c> if it haven't been called manually.
+</summary>
+        </member>
+        <member name="M:D3D.D3D12RootSignature.#ctor(std.span&lt;CD3DX12_ROOT_PARAMETER1,0xffffffffffffffff&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,std.span&lt;D3D12_STATIC_SAMPLER_DESC,0xffffffffffffffff&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,D3D12_ROOT_SIGNATURE_FLAGS!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,System.Char!System.Runtime.CompilerServices.IsConst*)">
+            <summary>
+Creates Root Signature upon construction.
+</summary>
+            <param name="Parameters"> Either std::vector or std::array. </param>
+            <param name="Samplers"> Either std::vector or std::array. </param>
+            <param name="RootFlags"> Recommanded to use minimal access. </param>
+            <param name="DebugName"> Optional. </param>
+        </member>
+        <member name="T:D3D.D3D12RootSignature">
+            <summary>
+Wrapper for Graphics Root Signatures.
+</summary>
+        </member>
+        <member name="T:CameraInput">
+            <summary>
+dinput.h based controls for Camera
+</summary>
+        </member>
+        <member name="M:Camera.OnAspectRatioChange(System.Single)">
+            <summary> Required to call when window is resizing as Render Targets change their aspect ratio. </summary>
+        </member>
+        <member name="M:gfx.CreateUAV(ID3D12Resource*,gfx.BufferData,D3D.D3D12Descriptor*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary />
+            <param name="pResource" />
+            <param name="Data" />
+            <param name="Descriptor" />
+        </member>
+        <member name="M:gfx.CreateSRV(ID3D12Resource*,gfx.BufferData,D3D.D3D12Descriptor*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary />
+            <param name="pResource" />
+            <param name="Data" />
+            <param name="Descriptor" />
+        </member>
+        <member name="F:gfx.Buffer.m_Descriptor">
+            <summary>
+Mainly for SRV use for StructureBuffer type.
+</summary>
+        </member>
+        <member name="M:gfx.Buffer.GetData">
+            <summary />
+            <returns />
+        </member>
+        <member name="M:gfx.Buffer.GetGPUAddress">
+            <summary />
+            <returns />
+        </member>
+        <member name="M:gfx.Buffer.GetBuffer">
+            <summary>
+Note: Not sure if should be called in destructure rather then manually.
+Might cause issues when using DXR later.
+</summary>
+            <summary />
+            <returns />
+        </member>
+        <member name="M:gfx.Buffer.Create(gfx.BufferData,&lt;unknown type&gt;,System.Boolean)">
+            <summary />
+            <param name="Data" />
+            <param name="Usage" />
+            <param name="bSRV" />
+        </member>
+        <member name="M:gfx.Buffer.Dispose">
+            <summary />
+        </member>
+        <member name="M:gfx.Buffer.#ctor(gfx.BufferData,&lt;unknown type&gt;,System.Boolean)">
+            <summary />
+            <summary />
+            <param name="Data" />
+            <param name="Usage" />
+            <param name="bSRV" />
+        </member>
+        <member name="T:gfx.Buffer">
+            <summary>
+Base class for creating different buffer types.
+</summary>
+        </member>
+        <member name="T:gfx.BufferType">
+            <summary>
+Indicating desired buffer type.<br />
+Used to transit buffer resource into appropiate state.
+</summary>
+        </member>
+        <member name="T:gfx.BufferData">
+            <summary>
+Used to pass to Buffer upon creation.<br /></summary>
+        </member>
+        <member name="T:D3D.D3D12Context.FeatureSupport">
+            <summary>
+Indicates if listed features are supported or are not.
+</summary>
+        </member>
+        <member name="F:D3D.D3D12Context.m_DeferredHeap">
+            <summary>
+Used to create Render Targets for Deferred Rendering passes.
+</summary>
+        </member>
+        <member name="F:D3D.D3D12Context.m_DepthHeap">
+            <summary>
+DSV heap.
+</summary>
+        </member>
+        <member name="F:D3D.D3D12Context.m_MainHeap">
+            <summary>
+CBV_SRV_UAV heap.<br />Main source of resource allocations.
+</summary>
+        </member>
+        <member name="M:D3D.D3D12Context.CheckFeatures">
+            <summary>
+Query GPU capabilities.<br />
+Validates if current GPU does provide necessary features to run the engine.<br />
+Features that must be supported:<br />
+- Shader Model 6.0+. Desired 6.6 support, but 6.3 will suffice for current needs.<br />
+- Raytracing support.<br /></summary>
+        </member>
+        <member name="M:D3D.D3D12Context.ReleaseRenderTargets">
+            <summary>
+Used before resizing SwapChain context.
+Required to proper resizing of SwapChain Backbuffers.
+</summary>
+        </member>
+        <member name="M:D3D.D3D12Context.GetSceneViewport">
+            <summary />
+            <returns> Pointer to Scene Viewport. </returns>
+        </member>
+        <member name="M:D3D.D3D12Context.GetDeferredHeap">
+            <summary />
+            <returns> Pointer to Deferred based Render Target Heap. </returns>
+        </member>
+        <member name="M:D3D.D3D12Context.GetDepthHeap">
+            <summary />
+            <returns> Pointer to general use DSV Descriptor Heap. </returns>
+        </member>
+        <member name="M:D3D.D3D12Context.GetMainHeap">
+            <summary />
+            <returns> Pointer to SRV/CBV/UAV Descriptor Heap. </returns>
+        </member>
+        <member name="M:D3D.D3D12Context.IsInitialized">
+            <summary>
+Preventing from re-initializing D3D context.
+</summary>
+            <returns>
+                <b>True</b> if was already initialized. </returns>
+        </member>
+        <member name="M:D3D.D3D12Context.ReleaseD3D">
+            <summary>
+Safe release of all member <c>ComPtrs</c> and other DirectX based structs.<br />
+Note: If in Debug mode, check for live objects.
+</summary>
+        </member>
+        <member name="M:D3D.D3D12Context.OnResize">
+            <summary>
+Resize <c>Scene Viewport</c> and resize all <c>SwapChain Backbuffers</c>.
+</summary>
+        </member>
+        <member name="M:D3D.D3D12Context.FlushGPU">
+            <summary>
+Clear <c>Fence Event values</c> then move back to first backbuffer.
+</summary>
+        </member>
+        <member name="M:D3D.D3D12Context.MoveToNextFrame">
+            <summary>
+Move to next <c>SwapChain Backbuffer</c><br />.
+If frame is not ready to be presented, wait until it is.
+</summary>
+        </member>
+        <member name="M:D3D.D3D12Context.InitializeHeaps">
+            <summary>
+Main shader resource and scene depth heap.
+</summary>
+        </member>
+        <member name="M:D3D.D3D12Context.InitializeD3D">
+            <summary>
+Initialize D3D12 related context:<br />
+- Device,<br />
+- Command lists and allocators,<br />
+- SwapChain,<br />
+- Descriptor Heaps,<br />
+- Check GPU features
+</summary>
+        </member>
+        <member name="T:D3D.D3D12Context">
+            <summary>
+Main class (entry point) for DirectX 12 based context.<br />
+All pointers to DX structures are initialized here,
+as well as they are cleanup here via class destructor.<br />
+Class is meant for simplying and securing both context creation and it's later cleanup.
+</summary>
+        </member>
+        <member name="M:D3D.GetCommandAllocator">
+            <returns> Command Allocator for CURRENT frame. </returns>
+        </member>
+        <member name="M:D3D.TransitResource(ID3D12Resource*,D3D12_RESOURCE_STATES,D3D12_RESOURCE_STATES)">
+            <summary>
+Single Resource barrier transition.
+</summary>
+            <param name="pResource"> Target resource to make transition. </param>
+            <param name="Before"> Current state. </param>
+            <param name="After"> Desired state. </param>
+        </member>
+        <member name="M:D3D.SetPSO(D3D.D3D12PipelineState*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary>
+Wrapper for setting Pipeline State Objects.
+</summary>
+            <param name="Usage"> Target object. </param>
+        </member>
+        <member name="M:D3D.SetRootSignature(D3D.D3D12RootSignature*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,&lt;unknown type&gt;)">
+            <summary>
+Wrapper for setting Root Signatures.
+</summary>
+            <param name="RootSignature"> Target object. </param>
+            <param name="Usage"> Is meant for Graphics or Compute pipeline usage. </param>
+        </member>
+        <member name="M:D3D.ResetCommandLists">
+            <summary>
+Reset current ID3D12CommandAllocator and ID3D12GraphicsCommandList.<br />
+Used before Command List starts preparing current frame - 
+begins BeginFrame method and thus starts recording Command List content.
+</summary>
+        </member>
+        <member name="M:D3D.ExecuteCommandLists(System.Boolean)">
+            <summary> Execute content currently bound to ID3D12GraphicsCommandList4*. </summary>
+            <param name="bResetAllocator">: If true Close command list. False by default.</param>
+        </member>
+        <member name="M:D3D.WaitForGPU">
+            <summary>
+Wait until <c>Fence</c> event is complete.
+</summary>
+        </member>
+        <member name="M:D3D.ReleaseCommands">
+            <summary>
+Safe release of <c>ComPtrs</c>.
+</summary>
+        </member>
+        <member name="M:D3D.InitializeCommands">
+            <summary>
+Create Command Allocators (one per frame), Graphics Command List and Graphics Command Queue.
+</summary>
+        </member>
+        <member name="M:debug.Print(std.basic_string&lt;System.Char,std.char_traits{System.Char},std.allocator&lt;System.Char&gt;&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary> Print debug message </summary>
+        </member>
+        <member name="M:debug.Print(std.basic_string&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte},std.allocator&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte&gt;&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary> Print debug message </summary>
+        </member>
+        <member name="M:utility.ErrorMessage(std.basic_string&lt;System.Char,std.char_traits{System.Char},std.allocator&lt;System.Char&gt;&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary> Debug Win32 API MessageBox pop up </summary>
+        </member>
+        <member name="M:utility.ErrorMessage(std.basic_string_view&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte}&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary> Debug Win32 API MessageBox pop up </summary>
+        </member>
+        <member name="M:utility.ToWideString(std.basic_string_view&lt;System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte,std.char_traits{System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte}&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary>
+Convert given text to wide string.
+</summary>
+            <param name="Text" />
+            <returns />
+        </member>
+        <member name="T:AddressMode">
+            <summary>
+For Textures and Samplers.
+</summary>
+        </member>
+        <member name="T:TopologyType">
+            <summary>
+Geometry topology.
+</summary>
+        </member>
+        <member name="T:PipelineType">
+            <summary>
+Applies to both PipelineState and RootSignature
+</summary>
+        </member>
+        <member name="T:ShaderType">
+            <summary>
+Used to determine desired shader type.
+</summary>
+        </member>
+        <member name="T:ShaderModel">
+            <summary>
+Used to determine desired target shader version.
+</summary>
+        </member>
+        <member name="M:D3D.GetRenderTarget">
+            <summary> Get Render Target for <b>current</b> frame. </summary>
+            <returns>
+                <c>ID3D12Resource*</c>
+            </returns>
+        </member>
+        <member name="F:D3D.g_ClearColor">
+Swap Chain backbuffer background color
+</member>
+        <member name="F:D3D.g_RenderTargetHeap">
+            <summary>
+Used for SwapChain Presenting.<br />
+Not meant to be used for Deferred targets.
+</summary>
+        </member>
+        <member name="M:D3D.D3D12Viewport.Scissor">
+            <summary> Scissor getter </summary>
+            <returns> Private member of type: D3D12_RECT </returns>
+        </member>
+        <member name="M:D3D.D3D12Viewport.Viewport">
+            <summary> Viewport getter </summary>
+            <returns> Private member of type: D3D12_VIEWPORT </returns>
+        </member>
+        <member name="M:D3D.D3D12Viewport.SetScissor(System.UInt32,System.UInt32)">
+Set dimensions for Scissor only
+</member>
+        <member name="M:D3D.D3D12Viewport.SetViewport(System.UInt32,System.UInt32)">
+Set dimensions for Viewport only
+</member>
+        <member name="M:D3D.D3D12Viewport.Set(System.UInt32,System.UInt32)">
+Set same dimensions for both Viewport and Scissor
+</member>
+        <member name="T:D3D.D3D12Viewport">
+            <summary>
+D3D12_VIEWPORT and D3D12_RECT wrapper.<br />
+D3D12Viewport is meant to be used as a class object
+for later reusability.<br />
+Example usage:<br />
+- main renderer viewport and scissor,<br />
+- shadow mapping viewport per light source,<br /></summary>
+        </member>
+        <member name="M:gfx.ShaderTypeToTarget(&lt;unknown type&gt;)">
+            <summary>
+Converts ShaderType enum value to LPCWSTR for shader creation usage.
+</summary>
+            <param name="TypeOf"> Enum type. </param>
+            <returns />
+        </member>
+        <member name="M:D3D.Utility.GetScreenOutputInputLayout">
+            <summary>
+Used for deferred rendering screen output (aka screen quad).
+</summary>
+            <returns> Array of: XMFLOAT3 Position, XMFLOAT2 TexCoord </returns>
+        </member>
+        <member name="M:D3D.Utility.GetSkyInputLayout">
+            <summary>
+Plain skybox and Image Based Lighting usage.
+</summary>
+            <returns> Array of: XMFLOAT3 Position, XMFLOAT3 TexCoord </returns>
+        </member>
+        <member name="M:D3D.Utility.GetModelInputLayout">
+            <summary> 3D Model layout. </summary>
+            <returns>
+Array of: XMFLOAT3 Position, XMFLOAT2 TexCoord, XMFLOAT3 Normal,XMFLOAT3 Tangent, XMFLOAT3 Bitangent
+</returns>
+        </member>
+        <member name="M:D3D.Utility.CreateStaticSampler(System.UInt32,System.UInt32,D3D12_FILTER,D3D12_TEXTURE_ADDRESS_MODE,D3D12_COMPARISON_FUNC,D3D12_SHADER_VISIBILITY)">
+            <summary />
+            <param name="ShaderRegister" />
+            <param name="RegisterSpace" />
+            <param name="Filter" />
+            <param name="AddressMode" />
+            <param name="ComparsionFunc" />
+            <param name="Visibility" />
+            <returns> D3D12_STATIC_SAMPLER_DESC </returns>
+        </member>
+        <member name="F:D3D.Utility.HeapUpload">
+            <summary>
+D3D12_HEAP_TYPE_UPLOAD
+</summary>
+        </member>
+        <member name="F:D3D.Utility.HeapDefault">
+            <summary>
+D3D12_HEAP_TYPE_DEFAULT
+</summary>
+        </member>
+        <member name="M:D3D.Utility.UploadHeap(System.Boolean)">
+            <summary>
+Heap Desc in <b>Upload</b> state for D3D12MA usage.
+</summary>
+            <param name="bComitted"> Indicates whether to set <c>ALLOCATION_FLAG_COMMITTED</c>. </param>
+            <returns />
+        </member>
+        <member name="T:D3D.Utility">
+            <summary>
+Helper function for building Root Signatures and PSOs.<br />
+Part of D3D namespace to prevent collision with general utilities.
+</summary>
+        </member>
+        <member name="F:D3D.g_D3DDebug">
+Debug helpers
+</member>
+        <member name="M:D3D.ReleaseDevice">
+            <summary> 
+Release all Device related ComPtrs.<br />
+Should return Refcount: 1 for ID3D12Device.<br />
+Otherwise some resources haven't been released, or were released incorrectly.
+</summary>
+        </member>
+        <member name="M:D3D.HeapAllocation(ID3D12Resource**,D3D12MA.Allocation**,CD3DX12_RESOURCE_DESC!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,D3D12MA.ALLOCATION_FLAGS,D3D12_HEAP_TYPE,D3D12_HEAP_FLAGS)">
+            <summary>
+Make allocation from <c>D3D12MA::Allocator</c>.
+</summary>
+            <param name="ppResource"> Target Resource. </param>
+            <param name="pAllocation"> Target Allocation. </param>
+            <param name="AllocationFlags"> D3D12MA Flags. </param>
+            <param name="HeapDesc"> Heap Desc. </param>
+            <param name="HeapType"> Desired Heap type. Defaults to <c>D3D12_HEAP_TYPE_UPLOAD</c>. </param>
+            <param name="HeapFlags"> Defaults to <c>D3D12_HEAP_FLAG_NONE</c>. </param>
+        </member>
+        <member name="M:D3D.QueryAdapterMemory">
+            <summary> GPU Virtual Memory usage. </summary>
+            <returns> Current VRAM usage in MegaBytes. </returns>
+        </member>
+        <member name="M:D3D.CheckRaytracingSupport">
+Raytracing support is mendatory
+as engine is meant to be built around hybrid path
+</member>
+        <member name="M:D3D.D3D12DescriptorHeap.CanAllocate">
+            <summary>
+Can allocate only when count of currently allocated descriptors is less then max available.
+</summary>
+            <returns>
+                <b>True</b> is allocation is possible. </returns>
+        </member>
+        <member name="F:D3D.D3D12DescriptorHeap.m_Heap">
+            <summary> Actual Heap. </summary>
+        </member>
+        <member name="M:D3D.D3D12DescriptorHeap.GetGPUptr(System.UInt32)">
+            <summary />
+            <returns> GPU Handle of given index from the Heap. </returns>
+        </member>
+        <member name="M:D3D.D3D12DescriptorHeap.GetCPUptr(System.UInt32)">
+            <summary />
+            <returns> CPU Handle of given index from the Heap. </returns>
+        </member>
+        <member name="M:D3D.D3D12DescriptorHeap.Heap">
+            <summary> Getter for underlaying ID3D12DescriptorHeap COM pointer. </summary>
+            <returns> ID3D12DescriptorHeap* </returns>
+        </member>
+        <member name="M:D3D.D3D12DescriptorHeap.Override(D3D.D3D12Descriptor*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary>
+Used when a <b>D3D12Descriptor</b> is already allocated (non-zero pointer)
+to avoid allocating another, redundant index inside of the Heap.
+</summary>
+            <param name="TargetDescriptor">
+                <c>Descriptor</c> to override. </param>
+        </member>
+        <member name="M:D3D.D3D12DescriptorHeap.Allocate(D3D.D3D12Descriptor*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary>
+Allocate given <b><c>D3D12Descriptor</c></b> inside the Heap of this class object.
+</summary>
+            <param name="TargetDescriptor">
+                <c>Descriptor</c> to allocate. </param>
+        </member>
+        <member name="M:D3D.D3D12DescriptorHeap.#ctor(&lt;unknown type&gt;,System.UInt32,System.Char!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary />
+            <param name="eUsage"> Type of <c>Descriptors</c>. </param>
+            <param name="MaxCount"> Maximum capacity of the Heap. </param>
+            <param name="DebugName"> Optional. </param>
+        </member>
+        <member name="M:D3D.D3D12DescriptorHeap.#ctor(D3D12_DESCRIPTOR_HEAP_DESC!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,System.Char!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary>
+Desc based constructor.
+</summary>
+            <param name="Desc"> Heap Desc. </param>
+            <param name="DebugName"> Optional. </param>
+        </member>
+        <member name="T:D3D.D3D12DescriptorHeap">
+            <summary>
+Unfinished solution
+</summary>
+        </member>
+        <member name="M:D3D.D3D12Descriptor.IsValid">
+            <summary> Indicates whether Descriptor is allocated. </summary>
+            <returns> True if is Descriptor's CPU pointer is non-zero. </returns>
+        </member>
+        <member name="M:D3D.D3D12Descriptor.GetGPU">
+Get GPU descriptor handle
+</member>
+        <member name="M:D3D.D3D12Descriptor.GetCPU">
+Get CPU descriptor handle
+</member>
+        <member name="M:D3D.D3D12Descriptor.SetGPU(D3D12_GPU_DESCRIPTOR_HANDLE)">
+Setter for GPU descriptor handle
+</member>
+        <member name="M:D3D.D3D12Descriptor.SetCPU(D3D12_CPU_DESCRIPTOR_HANDLE)">
+Setter for CPU descriptor handle
+</member>
+        <member name="T:D3D.D3D12Descriptor">
+            <summary> 
+D3D12Descriptor takes a role of a wrapper around single descriptor object.<br />
+Holds pointer to allocated CPU handle address and (for SRV/CBV/UAV heap type) GPU pointer. 
+</summary>
+        </member>
+        <member name="T:Logger">
+            <summary>
+Logger class meant for ImGui output usage.
+</summary>
+        </member>
+    </members>
+</doc>
