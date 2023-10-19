@@ -18,6 +18,11 @@ namespace D3D
 		m_Type			 = Desc.Type;
 		m_DescriptorSize = sizeof(Desc.Type);
 		m_MaxDescriptors = Desc.NumDescriptors;
+		m_AvailableAllocs = m_MaxDescriptors;
+
+		m_AvailableCpuPtr = static_cast<uint64_t>(m_Heap->GetCPUDescriptorHandleForHeapStart().ptr) + m_DescriptorSize;
+		if (m_Type != D3D12_DESCRIPTOR_HEAP_TYPE_DSV && m_Type != D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
+			m_AvailableGpuPtr = static_cast<uint64_t>(m_Heap->GetGPUDescriptorHandleForHeapStart().ptr) + m_DescriptorSize;
 	}
 
 	D3D12DescriptorHeap::D3D12DescriptorHeap(HeapUsage Usage, uint32_t MaxCount, const LPCWSTR& DebugName)
@@ -27,7 +32,7 @@ namespace D3D
 
 		switch (Usage)
 		{
-		case HeapUsage::eSRV_CBV_UAV:
+		case HeapUsage::eShader:
 		{
 			desc.Type	= D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 			desc.Flags	= D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
@@ -56,6 +61,11 @@ namespace D3D
 		m_Type = desc.Type;
 		m_DescriptorSize = g_Device.Get()->GetDescriptorHandleIncrementSize(desc.Type);
 		m_MaxDescriptors = desc.NumDescriptors;
+		m_AvailableAllocs = m_MaxDescriptors;
+
+		m_AvailableCpuPtr = static_cast<uint64_t>(m_Heap->GetCPUDescriptorHandleForHeapStart().ptr) + m_DescriptorSize;
+		if (m_Type != D3D12_DESCRIPTOR_HEAP_TYPE_DSV && m_Type != D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
+			m_AvailableGpuPtr = static_cast<uint64_t>(m_Heap->GetGPUDescriptorHandleForHeapStart().ptr) + m_DescriptorSize;
 	}
 
 	D3D12DescriptorHeap::~D3D12DescriptorHeap()
@@ -63,39 +73,75 @@ namespace D3D
 		Release();
 	}
 
-	void D3D12DescriptorHeap::Allocate(D3D12Descriptor& TargetDescriptor)
+	void D3D12DescriptorHeap::Allocate(D3D12Descriptor& TargetDescriptor, uint32_t Count)
 	{
 		if (!CanAllocate())
 		{
-			// Should throw error for now
+			// Should throw warning for now
 		}
 
 		if (!TargetDescriptor.IsValid())
 		{
-			++m_Allocated;
-			TargetDescriptor.SetCPU(GetCPUptr(m_Allocated));
+			TargetDescriptor.SetCPU(GetCPUptr(Count));
+
 			// Types D3D12_DESCRIPTOR_HEAP_TYPE_DSV and D3D12_DESCRIPTOR_HEAP_TYPE_RTV
 			// cannot allocate GPU Handle, thus we skip allocating them to prevent causing potential errors.
 			if (m_Type != D3D12_DESCRIPTOR_HEAP_TYPE_DSV && m_Type != D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
-				TargetDescriptor.SetGPU(GetGPUptr(m_Allocated));
+				TargetDescriptor.SetGPU(GetGPUptr(Count));
 
-			TargetDescriptor.Index = m_Allocated;
+			TargetDescriptor.Index = GetIndex(TargetDescriptor);
+			m_AvailableAllocs -= Count;
 		}
 		else
 		{
-			Override(TargetDescriptor);
+			Override(TargetDescriptor, Count);
 		}
+
+ 	}
+	
+	void D3D12DescriptorHeap::Override(D3D12Descriptor& TargetDescriptor, uint32_t Count)
+	{
+		auto offset = GetIndex(TargetDescriptor);
+		D3D12_CPU_DESCRIPTOR_HANDLE outputc = (D3D12_CPU_DESCRIPTOR_HANDLE)(CpuHeapStart().ptr + (offset * m_DescriptorSize));
+		TargetDescriptor.SetCPU(outputc);
+		if (m_Type != D3D12_DESCRIPTOR_HEAP_TYPE_DSV && m_Type != D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
+		{
+			D3D12_GPU_DESCRIPTOR_HANDLE outputg = (D3D12_GPU_DESCRIPTOR_HANDLE)(GpuHeapStart().ptr + (offset * m_DescriptorSize));
+			TargetDescriptor.SetGPU(outputg);
+		}
+
+		//TargetDescriptor.SetCPU(GetCPUptr(TargetDescriptor.Index, Count));
+		//if (m_Type != D3D12_DESCRIPTOR_HEAP_TYPE_DSV && m_Type != D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
+		//	TargetDescriptor.SetGPU(GetGPUptr(TargetDescriptor.Index, Count));
 	}
 
-	void D3D12DescriptorHeap::Override(D3D12Descriptor& TargetDescriptor)
+	D3D12_CPU_DESCRIPTOR_HANDLE D3D12DescriptorHeap::GetCPUptr(uint32_t Count)
 	{
-		TargetDescriptor.SetCPU(GetCPUptr(TargetDescriptor.Index));
-		if (m_Type != D3D12_DESCRIPTOR_HEAP_TYPE_DSV && m_Type != D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
-			TargetDescriptor.SetGPU(GetGPUptr(TargetDescriptor.Index));
+		D3D12_CPU_DESCRIPTOR_HANDLE output = (D3D12_CPU_DESCRIPTOR_HANDLE)(m_AvailableCpuPtr);
+		m_AvailableCpuPtr += ((size_t)Count * m_DescriptorSize);
+		return output ;
+	}
+
+	D3D12_GPU_DESCRIPTOR_HANDLE D3D12DescriptorHeap::GetGPUptr(uint32_t Count)
+	{
+		D3D12_GPU_DESCRIPTOR_HANDLE output = (D3D12_GPU_DESCRIPTOR_HANDLE)(m_AvailableGpuPtr);
+		m_AvailableGpuPtr += ((size_t)Count * m_DescriptorSize);
+		return output;
+	}
+
+	size_t D3D12DescriptorHeap::GetHandleFromOffset(uint32_t Offset)
+	{
+		return size_t();
+	}
+
+	uint32_t D3D12DescriptorHeap::GetIndex(D3D12Descriptor& TargetDescriptor)
+	{
+		return static_cast<uint32_t>((TargetDescriptor.GetCPU().ptr - m_Heap->GetCPUDescriptorHandleForHeapStart().ptr) / m_DescriptorSize);
 	}
 
 	void D3D12DescriptorHeap::Release()
 	{
 		SAFE_RELEASE(m_Heap);
 	}
+
 }
