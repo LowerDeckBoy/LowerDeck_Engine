@@ -36,6 +36,13 @@
 		}
 #endif // ThrowIfFailed
 
+#ifndef ASSERT
+// TODO:
+#define ASSERT(Expr, message) \
+	if (!Expr) \
+
+#endif
+
 namespace utility
 {
 	/// <summary>
