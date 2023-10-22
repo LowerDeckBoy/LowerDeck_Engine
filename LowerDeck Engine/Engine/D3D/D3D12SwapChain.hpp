@@ -11,6 +11,10 @@ namespace D3D
 {
 	extern ComPtr<IDXGISwapChain3> g_SwapChain;
 
+	/// <summary>
+	/// Used for SwapChain Presenting.<br/>
+	/// Not meant to be used for Deferred targets.
+	/// </summary>
 	extern std::unique_ptr<D3D12DescriptorHeap> g_RenderTargetHeap;
 	extern std::array<ComPtr<ID3D12Resource>, FRAME_COUNT> g_RenderTargets;
 

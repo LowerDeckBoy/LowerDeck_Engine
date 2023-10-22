@@ -68,7 +68,7 @@ namespace D3D
 		g_CommandList.Get()->ClearDepthStencilView(depthHandle, D3D12_CLEAR_FLAG_DEPTH, D3D12_MAX_DEPTH, 0, 0, nullptr);
 	}
 
-	void D3D12DepthBuffer::OnResize(D3D12DescriptorHeap* pDepthHeap, D3D12Viewport* pViewport, bool bSRV)
+	void D3D12DepthBuffer::OnResize(D3D12DescriptorHeap* pDepthHeap, D3D12Viewport* pViewport)
 	{
 		if (m_Resource.Get())
 			m_Resource.Reset();

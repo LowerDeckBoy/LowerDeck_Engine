@@ -45,7 +45,7 @@ namespace D3D
 		/// <param name="bComitted"> Indicates whether to set <c>ALLOCATION_FLAG_COMMITTED</c>. </param>
 		/// <returns></returns>
 		static D3D12MA::ALLOCATION_DESC UploadHeap(bool bComitted = false);
-
+		
 		/// <summary>
 		/// D3D12_HEAP_TYPE_DEFAULT
 		/// </summary>
@@ -54,6 +54,11 @@ namespace D3D
 		/// D3D12_HEAP_TYPE_UPLOAD
 		/// </summary>
 		inline static const CD3DX12_HEAP_PROPERTIES HeapUpload{ CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD) };
+
+		/// <summary>
+		/// D3D12_HEAP_TYPE_GPU_UPLOAD
+		/// </summary>
+		inline static const CD3DX12_HEAP_PROPERTIES HeapGpuUpload{ CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_GPU_UPLOAD) };
 
 		/// <summary>
 		/// 

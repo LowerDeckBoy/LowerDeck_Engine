@@ -66,9 +66,9 @@ namespace D3D
 
 namespace gfx
 {
-	LPCWSTR ShaderTypeToTarget(ShaderType TypeOf)
+	LPCWSTR ShaderTypeToTarget(ShaderType eType)
 	{
-		switch (TypeOf)
+		switch (eType)
 		{
 		case ShaderType::eVertex:
 			return L"vs_6_6";

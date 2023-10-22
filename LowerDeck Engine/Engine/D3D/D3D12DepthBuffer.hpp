@@ -38,7 +38,7 @@ namespace D3D
 		/// <summary>
 		/// As it says.
 		/// </summary>
-		void OnResize(D3D12DescriptorHeap* pDepthHeap, D3D12Viewport* pViewport, bool bSRV = false);
+		void OnResize(D3D12DescriptorHeap* pDepthHeap, D3D12Viewport* pViewport);
 
 		ID3D12Resource* Get() { return m_Resource.Get(); }
 
