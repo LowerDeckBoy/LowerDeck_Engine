@@ -9,21 +9,21 @@ namespace ecs
 
     void World::Initialize()
     {
-        
+        m_Registry = std::make_unique<entt::registry>();
     }
 
     entt::entity World::CreateEntity()
     {
-        return m_Registry.create();
+        return m_Registry->create();
     }
 
     void World::DestroyEntity(entt::entity Entity)
     {
-        m_Registry.destroy(Entity);
+        m_Registry->destroy(Entity);
     }
 
     void World::Release()
     {
-        m_Registry.clear();
+        m_Registry->clear();
     }
 }
