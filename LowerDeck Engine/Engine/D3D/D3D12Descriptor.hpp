@@ -20,6 +20,8 @@ namespace D3D
 			m_GPU.ptr = 0;
 		}
 
+		//D3D12Descriptor operator=(const D3D12Descriptor& Other) = default;
+
 		/// Setter for CPU descriptor handle
 		inline void SetCPU(D3D12_CPU_DESCRIPTOR_HANDLE Handle) noexcept { m_CPU = Handle; }
 		/// Setter for GPU descriptor handle

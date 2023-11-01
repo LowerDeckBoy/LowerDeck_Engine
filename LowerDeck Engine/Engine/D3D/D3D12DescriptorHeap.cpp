@@ -129,6 +129,11 @@ namespace D3D
 		return output;
 	}
 
+	uint32_t D3D12DescriptorHeap::GetIndexFromOffset(D3D12Descriptor& TargetDescriptor, uint32_t Offset)
+	{
+		return static_cast<uint32_t>((TargetDescriptor.GetCPU().ptr + (Offset * 32) - m_Heap->GetCPUDescriptorHandleForHeapStart().ptr) / m_DescriptorSize);
+	}
+
 	size_t D3D12DescriptorHeap::GetHandleFromOffset(uint32_t Offset)
 	{
 		return size_t();

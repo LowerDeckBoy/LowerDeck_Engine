@@ -45,6 +45,9 @@ namespace D3D
 		/// <param name="TargetDescriptor"> <c>Descriptor</c> to allocate. </param>
 		/// <param name="Count"> Amount of descriptors to allocate. </param>
 		void Allocate(D3D12Descriptor& TargetDescriptor, uint32_t Count = 1);
+
+		/// 
+		//void AllocateGPU(D3D12Descriptor& TargetDescriptor, uint32_t Count = 1);
 		
 		/// <summary>
 		/// Used when a <b>D3D12Descriptor</b> is already allocated (non-zero pointer)
@@ -56,7 +59,7 @@ namespace D3D
 		
 		/// <summary> Getter for underlaying ID3D12DescriptorHeap COM pointer. </summary>
 		/// <returns> ID3D12DescriptorHeap* </returns>
-		[[nodiscard]] inline ID3D12DescriptorHeap*  Heap() { return m_Heap.Get(); }
+		[[nodiscard]] inline ID3D12DescriptorHeap* Heap() { return m_Heap.Get(); }
 		/// <summary>  </summary>
 		/// <returns> <c>GetAddressOf()</c> of underlying Heap. </returns>
 		[[nodiscard]] inline ID3D12DescriptorHeap** HeapAddressOf() { return m_Heap.GetAddressOf(); }
@@ -76,6 +79,9 @@ namespace D3D
 		/// <summary></summary>
 		/// <returns> GPU Handle of given index from the Heap. </returns>
 		[[nodiscard]] D3D12_GPU_DESCRIPTOR_HANDLE GetGPUptr(uint32_t Count);
+
+		uint32_t GetIndexFromOffset(D3D12Descriptor& TargetDescriptor, uint32_t Offset);
+		
 
 		void Release();
 
