@@ -7,6 +7,11 @@
 #include <array>
 #include <vector>
 
+#include <directxtk12/WICTextureLoader.h>
+#include <directxtk12/ResourceUploadBatch.h>
+
+#include "MipMapGenerator.hpp"
+
 namespace lde
 {
 	ImageBasedLighting::ImageBasedLighting(const std::string_view& Filepath)
@@ -148,18 +153,31 @@ namespace lde
 	{
 		// Temporal pre-transformed texture
 		ComPtr<ID3D12Resource> preTransformResource;
-		TextureUtility::CreateFromHDR(Filepath, preTransformResource.ReleaseAndGetAddressOf(), m_SpecularMippedDescriptor, true);
-		//TextureUtility::CreateFromHDR(Filepath, preTransformResource.ReleaseAndGetAddressOf(), m_SpecularMippedDescriptor, true);
+		TextureUtility::CreateFromHDR(Filepath, preTransformResource.ReleaseAndGetAddressOf());
+
+		//m_Skybox = new Texture(Filepath);
+
 		D3D::D3D12Context::GetMainHeap()->Allocate(m_SkyboxDescriptor);
 		TextureUtility::CreateSRV(preTransformResource.GetAddressOf(), m_SkyboxDescriptor, 1, DXGI_FORMAT_R32G32B32A32_FLOAT);
+		//TextureUtility::CreateSRV(preTransformResource.GetAddressOf(), m_SkyboxDescriptor, 1, DXGI_FORMAT_R32G32B32A32_FLOAT);
+
+		const auto desc{ preTransformResource->GetDesc() };
+
+		uint32_t cubeResolution{ 1024 };
+		if (desc.Width < 1024)
+			cubeResolution = 512;
+		else if (desc.Width >= 2048)
+			cubeResolution = 2048;
+		else if (desc.Width >= 4096)
+			cubeResolution = 4096;
 
 		ComPtr<ID3D12Resource> uavTexture;
 		TextureUtility::CreateResource(uavTexture.GetAddressOf(),
-			TextureData(1024, 1024, 6, DXGI_FORMAT_R16G16B16A16_FLOAT),
+			TextureData(cubeResolution, cubeResolution, 6, DXGI_FORMAT_R16G16B16A16_FLOAT, 6),
 			TextureDesc(D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS));
-		// Temporal UAV Descriptor to hold post-transformed texture
 
-		D3D::D3D12Descriptor uavDescriptor;
+		// Temporal UAV Descriptor to hold post-transformed texture
+		
 		D3D::D3D12Context::GetMainHeap()->Allocate(uavDescriptor);
 		TextureUtility::CreateUAV(uavTexture.GetAddressOf(), uavDescriptor, 6, DXGI_FORMAT_R16G16B16A16_FLOAT);
 
@@ -186,12 +204,13 @@ namespace lde
 			pCommandList->SetPipelineState(computePipeline);
 			pCommandList->SetComputeRootDescriptorTable(0, m_SkyboxDescriptor.GetGPU());
 			pCommandList->SetComputeRootDescriptorTable(1, uavDescriptor.GetGPU());
-			pCommandList->Dispatch(1024 / 32, 1024 / 32, 6);
+			pCommandList->Dispatch(cubeResolution / 32, cubeResolution / 32, 6);
 			};
 		dispatch(D3D::g_CommandList.Get());
 
 		// Actual Skybox resource
-		TextureUtility::CreateResource(m_Skybox.ReleaseAndGetAddressOf(), { 1024, 1024, 6, DXGI_FORMAT_R16G16B16A16_FLOAT }, TextureDesc(D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS));
+		
+		TextureUtility::CreateResource(m_Skybox.ReleaseAndGetAddressOf(), { cubeResolution, cubeResolution, 6, DXGI_FORMAT_R16G16B16A16_FLOAT, 6 }, TextureDesc(D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS));
 		m_Skybox.Get()->SetName(L"[Image Based Lighting] TextureCube Resource");
 
 		std::array<D3D12_RESOURCE_BARRIER, 2> preCopyBarriers{};
@@ -208,18 +227,23 @@ namespace lde
 		D3D::g_CommandList.Get()->ResourceBarrier(static_cast<uint32_t>(postCopyBarriers.size()), postCopyBarriers.data());
 
 		D3D::ExecuteCommandLists(true);
-		
+
 		TextureUtility::CreateSRV(m_Skybox.GetAddressOf(), m_SkyboxDescriptor, 1, DXGI_FORMAT_R16G16B16A16_FLOAT, D3D12_SRV_DIMENSION_TEXTURECUBE);
 
 		SAFE_RELEASE(preTransformResource);
 		SAFE_RELEASE(uavTexture);
 		SAFE_DELETE(computePipeline);
 
-		//TextureUtility::CreateFromHDR(Filepath, m_SpecularMap.ReleaseAndGetAddressOf(), m_SpecularMippedDescriptor, true);
-		//D3D::D3D12Context::GetMainHeap()->Allocate(m_SpecularDescriptor);
-		//DXGI_FORMAT_R16G16B16A16_FLOAT
-		//TextureUtility::CreateUAV(m_SpecularMap.GetAddressOf(), m_SpecularDescriptor, 6, DXGI_FORMAT_R32G32B32A32_FLOAT);
-		//m_SpecularMap.Get()->SetName(L"[Image Based Lighting] Specular Map");
+		//TEST
+		//TextureUtility::
+		//Texture testTexture(Filepath);
+		//MipMapGenerator::Generate2D(testTexture, 2, 1);
+		//D3D::ExecuteCommandLists(true);
+		//D3D::WaitForGPU();
+		//D3D::FlushGPU();
+
+		
+		//MipMapGenerator::Generate2D(*m_SkyboxTexture, 3, 1);
 
 	}
 
@@ -246,7 +270,7 @@ namespace lde
 
 			m_IrradianceMap.Get()->SetName(L"[Image Based Lighting] Irradiance Map");
 		}
-
+		
 		// Compute execution and resource transition
 		const auto dispatch = [&](ID3D12GraphicsCommandList4* pCommandList) {
 			pCommandList->SetDescriptorHeaps(1, D3D::D3D12Context::GetMainHeap()->HeapAddressOf());
@@ -281,11 +305,11 @@ namespace lde
 			ThrowIfFailed(D3D::g_Device.Get()->CreateComputePipelineState(&psoDesc, IID_PPV_ARGS(&pipelineState)));
 		}
 
-		uint32_t mips = 1;
+		uint16_t mips = 1;
 		// Resource and Descriptor creation
 		{
 			TextureUtility::CreateResource(m_SpecularMap.ReleaseAndGetAddressOf(), TextureData(256, 256, 6, DXGI_FORMAT_R16G16B16A16_FLOAT, mips),
-			TextureDesc(D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
+				TextureDesc(D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 
 			D3D::D3D12Context::GetMainHeap()->Allocate(m_SpecularDescriptor);
 			TextureUtility::CreateUAV(m_SpecularMap.GetAddressOf(), m_SpecularDescriptor, 6, DXGI_FORMAT_R16G16B16A16_FLOAT);
@@ -293,7 +317,6 @@ namespace lde
 		}
 
 		// Compute execution and resource transition
-		
 		const auto dispatch = [&](ID3D12GraphicsCommandList4* pCommandList) {
 			pCommandList->SetDescriptorHeaps(1, D3D::D3D12Context::GetMainHeap()->HeapAddressOf());
 			pCommandList->SetComputeRootSignature(pComputeRoot);
@@ -306,12 +329,7 @@ namespace lde
 			pCommandList->ResourceBarrier(1, &toCommon);
 			};
 		
-
-		//for (UINT arraySlice = 0; arraySlice < 6; ++arraySlice)
-		//{
-		//	const UINT subresourceIndex = D3D12CalcSubresource(0, arraySlice, 0, m_envTexture.levels, 6);
-		//	m_commandList->CopyTextureRegion(&CD3DX12_TEXTURE_COPY_LOCATION{ m_envTexture.texture.Get(), subresourceIndex }, 0, 0, 0, //&CD3DX12_TEXTURE_COPY_LOCATION{ envTextureUnfiltered.texture.Get(), subresourceIndex }, nullptr);
-		//}
+		// TODO:
 		/*
 		const auto dispatch = [&](ID3D12GraphicsCommandList4* pCommandList) {
 			pCommandList->SetDescriptorHeaps(1, D3D::D3D12Context::GetMainHeap()->HeapAddressOf());
