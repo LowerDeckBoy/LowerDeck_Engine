@@ -47,9 +47,7 @@ namespace gfx
 			// Include paths: without them, it can cause issues when trying to do includes inside hlsl
 			L"-I Shaders/", L"-I", parentPath.c_str(),
 			// HLSL version: 2021 is latest
-			L"-HV 2021",
-			// 	Strip debug information and strip reflection data from shader bytecode
-			L"-Qstrip_debug", L"-Qstrip_reflect",
+			L"-HV 2021"
 		};
 
 #if defined (_DEBUG)
@@ -81,7 +79,6 @@ namespace gfx
 		SAFE_DELETE(sourceBlob);
 
 		return blob;
-		//return Shader(blob);
 	}
 
 	void ShaderManager::Release()

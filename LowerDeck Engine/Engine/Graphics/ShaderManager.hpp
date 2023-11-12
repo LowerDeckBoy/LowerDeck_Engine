@@ -5,11 +5,10 @@
 #include <string_view>
 #include "../D3D/D3D12Types.hpp"
 #include "Shader.hpp"
+#include "../Utility/Singleton.hpp"
 
 namespace gfx
 {
-
-
 	// TODO:
 	// Add checking if .cso files are available,
 	// if so, skip shader compilation
@@ -18,10 +17,11 @@ namespace gfx
 	/// Single instance for creating and compiling shader model 6.x.<br/>
 	/// DXIL Libraries require to create Compiler and Library
 	/// so Manager role is to create them once instead of per shader basis.<br/>
-	/// Meant for <c><i>std::shared_ptr</i></c> usage.
+	/// Meant to be used as a Singleton.
 	/// </summary>
-	class ShaderManager
+	class ShaderManager : public Singleton<ShaderManager>
 	{
+		friend class Singleton<ShaderManager>;
 	public:
 		/// <summary>
 		/// Initializes IDxc pointers.
@@ -57,5 +57,10 @@ namespace gfx
 		Microsoft::WRL::ComPtr<IDxcIncludeHandler>	m_IncludeHandler;
 		Microsoft::WRL::ComPtr<IDxcLibrary>			m_Library;
 		
+	private:
+		// TODO:
+		//void GetWarning();
+		//void GetError();
+
 	};
 }
