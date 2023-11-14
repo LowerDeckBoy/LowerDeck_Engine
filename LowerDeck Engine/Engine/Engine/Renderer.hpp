@@ -1,17 +1,27 @@
 #pragma once
 #include "../Engine/D3D/D3D12Context.hpp"
-#include "../Graphics/ShaderManager.hpp"
-#include "../Graphics/Shader5.hpp"
 #include "../D3D/D3D12DepthBuffer.hpp"
 #include "../D3D/D3D12RootSignature.hpp"
-#include "../D3D/D3D12GraphicsPipelineState.hpp"
+#include "../D3D/D3D12PipelineState.hpp"
+#include "../Graphics/ShaderManager.hpp"
+#include "../Graphics/Shader5.hpp"
 
+#include "../Utility/Singleton.hpp"
+
+#include "../Graphics/TextureManager.hpp"
 #include "../Render/Model/Model.hpp"
-#include "../Render/Deferred/DeferredContext.hpp"
 
 #include "../Graphics/ImageBasedLighting.hpp"
 // Temporal
 #include "../Render/Lights/PointLights.hpp"
+
+#include "../Render/ScreenOutput.hpp"
+// RenderPasses
+#include "../Render/RenderPass/GBufferPass.hpp"
+#include "../Render/RenderPass/LightPass.hpp"
+
+#include "../Graphics/MipMapGenerator.hpp"
+
 
 class Camera;
 class Editor;
@@ -74,7 +84,14 @@ protected:
 	/// <param name="StateBefore"></param>
 	void TransitToPresent(D3D12_RESOURCE_STATES StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET);
 
+	/// <summary>
+	/// Wrapper for setting desired <c>Descriptor Heaps</c> (SRV_UAV_CBV and Sampler Heaps).
+	/// </summary>
+	/// <param name="Heaps"> Reference to vector of Heaps. </param>
 	void SetHeaps(const std::vector<ID3D12DescriptorHeap*>& Heaps);
+	/// <summary>
+	/// Set actual Scene Viewport - SwapChain output.
+	/// </summary>
 	void SetViewport();
 
 	/// <summary>Set SwapChain Render Targets for frame presentation</summary>
@@ -92,9 +109,6 @@ protected:
 
 	std::array<const char*, 6> m_OutputRenderTargets{ "Shaded", "Depth", "Base Color", "Normal", "Metal-Roughness", "World Position" };
 
-	uint32_t m_ViewportWidth{ 0 };
-	uint32_t m_ViewportHeight{ 0 };
-
 private:
 	// Debug only
 	// Forward States
@@ -108,15 +122,17 @@ private:
 private:
 	std::unique_ptr<D3D::D3D12Viewport> m_SceneViewport;
 	std::shared_ptr<D3D::D3D12Context> m_D3DContext;
-	//D3D::D3D12Context* m_D3DContext;
 	std::unique_ptr<D3D::D3D12DepthBuffer> m_DepthStencil;
 	Camera* m_SceneCamera;
-	//std::shared_ptr<Camera> m_SceneCamera;
 	std::shared_ptr<Editor> m_Editor;
 
+	std::shared_ptr<TextureManager> m_TextureManager;
 	std::shared_ptr<gfx::ShaderManager> m_ShaderManager;
 
-	std::unique_ptr<DeferredContext> m_DeferredContext;
+	std::unique_ptr<ScreenOutput> m_DeferredOutput;
+	//
+	std::unique_ptr<GBufferPass> m_GBufferPass;
+	std::unique_ptr<LightPass> m_LightPass;
 
 	std::vector<std::unique_ptr<Model>> m_Models;
 	
@@ -126,6 +142,8 @@ private:
 	std::unique_ptr<lde::ImageBasedLighting> m_ImageBasedLighting;
 	// Temporal
 	std::unique_ptr<PointLights> m_PointLights;
+	//static 
+	static MipMapGenerator m_MipGen;
 
 public:
 	static bool bVsync;

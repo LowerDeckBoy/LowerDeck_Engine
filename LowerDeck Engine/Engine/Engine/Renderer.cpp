@@ -8,10 +8,11 @@ bool Renderer::bVsync = true;
 int32_t Renderer::SelectedRenderTarget = 0;
 bool Renderer::bDrawSky = true;
 
+MipMapGenerator Renderer::m_MipGen;
+
 Renderer::Renderer(std::shared_ptr<D3D::D3D12Context> pD3DContext, Camera* pCamera)
 {
 	m_D3DContext = pD3DContext;
-	//m_D3DContext = std::make_shared<D3D::D3D12Context>();
 	m_SceneCamera = pCamera;
 	Initialize();
 }
@@ -25,32 +26,41 @@ void Renderer::Initialize()
 {
 	m_SceneViewport = std::make_unique<D3D::D3D12Viewport>();
 
-	//m_D3DContext = std::make_shared<D3D::D3D12Context>();
-	//m_D3DContext->InitializeD3D();
-
+	// wrap into singletons
 	m_ShaderManager = std::make_shared<gfx::ShaderManager>();
+	m_TextureManager = std::make_shared<TextureManager>();
 
 	m_DepthStencil = std::make_unique<D3D::D3D12DepthBuffer>(m_D3DContext->GetDepthHeap(), m_D3DContext->GetSceneViewport());
 
-	m_DeferredContext = std::make_unique<DeferredContext>(m_D3DContext, m_ShaderManager, m_DepthStencil.get());
+	m_DeferredOutput = std::make_unique<ScreenOutput>();
+
+	// Render Passes
+	m_GBufferPass = std::make_unique<GBufferPass>(m_D3DContext->GetSceneViewport(), m_DepthStencil.get());
+	m_LightPass = std::make_unique<LightPass>(m_D3DContext->GetSceneViewport(), m_DepthStencil.get());
 
 	CreateRootSignatures();
 	CreatePipelines();
 
+	//m_MipGen.Setup(m_ShaderManager);
+	m_MipGen.CreateComputeState(m_ShaderManager);
+
 	m_cbCamera = std::make_shared<gfx::ConstantBuffer<gfx::cbCameraBuffer>>(&m_cbCameraData);
 
 	m_PointLights = std::make_unique<PointLights>();
-	m_ImageBasedLighting = std::make_unique<lde::ImageBasedLighting>("Assets/Textures/HDR/newport_loft.hdr");
 
-	m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/DamagedHelmet/DamagedHelmet.gltf", "DamagedHelmet"));
-	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/MetalRoughSpheres/MetalRoughSpheres.gltf", "ballz"));
-	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/SciFiHelmet/SciFiHelmet.gltf", "SciFiHelmet"));
+
+	m_ImageBasedLighting = std::make_unique<lde::ImageBasedLighting>("Assets/Textures/HDR/newport_loft.hdr");
+	//m_ImageBasedLighting = std::make_unique<lde::ImageBasedLighting>("Assets/Textures/HDR/environment.hdr");
+	//m_ImageBasedLighting = std::make_unique<lde::ImageBasedLighting>("Assets/Textures/HDR/satara_night_4k.hdr");
+
+	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/DamagedHelmet/DamagedHelmet.gltf", "DamagedHelmet"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/sponza/Sponza.gltf", "Sponza"));
+	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/MetalRoughSpheres/MetalRoughSpheres.gltf", "ballz"));
+	m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/SciFiHelmet/SciFiHelmet.gltf", "SciFiHelmet"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/cube/Cube.gltf"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/mathilda/scene.gltf"));
 
 	D3D::ExecuteCommandLists();
-
 }
 
 void Renderer::RecordCommandLists()
@@ -58,32 +68,45 @@ void Renderer::RecordCommandLists()
 	// MUST be set before actual drawing in order to gain access to bindless resources
 	SetHeaps({ D3D::D3D12Context::GetMainHeap()->Heap() });
 
-	// Forward
-	//D3D::g_CommandList.Get()->SetPipelineState(m_DefaultPSO.Get());
-	//D3D::g_CommandList.Get()->SetGraphicsRootSignature(m_DefaultRootSignature.Get());
-	//SetViewport();
-	//SetRenderTarget();
-	//ClearRenderTarget();
-	//m_DepthStencil->Clear();
-	//for (auto& model : m_Models)
-	//	model->Draw(m_SceneCamera);
-	//SetViewport();
-	m_DeferredContext->PassGBuffer(m_SceneCamera, m_Models);
+	// GBuffer pass
+	{
+		m_GBufferPass->BeginPass();
 
-	// NOTE: Bad solution but temporarily gets the job done
-	m_DeferredContext->PassLight(m_cbCamera.get(), m_PointLights.get(), m_ImageBasedLighting.get());
-	DrawSkybox();
-	m_DeferredContext->PassLightEnd();
+		for (const auto& model : m_Models)
+			model->Draw(m_SceneCamera);
 
+		m_GBufferPass->EndPass();
+	}
+	
+	// Light Pass
+	{
+		m_LightPass->BeginPass();
+
+		// TODO: Gotta clean it up
+		std::array<uint32_t, 5> gbufferIndices { m_GBufferPass->GetGBuffers().at(0).Index, m_GBufferPass->GetGBuffers().at(1).Index, m_GBufferPass->GetGBuffers().at(2).Index, m_GBufferPass->GetGBuffers().at(3).Index, m_GBufferPass->GetGBuffers().at(4).Index };
+		std::array<uint32_t, 4> iblIndices{ m_ImageBasedLighting->SkyboxDescriptor().Index, m_ImageBasedLighting->IrradianceDescriptor().Index, m_ImageBasedLighting->SpecularDescriptor(). Index, m_ImageBasedLighting->SpecularBRDFDescriptor().Index };
+
+		m_LightPass->DrawData(gbufferIndices, iblIndices);
+
+		D3D::g_CommandList.Get()->SetGraphicsRootConstantBufferView(0, m_cbCamera->GetBuffer()->GetGPUVirtualAddress());
+		D3D::g_CommandList.Get()->SetGraphicsRootConstantBufferView(3, m_PointLights->m_cbPointLights->GetBuffer()->GetGPUVirtualAddress());
+
+		m_DeferredOutput->Draw();
+
+		D3D::TransitResource(m_DepthStencil->Get(), D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+
+		DrawSkybox();
+
+		m_LightPass->EndPass();
+	}
+	
 	SetViewport();
 	SetRenderTarget();
 	ClearRenderTarget();
 
-	// Output viewport window | ImGuiWindowFlags_NoMoveImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize
-	ImGui::Begin("Scene", nullptr);
+	// Output viewport window 
+	ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove);
 	auto viewportSize{ ImGui::GetContentRegionAvail() };
-	m_ViewportWidth		= static_cast<uint32_t>(viewportSize.x);
-	m_ViewportHeight	= static_cast<uint32_t>(viewportSize.y);
 	ImGui::Image(reinterpret_cast<ImTextureID>(GetViewportRenderTarget(SelectedRenderTarget)), { viewportSize.x, viewportSize.y });
 	ImGui::End();
 
@@ -115,7 +138,14 @@ void Renderer::Render()
 
 	D3D::ExecuteCommandLists(false);
 
-	ThrowIfFailed(D3D::g_SwapChain.Get()->Present((bVsync ? 1 : 0), 0), "Failed to present frame!");
+	ThrowIfFailed(D3D::g_SwapChain.Get()->Present((bVsync ? 1 : 0), 0));
+	//HRESULT hResult{ D3D::g_SwapChain.Get()->Present((bVsync ? 1 : 0), 0) };
+	//if (FAILED(hResult))
+	//{
+	//	HRESULT reason = D3D::g_Device.Get()->GetDeviceRemovedReason();
+	//	utility::ErrorMessage(std::wstring(_com_error(reason).ErrorMessage()));
+	//	std::abort();
+	//}
 
 	m_D3DContext->MoveToNextFrame();
 }
@@ -135,7 +165,9 @@ void Renderer::OnResize()
 {
 	m_D3DContext->OnResize();
 	m_DepthStencil->OnResize(m_D3DContext->GetDepthHeap(), m_D3DContext->GetSceneViewport());
-	m_DeferredContext->OnResize();
+
+	m_GBufferPass->OnResize(m_D3DContext->GetSceneViewport());
+	m_LightPass->OnResize(m_D3DContext->GetSceneViewport());
 
 	D3D::WaitForGPU();
 	m_D3DContext->FlushGPU();
@@ -156,10 +188,6 @@ void Renderer::BeginFrame()
 
 void Renderer::EndFrame()
 {
-	ImGui::Begin("Camera");
-	m_SceneCamera->DrawGUI();
-	ImGui::End();
-
 	DrawGUI();
 
 	if (m_Editor)
@@ -207,12 +235,24 @@ void Renderer::ClearRenderTarget()
 void Renderer::DrawGUI()
 {
 	ImGui::Begin("Scene properties");
-	ImGui::Checkbox("V-sync", &bVsync);
-	ImGui::SameLine();
-	ImGui::Checkbox("Draw Sky", &bDrawSky);
-	ImGui::NewLine();
-	ImGui::Text("Render Target:");
-	ImGui::ListBox("G-Buffer", &SelectedRenderTarget, m_OutputRenderTargets.data(), static_cast<uint32_t>(m_OutputRenderTargets.size()));
+	if (ImGui::CollapsingHeader("Properties"))
+	{
+		ImGui::Checkbox("V-sync", &bVsync);
+		ImGui::SameLine();
+		ImGui::Checkbox("Draw Sky", &bDrawSky);
+		if (ImGui::BeginCombo("Render Target", m_OutputRenderTargets.at(SelectedRenderTarget)))
+		{
+			ImGui::ListBox("G-Buffer", &SelectedRenderTarget, m_OutputRenderTargets.data(), static_cast<uint32_t>(m_OutputRenderTargets.size()), -1);
+			ImGui::EndCombo();
+		}
+	}
+
+	if (ImGui::CollapsingHeader("Camera"))
+	{
+		m_SceneCamera->DrawGUI();
+
+	}
+
 	ImGui::End();
 
 	m_PointLights->DrawGUI();
@@ -226,42 +266,29 @@ uint64_t Renderer::GetViewportRenderTarget(int32_t Selected)
 	switch (Selected)
 	{
 	case 0:
-		return m_DeferredContext->OutputDescriptor().GetGPU().ptr;
+		return m_LightPass->OutputDescriptor().GetGPU().ptr;
 	case 1:
-		return m_DeferredContext->m_ShaderDescs.at(0).GetGPU().ptr;
+		return m_GBufferPass->GetGBuffers().at(0).GetGPU().ptr;
 	case 2:
-		return m_DeferredContext->m_ShaderDescs.at(1).GetGPU().ptr;
+		return m_GBufferPass->GetGBuffers().at(1).GetGPU().ptr;
 	case 3:
-		return m_DeferredContext->m_ShaderDescs.at(2).GetGPU().ptr;
+		return m_GBufferPass->GetGBuffers().at(2).GetGPU().ptr;
 	case 4:
-		return m_DeferredContext->m_ShaderDescs.at(3).GetGPU().ptr;
+		return m_GBufferPass->GetGBuffers().at(3).GetGPU().ptr;
 	case 5:
-		return m_DeferredContext->m_ShaderDescs.at(4).GetGPU().ptr;
+		return m_GBufferPass->GetGBuffers().at(4).GetGPU().ptr;
 	}
 
-	return m_DeferredContext->OutputDescriptor().GetGPU().ptr;
+	return m_LightPass->OutputDescriptor().GetGPU().ptr;
 }
 
 void Renderer::Release()
 {
-	m_PointLights.reset();
-	m_DeferredContext.reset();
-
 	for (auto& model : m_Models)
 	{
 		model.reset();
 		model = nullptr;
 	}
-
-	m_cbCamera.reset();
-	m_ImageBasedLighting.reset();
-	m_SkyboxRS.Release();
-	m_SkyboxPSO.Release();
-
-	m_DefaultRootSignature.Release();
-	m_DefaultPSO.Release();
-
-	m_DepthStencil->Release();
 
 	m_ShaderManager.reset();
 	m_ShaderManager = nullptr;
@@ -293,7 +320,9 @@ void Renderer::CreateRootSignatures()
 	// Image Based Lighting
 	{
 		std::vector<CD3DX12_ROOT_PARAMETER1> skyboxParams(2);
+		// Per Object Matrices
 		skyboxParams.at(0).InitAsConstantBufferView(0, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_VERTEX);
+		// Texture Indices
 		skyboxParams.at(1).InitAsConstants(1, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL);
 
 		std::vector<D3D12_STATIC_SAMPLER_DESC> samplers(1);
@@ -305,16 +334,17 @@ void Renderer::CreateRootSignatures()
 
 void Renderer::CreatePipelines()
 {
-	D3D::D3D12GraphicsPipelineStateBuilder* psoBuilder{ new D3D::D3D12GraphicsPipelineStateBuilder(m_ShaderManager) };
+	auto* psoBuilder{ new D3D::D3D12GraphicsPipelineStateBuilder() };
 	
 	//Default PSO
 	{
 		auto layout{ D3D::Utility::GetModelInputLayout() };
 		psoBuilder->SetInputLayout(layout);
-		psoBuilder->SetVertexShader("Shaders/Default_Forward.hlsl", L"VSmain");
-		psoBuilder->SetPixelShader("Shaders/Default_Forward.hlsl", L"PSmain");
+		psoBuilder->SetVertexShader("Shaders/Forward.hlsl", L"VSmain");
+		psoBuilder->SetPixelShader("Shaders/Forward.hlsl", L"PSmain");
+		//psoBuilder->SetWireframeMode(true);
 
-		psoBuilder->Create(m_DefaultPSO, m_DefaultRootSignature.Get(), L"Default PSO");
+		//psoBuilder->Create(m_DefaultPSO, m_DefaultRootSignature.Get(), L"Default PSO");
 		psoBuilder->Reset();
 	}
 

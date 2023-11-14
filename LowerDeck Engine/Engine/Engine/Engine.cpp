@@ -89,11 +89,15 @@ void Engine::OnResize()
 void Engine::Release()
 {
 	m_Editor->Release();
+	//
 	m_Renderer->Release();
+	m_Renderer.reset();
+	m_Renderer = nullptr;
 
 	D3D::WaitForGPU();
 	m_D3D12Context->FlushGPU();
 	m_D3D12Context->ReleaseD3D();
+
 }
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
