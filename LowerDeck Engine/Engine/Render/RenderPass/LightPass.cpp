@@ -1,7 +1,7 @@
 #include "../../D3D/D3D12Viewport.hpp"
 #include "../../D3D/D3D12Descriptor.hpp"
 #include "../../D3D/D3D12RootSignature.hpp"
-#include "../../D3D/D3D12PipelineState.hpp"
+#include "../../D3D/D3D12GraphicsPipelineState.hpp"
 #include "../../D3D/D3D12DepthBuffer.hpp"
 
 #include "LightPass.hpp"
@@ -12,7 +12,7 @@
 #include "../../Graphics/TextureUtility.hpp"
 
 
-LightPass::LightPass(D3D::D3D12Viewport* pViewport, D3D::D3D12DepthBuffer* pSceneDepth)
+LightPass::LightPass(D3D::D3D12Viewport* pViewport, D3D::D3D12DepthBuffer* pSceneDepth, std::shared_ptr<gfx::ShaderManager> pShaderManager)
 {
 	m_SceneDepth = pSceneDepth;
 	CreateTargets(pViewport);
@@ -38,12 +38,12 @@ LightPass::LightPass(D3D::D3D12Viewport* pViewport, D3D::D3D12DepthBuffer* pScen
 
 	// PSO
 	{
-		auto* builder{ new D3D::D3D12GraphicsPipelineStateBuilder() };
+		auto* builder{ new D3D::D3D12GraphicsPipelineStateBuilder(pShaderManager) };
 		auto layout{ D3D::Utility::GetScreenOutputInputLayout() };
 
 		builder->SetInputLayout(layout);
-		builder->SetVertexShader("Shaders/Deferred/Deferred.hlsl", L"VSmain");
-		builder->SetPixelShader("Shaders/Deferred/Deferred.hlsl", L"PSmain");
+		builder->SetVertexShader("Shaders/Deferred/DeferredOutput.hlsl", L"VSmain");
+		builder->SetPixelShader("Shaders/Deferred/DeferredOutput.hlsl", L"PSmain");
 		builder->SetEnableDepth(false);
 
 		builder->Create(m_PSO, m_RootSignature.Get(), L"Deferred Light Pass PSO");
@@ -97,9 +97,6 @@ void LightPass::Release()
 
 void LightPass::CreateTargets(D3D::D3D12Viewport* pViewport)
 {
-	if (m_OutputResource.Get())
-		m_OutputResource.Reset();
-
 	D3D12_RESOURCE_DESC outputDesc{};
 	outputDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	outputDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -131,9 +128,11 @@ void LightPass::CreateTargets(D3D::D3D12Viewport* pViewport)
 		IID_PPV_ARGS(m_OutputResource.ReleaseAndGetAddressOf())));
 	m_OutputResource.Get()->SetName(L"Deferred Light Pass Resource");
 
+	//rtvHandle.Offset(1, 32);
 	D3D::D3D12Context::GetDeferredHeap()->Allocate(m_OutputRTVDesc);
-
+	//rtvHandle.InitOffsetted(m_DeferredHeap->GetCPUHandle(), 5, 32);
+	//m_OutputRTVDesc = rtvHandle;
+	//D3D::g_Device.Get()->CreateRenderTargetView(m_OutputResource.Get(), &rtvDesc, m_OutputRTVDesc);
 	D3D::g_Device.Get()->CreateRenderTargetView(m_OutputResource.Get(), &rtvDesc, m_OutputRTVDesc.GetCPU());
-
 	TextureUtility::CreateSRV(m_OutputResource.GetAddressOf(), m_OutputDescriptor, 1);
 }

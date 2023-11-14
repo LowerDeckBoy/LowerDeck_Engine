@@ -36,4 +36,8 @@ private:
 	Camera* m_SceneCamera{ nullptr };
 
 	std::vector<std::unique_ptr<Model>> m_Models;
+
+	//uint32_t m_ViewportWidth{ 0 };
+	//uint32_t m_ViewportHeight{ 0 };
+
 };

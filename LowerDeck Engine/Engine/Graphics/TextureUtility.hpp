@@ -45,18 +45,15 @@ public:
 	/// <param name="Descriptor"></param>
 	static void CreateFromWIC(const std::string_view& Filepath, ID3D12Resource** ppResource, D3D::D3D12Descriptor& Descriptor);
 	// Note: testing required
-	//static void CreateFromDDS(const std::string_view& Filepath, ID3D12Resource** ppResource, D3D::D3D12Descriptor& Descriptor);
+	static void CreateFromDDS(const std::string_view& Filepath, ID3D12Resource** ppResource, D3D::D3D12Descriptor& Descriptor);
 	// Note: testing required
-	static void CreateFromHDR(const std::string_view& Filepath, ID3D12Resource** ppResource);
-	static void CreateFromHDR(const std::string_view& Filepath, ID3D12Resource** ppResource, D3D::D3D12Descriptor& Descriptor, uint16_t MipLevels);
+	static void CreateFromHDR(const std::string_view& Filepath, ID3D12Resource** ppResource, D3D::D3D12Descriptor& Descriptor, bool bGenerateMipChain = false);
 
 	static ID3D12Resource* CreateResource(TextureData Data, TextureDesc Desc);
 	static void CreateResource(ID3D12Resource** ppTarget, TextureData Data, TextureDesc Desc);
 
-	[[maybe_unused]]
+	static void CreateFromWIC(const std::string_view& Filepath, ID3D12Resource** ppResource, D3D::D3D12Descriptor& Descriptor, bool bMips);
 	static DirectX::ScratchImage GenerateMipChain(DirectX::ScratchImage& BaseImage, uint16_t MipLevels, bool bIsWIC = true);
-
-	//https://github.com/michal-z/ImageBasedPBR/blob/master/Source/ImageBasedPBR.cpp#L589
 
 	/// <summary>
 	/// Create <c>ShaderResourceView</c> for given <c>Texture Resource</c> and it's <c>Descriptor</c>.

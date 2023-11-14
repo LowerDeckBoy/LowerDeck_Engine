@@ -26,7 +26,7 @@ void Texture::Create(const std::string_view& Filepath)
 	case utility::FileExtension::ePNG:
 	{
 		// WIC
-		//TextureUtility::CreateFromWIC(Filepath, m_Resource.GetAddressOf(), m_SRV);
+		TextureUtility::CreateFromWIC(Filepath, m_Resource.GetAddressOf(), m_SRV);
 		break;
 	}
 	case utility::FileExtension::eDDS:
@@ -36,7 +36,7 @@ void Texture::Create(const std::string_view& Filepath)
 	}
 	case utility::FileExtension::eHDR:
 	{
-		//TextureUtility::CreateFromHDR(Filepath, m_Resource.GetAddressOf());
+		// TODO: HDR
 		break;
 	}
 
@@ -44,21 +44,6 @@ void Texture::Create(const std::string_view& Filepath)
 		break;
 	}
 
-}
-
-uint32_t Texture::CountMips()
-{
-	if (Width == 0 || Height == 0)
-		return 0;
-
-	uint32_t count = 1;
-	while (Width > 1 || Height > 1)
-	{
-		Width >>= 1;
-		Height >>= 1;
-		count++;
-	}
-	return count;
 }
 
 void Texture::Release()

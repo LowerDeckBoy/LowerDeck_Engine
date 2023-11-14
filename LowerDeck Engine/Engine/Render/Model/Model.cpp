@@ -3,11 +3,9 @@
 #include "../../D3D/D3D12Device.hpp"
 #include "../../D3D/D3D12Command.hpp"
 #include "../../Graphics/Buffer/BufferUtility.hpp"
-#include "../../Graphics/TextureManager.hpp"
 #include <ImGui/imgui.h>
 
 
-//Model::Model(std::string_view Filepath, const std::string& ModelName)
 Model::Model(std::string_view Filepath, const std::string& ModelName)
 	: Importer(Filepath)
 {
@@ -90,6 +88,8 @@ void Model::Draw(Camera* pCamera)
 			D3D::g_CommandList.Get()->DrawInstanced(m_Meshes.at(i)->VertexCount, 1, m_Meshes.at(i)->StartVertexLocation, 0);
 		}
 	}
+
+	//DrawGUI();
 }
 
 void Model::DrawGUI()
@@ -136,6 +136,9 @@ void Model::DrawGUI()
 
 void Model::Release()
 {
+	m_cbPerObject.reset();
+	m_VertexBuffer.reset();
+	m_IndexBuffer.reset();
 
 }
 
