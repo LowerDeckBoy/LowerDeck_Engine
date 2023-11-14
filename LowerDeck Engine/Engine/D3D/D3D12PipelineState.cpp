@@ -1,6 +1,7 @@
-#include "D3D12GraphicsPipelineState.hpp"
+#include "D3D12PipelineState.hpp"
 #include "D3D12Device.hpp"
 #include "D3D12Utility.hpp"
+#include "../Graphics/ShaderManager.hpp"
 #include "../Utility/Utility.hpp"
 
 namespace D3D
@@ -11,8 +12,7 @@ namespace D3D
 	}
 
 
-	D3D12GraphicsPipelineStateBuilder::D3D12GraphicsPipelineStateBuilder(std::shared_ptr<gfx::ShaderManager> pShaderManager)
-		: m_ShaderManager(pShaderManager)
+	D3D12GraphicsPipelineStateBuilder::D3D12GraphicsPipelineStateBuilder()
 	{
 	}
 
@@ -31,15 +31,15 @@ namespace D3D
 		desc.InputLayout = { m_InputLayout.data(), static_cast<uint32_t>(m_InputLayout.size()) };
 		// Set Shaders
 		if (m_VertexShader)
-			desc.VS = CD3DX12_SHADER_BYTECODE(m_VertexShader->GetBufferPointer(), m_VertexShader->GetBufferSize());
+			desc.VS = m_VertexShader->Bytecode();
 		if (m_PixelShader)
-			desc.PS = CD3DX12_SHADER_BYTECODE(m_PixelShader->GetBufferPointer(), m_PixelShader->GetBufferSize());
+			desc.PS = m_PixelShader->Bytecode();
 		if (m_GeometryShader)
-			desc.GS = CD3DX12_SHADER_BYTECODE(m_GeometryShader->GetBufferPointer(), m_GeometryShader->GetBufferSize());
+			desc.GS = m_GeometryShader->Bytecode();
 		if (m_HullShader)
-			desc.HS = CD3DX12_SHADER_BYTECODE(m_HullShader->GetBufferPointer(), m_HullShader->GetBufferSize());
+			desc.HS = m_HullShader->Bytecode();
 		if (m_DomainShader)
-			desc.DS = CD3DX12_SHADER_BYTECODE(m_DomainShader->GetBufferPointer(), m_DomainShader->GetBufferSize());
+			desc.DS = m_DomainShader->Bytecode();
 
 		// Rasterizer State
 		desc.RasterizerState = m_RasterizerDesc;
@@ -96,27 +96,33 @@ namespace D3D
 
 	void D3D12GraphicsPipelineStateBuilder::SetVertexShader(const std::string_view& Filepath, LPCWSTR EntryPoint)
 	{
-		m_VertexShader = m_ShaderManager->CompileDXIL(Filepath, ShaderType::eVertex, EntryPoint);
+		auto& shaderManager = gfx::ShaderManager::GetInstance();
+		m_VertexShader = new gfx::Shader(shaderManager.CompileDXIL(Filepath, ShaderType::eVertex, EntryPoint));
+		//m_VertexShader = new gfx::Shader(m_ShaderManager->CompileDXIL(Filepath, ShaderType::eVertex, EntryPoint));
 	}
 
 	void D3D12GraphicsPipelineStateBuilder::SetPixelShader(const std::string_view& Filepath, LPCWSTR EntryPoint)
 	{
-		m_PixelShader = m_ShaderManager->CompileDXIL(Filepath, ShaderType::ePixel, EntryPoint);
+		auto& shaderManager = gfx::ShaderManager::GetInstance();
+		m_PixelShader = new gfx::Shader(shaderManager.CompileDXIL(Filepath, ShaderType::ePixel, EntryPoint));
 	}
 
 	void D3D12GraphicsPipelineStateBuilder::SetGeometryShader(const std::string_view& Filepath, LPCWSTR EntryPoint)
 	{
-		m_GeometryShader = m_ShaderManager->CompileDXIL(Filepath, ShaderType::eGeometry, EntryPoint);
+		auto& shaderManager = gfx::ShaderManager::GetInstance();
+		m_GeometryShader = new gfx::Shader(shaderManager.CompileDXIL(Filepath, ShaderType::eGeometry, EntryPoint));
 	}
 
 	void D3D12GraphicsPipelineStateBuilder::SetHullShader(const std::string_view& Filepath, LPCWSTR EntryPoint)
 	{
-		m_HullShader = m_ShaderManager->CompileDXIL(Filepath, ShaderType::eHull, EntryPoint);
+		auto& shaderManager = gfx::ShaderManager::GetInstance();
+		m_HullShader = new gfx::Shader(shaderManager.CompileDXIL(Filepath, ShaderType::eHull, EntryPoint));
 	}
 
 	void D3D12GraphicsPipelineStateBuilder::SetDomainShader(const std::string_view& Filepath, LPCWSTR EntryPoint)
 	{
-		m_DomainShader = m_ShaderManager->CompileDXIL(Filepath, ShaderType::eDomain, EntryPoint);
+		auto& shaderManager = gfx::ShaderManager::GetInstance();
+		m_DomainShader = new gfx::Shader(shaderManager.CompileDXIL(Filepath, ShaderType::eDomain, EntryPoint));
 	}
 
 	void D3D12GraphicsPipelineStateBuilder::SetEnableDepth(bool bEnable)
@@ -157,13 +163,10 @@ namespace D3D
 	{
 		Reset();
 
-		m_ShaderManager.reset();
-		m_ShaderManager = nullptr;
-
-		SAFE_DELETE(m_VertexShader);
-		SAFE_DELETE(m_PixelShader);
-		SAFE_DELETE(m_GeometryShader);
-		SAFE_DELETE(m_HullShader);
-		SAFE_DELETE(m_DomainShader);
+		delete m_VertexShader;
+		delete m_PixelShader;
+		delete m_GeometryShader;
+		delete m_HullShader;
+		delete m_DomainShader;
 	}
 }

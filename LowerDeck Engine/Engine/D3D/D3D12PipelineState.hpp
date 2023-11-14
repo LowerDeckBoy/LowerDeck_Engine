@@ -1,10 +1,10 @@
 #pragma once
 #include <d3d12.h>
 #include <d3dx12.h>
-#include "../Graphics/ShaderManager.hpp"
 #include <span>
+#include "D3D12Types.hpp"
 
-//class Shader5;
+namespace gfx { class Shader; }
 
 namespace D3D
 {
@@ -33,12 +33,11 @@ namespace D3D
 	{
 	public:
 		/// <summary>
-		/// Initializes <c>ShaderManager</c> at construction.
+		/// 
 		/// </summary>
-		/// <param name="pShaderManager"></param>
-		D3D12GraphicsPipelineStateBuilder(std::shared_ptr<gfx::ShaderManager> pShaderManager);
+		D3D12GraphicsPipelineStateBuilder();
 		/// <summary>
-		/// Resets <c>ShaderManager</c> and deletes IDxcBlobs.<br/>
+		/// Deletes IDxcBlobs.<br/>
 		/// Calls <c>Reset()</c>.
 		/// </summary>
 		~D3D12GraphicsPipelineStateBuilder();
@@ -128,8 +127,6 @@ namespace D3D
 		/// </summary>
 		void Release();
 
-		std::shared_ptr<gfx::ShaderManager> m_ShaderManager;
-
 		std::vector<CD3DX12_DESCRIPTOR_RANGE1>	m_Ranges;
 		std::vector<CD3DX12_ROOT_PARAMETER1>	m_Parameters;
 		std::vector<D3D12_INPUT_ELEMENT_DESC>	m_InputLayout;
@@ -137,11 +134,11 @@ namespace D3D
 		// Number of Render Targets is determine by size of vector.
 		std::vector<DXGI_FORMAT> m_RenderTargetFormats;
 
-		IDxcBlob* m_VertexShader	{ nullptr };
-		IDxcBlob* m_PixelShader		{ nullptr };
-		IDxcBlob* m_DomainShader	{ nullptr };
-		IDxcBlob* m_HullShader		{ nullptr };
-		IDxcBlob* m_GeometryShader	{ nullptr };
+		gfx::Shader* m_VertexShader		{ nullptr };
+		gfx::Shader* m_PixelShader		{ nullptr };
+		gfx::Shader* m_DomainShader		{ nullptr };
+		gfx::Shader* m_HullShader		{ nullptr };
+		gfx::Shader* m_GeometryShader	{ nullptr };
 
 		D3D12_ROOT_SIGNATURE_FLAGS m_RootFlags{ D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT };
 
