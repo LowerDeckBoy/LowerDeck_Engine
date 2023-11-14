@@ -102,6 +102,7 @@
     <ClCompile Include="Engine\D3D\D3D12Buffer.cpp" />
     <ClCompile Include="Engine\Graphics\Buffer\Buffer.cpp" />
     <ClCompile Include="Engine\Graphics\Buffer\BufferUtility.cpp" />
+    <ClCompile Include="Engine\Graphics\MipMapGenerator.cpp" />
     <ClCompile Include="Engine\Render\Deferred\DeferredContext.cpp" />
     <ClCompile Include="Engine\D3D\D3D12DepthBuffer.cpp" />
     <ClCompile Include="Engine\D3D\D3D12RootSignature.cpp" />
@@ -139,7 +140,11 @@
     <ClCompile Include="Engine\Render\Lights\PointLights.cpp" />
     <ClCompile Include="Engine\Render\Model\Importer.cpp" />
     <ClCompile Include="Engine\Render\Model\Model.cpp" />
+    <ClCompile Include="Engine\Render\RenderPass\GBufferPass.cpp" />
+    <ClCompile Include="Engine\Render\RenderPass\LightPass.cpp" />
     <ClCompile Include="Engine\Utility\FileSystem.cpp" />
+    <ClCompile Include="Engine\Utility\Math.cpp" />
+    <ClCompile Include="Engine\Utility\Utility.cpp" />
     <ClCompile Include="Engine\Window\Window.cpp" />
     <ClCompile Include="Dependencies\ImGui\imgui.cpp">
       <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</GenerateXMLDocumentationFiles>
@@ -168,6 +173,8 @@
     <ClInclude Include="Engine\Graphics\Buffer\ConstantBuffer.hpp" />
     <ClInclude Include="Engine\Graphics\Buffer\ConstantTypes.hpp" />
     <ClInclude Include="Engine\Graphics\Buffer\Vertex.hpp" />
+    <ClInclude Include="Engine\Graphics\MipMapGenerator.hpp" />
+    <ClInclude Include="Engine\Graphics\Shader.hpp" />
     <ClInclude Include="Engine\Render\Deferred\DeferredContext.hpp" />
     <ClInclude Include="Engine\D3D\D3D12DepthBuffer.hpp" />
     <ClInclude Include="Engine\D3D\D3D12RootSignature.hpp" />
@@ -199,8 +206,12 @@
     <ClInclude Include="Engine\Render\Model\Mesh.hpp" />
     <ClInclude Include="Engine\Render\Model\Meshlet.hpp" />
     <ClInclude Include="Engine\Render\Model\Model.hpp" />
+    <ClInclude Include="Engine\Render\RenderPass\GBufferPass.hpp" />
+    <ClInclude Include="Engine\Render\RenderPass\LightPass.hpp" />
     <ClInclude Include="Engine\Utility\FileSystem.hpp" />
+    <ClInclude Include="Engine\Utility\Math.hpp" />
     <ClInclude Include="Engine\Utility\MemoryUsage.hpp" />
+    <ClInclude Include="Engine\Utility\Singleton.hpp" />
     <ClInclude Include="Engine\Utility\Timer.hpp" />
     <ClInclude Include="Engine\Utility\TimeUtility.hpp" />
     <ClInclude Include="Engine\Utility\Utility.hpp" />
@@ -222,7 +233,6 @@
     <ClInclude Include="Engine\Render\Lights\PointLight.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="Shaders\Common.hlsli" />
     <None Include="Shaders\Deferred\DeferredLighting.hlsli" />
     <None Include="Shaders\Deferred\Deferred_Common.hlsli">
