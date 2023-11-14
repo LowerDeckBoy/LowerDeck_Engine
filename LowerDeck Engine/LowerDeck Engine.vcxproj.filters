@@ -129,9 +129,6 @@
     <ClCompile Include="Engine\Scene\GameObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Utility\Utility.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Utility\Math.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -368,30 +365,6 @@
     <ClInclude Include="Engine\Graphics\Buffer\Vertex.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\ImageBasedLighting.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\Shader.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\Shader5.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\ShaderManager.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\Texture.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\TextureManager.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\TextureUtility.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\MipMapGenerator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\D3D\D3D12Texture.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -425,12 +398,19 @@
     <ClInclude Include="Engine\Utility\Singleton.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Render\Deferred\DeferredContext.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\D3D\D3D12GraphicsPipelineState.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Deferred\DeferredCommon.hlsli" />
     <None Include="Shaders\Deferred\GBuffer.hlsli" />
     <None Include="Shaders\Common.hlsli" />
     <None Include="Shaders\Deferred\DeferredLighting.hlsli" />
+    <None Include="Shaders\RootSignatures.hlsli" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
