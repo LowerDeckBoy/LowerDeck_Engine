@@ -331,7 +331,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="Shaders\Deferred\Deferred_Common.hlsli" />
     <None Include="Shaders\Deferred\GBuffer.hlsli" />
     <None Include="Shaders\Common.hlsli" />
