@@ -147,6 +147,21 @@
     <ClCompile Include="Engine\D3D\D3D12Buffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Graphics\MipMapGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Render\RenderPass\GBufferPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Render\RenderPass\LightPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Utility\Math.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Utility\Utility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\D3D\D3D12Command.hpp">
@@ -329,13 +344,31 @@
     <ClInclude Include="Engine\D3D\D3D12Buffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Graphics\MipMapGenerator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Shader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Render\RenderPass\GBufferPass.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Render\RenderPass\LightPass.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Utility\Math.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Utility\Singleton.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="Shaders\Deferred\Deferred_Common.hlsli" />
     <None Include="Shaders\Deferred\GBuffer.hlsli" />
     <None Include="Shaders\Common.hlsli" />
     <None Include="Shaders\Deferred\DeferredLighting.hlsli" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Assets\Fonts\CascadiaCode-Bold.ttf" />
