@@ -3,7 +3,7 @@
 #include "D3D12SwapChain.hpp"
 #include "D3D12Types.hpp"
 #include "D3D12RootSignature.hpp"
-#include "D3D12GraphicsPipelineState.hpp"
+#include "D3D12PipelineState.hpp"
 #include "../Utility/Utility.hpp"
 
 namespace D3D
@@ -57,6 +57,26 @@ namespace D3D
         ::WaitForSingleObjectEx(g_FenceEvent, INFINITE, FALSE);
 
         g_FenceValues.at(FRAME_INDEX)++;
+    }
+
+    void FlushGPU()
+    {
+        for (uint32_t i = 0; i < FRAME_COUNT; i++)
+        {
+            const uint64_t currentValue{ g_FenceValues.at(i) };
+
+            ThrowIfFailed(g_CommandQueue->Signal(g_Fence.Get(), currentValue));
+            g_FenceValues.at(i)++;
+
+            if (g_Fence.Get()->GetCompletedValue() < currentValue)
+            {
+                ThrowIfFailed(g_Fence.Get()->SetEventOnCompletion(currentValue, g_FenceEvent));
+
+                ::WaitForSingleObject(g_FenceEvent, INFINITE);
+            }
+        }
+
+        FRAME_INDEX = 0;
     }
 
     void ExecuteCommandLists(bool bResetAllocator)

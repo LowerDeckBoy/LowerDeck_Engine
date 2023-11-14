@@ -18,9 +18,9 @@ namespace D3D
 
 	D3D_FEATURE_LEVEL g_FeatureLevel = D3D_FEATURE_LEVEL_12_2;
 
-	bool InitializeDevice()
+	void InitializeDevice()
 	{
-		uint32_t dxgiFactoryFlags = 0;
+		uint32_t dxgiFactoryFlags{ 0 };
 #if defined (_DEBUG)
 		dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
 
@@ -63,12 +63,12 @@ namespace D3D
 		allocatorDesc.pAdapter = g_Adapter.Get();
 		ThrowIfFailed(D3D12MA::CreateAllocator(&allocatorDesc, g_Allocator.ReleaseAndGetAddressOf()));
 
-		return true;
 	}
 
 	bool CheckRaytracingSupport()
 	{
 		D3D12_FEATURE_DATA_D3D12_OPTIONS5 features{};
+
 		if (SUCCEEDED(D3D12CreateDevice(g_Adapter.Get(), g_FeatureLevel, IID_PPV_ARGS(g_Device.GetAddressOf()))))
 		{
 			if (SUCCEEDED(g_Device.Get()->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &features, sizeof(features))))

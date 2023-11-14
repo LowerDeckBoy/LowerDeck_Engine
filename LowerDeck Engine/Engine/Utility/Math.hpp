@@ -14,11 +14,6 @@ namespace Math
 		return static_cast<uint64_t>((Value + (Alignment - 1)) & ~(Alignment - 1));
 	}
 
-	inline constexpr size_t Align(size_t Value, size_t Alignment)
-	{
-		return static_cast<size_t>((Value + (Alignment - 1)) & ~(Alignment - 1));
-	}
-
 	/// <summary>
 	/// Check whether given value is a power of two.
 	/// </summary>
