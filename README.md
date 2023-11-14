@@ -60,11 +60,10 @@ Current goals are focused more on ECS based graphics pipeline workflow for hybri
     - *Win32 API*
 - [**vcpkg**](https://www.vcpkg.io)
 
-**Note:**
-
-> [!NOTE] Supports **x64** architecture only.
-
-> [!NOTE] **HLSL SM6.6** support is required.
+> [!NOTE]
+> Supports **x64** architecture only.
+> 
+> **HLSL SM6.6** support is required.
 
 ## **Dependencies**
 - [**D3D12MemoryAllocator**](https://github.com/GPUOpen-LibrariesAndSDKs/D3D12MemoryAllocator)
