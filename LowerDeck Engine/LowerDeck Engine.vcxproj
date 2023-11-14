@@ -100,6 +100,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\D3D\D3D12Adapter.cpp" />
     <ClCompile Include="Engine\D3D\D3D12Buffer.cpp" />
     <ClCompile Include="Engine\Graphics\Buffer\Buffer.cpp" />
     <ClCompile Include="Engine\Graphics\Buffer\BufferUtility.cpp" />
@@ -166,6 +167,7 @@
     <ClCompile Include="Engine\Render\Lights\PointLight.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\D3D\D3D12Adapter.hpp" />
     <ClInclude Include="Engine\D3D\D3D12Buffer.hpp" />
     <ClInclude Include="Dependencies\EnTT\entt.hpp" />
     <ClInclude Include="Engine\ECS\Entity.hpp" />
@@ -234,7 +236,6 @@
     <ClInclude Include="Engine\Render\Lights\PointLight.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="Shaders\Common.hlsli" />
     <None Include="Shaders\Deferred\DeferredLighting.hlsli" />
     <None Include="Shaders\Deferred\Deferred_Common.hlsli">
