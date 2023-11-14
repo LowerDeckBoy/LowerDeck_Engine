@@ -39,13 +39,13 @@ namespace D3D
 	void D3D12Context::InitializeHeaps()
 	{
 		// SRV
-		m_MainHeap = std::make_unique<D3D12DescriptorHeap>(HeapUsage::eSRV_CBV_UAV, 4096, L"Main Descriptor Heap");
+		m_MainHeap = std::make_unique<D3D12DescriptorHeap>(HeapUsage::eShader, 16384, L"Main Descriptor Heap");
 
 		// DSV
-		m_DepthHeap = std::make_unique<D3D12DescriptorHeap>(HeapUsage::eDSV, 64, L"Main Depth Heap");
+		m_DepthHeap = std::make_unique<D3D12DescriptorHeap>(HeapUsage::eDSV, 1024, L"Main Depth Heap");
 
 		// Deferred
-		m_DeferredHeap = std::make_unique<D3D12DescriptorHeap>(HeapUsage::eRTV, 12, L"Deferred Heap");
+		m_DeferredHeap = std::make_unique<D3D12DescriptorHeap>(HeapUsage::eRTV, 16, L"Deferred Heap");
 	}
 
 	void D3D12Context::MoveToNextFrame()

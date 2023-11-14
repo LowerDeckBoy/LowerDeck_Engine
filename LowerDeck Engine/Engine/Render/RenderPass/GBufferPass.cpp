@@ -1,6 +1,6 @@
 #include "../../D3D/D3D12Descriptor.hpp"
 #include "../../D3D/D3D12RootSignature.hpp"
-#include "../../D3D/D3D12GraphicsPipelineState.hpp"
+#include "../../D3D/D3D12PipelineState.hpp"
 #include "../../D3D/D3D12Viewport.hpp"
 #include "../../D3D/D3D12DepthBuffer.hpp"
 #include "GBufferPass.hpp"
@@ -8,11 +8,11 @@
 #include "../../D3D/D3D12Context.hpp"
 
 
-GBufferPass::GBufferPass(D3D::D3D12Viewport* pViewport, D3D::D3D12DepthBuffer* pSceneDepth, std::shared_ptr<gfx::ShaderManager> pShaderManager)
+GBufferPass::GBufferPass(D3D::D3D12Viewport* pViewport, D3D::D3D12DepthBuffer* pSceneDepth)
 {
 	m_SceneDepth = pSceneDepth;
 
-	Initialize(pViewport, pShaderManager);
+	Initialize(pViewport);
 }
 
 GBufferPass::~GBufferPass()
@@ -33,7 +33,6 @@ void GBufferPass::BeginPass()
 
 	auto depthHandle{ m_SceneDepth->DSV().GetCPU() };
 	D3D::g_CommandList->ClearDepthStencilView(depthHandle, D3D12_CLEAR_FLAG_DEPTH, D3D12_MAX_DEPTH, 0, 0, nullptr);
-
 
 	D3D::g_CommandList.Get()->OMSetRenderTargets(RenderTargetsCount, rtvs.data(), false, &depthHandle);
 
@@ -62,15 +61,17 @@ void GBufferPass::Release()
 		SAFE_RELEASE(target);
 }
 
-void GBufferPass::Initialize(D3D::D3D12Viewport* pViewport, std::shared_ptr<gfx::ShaderManager> pShaderManager)
+void GBufferPass::Initialize(D3D::D3D12Viewport* pViewport)
 {
 	D3D12_ROOT_SIGNATURE_FLAGS rootFlags{ D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED | D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED };
 
-	std::vector<CD3DX12_ROOT_PARAMETER1> parameters(2);
+	std::vector<CD3DX12_ROOT_PARAMETER1> parameters(3);
 	// Per Object Matrices
 	parameters.at(0).InitAsConstantBufferView(0, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_VERTEX);
 	// Material indices + material data
 	parameters.at(1).InitAsConstants(20, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL);
+	// Index to vertex buffer and offset of vertices
+	parameters.at(2).InitAsConstants(2, 2, 0, D3D12_SHADER_VISIBILITY_VERTEX);
 	// Camera Buffer
 	//parameters.at(1).InitAsConstantBufferView(1, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_ALL);
 
@@ -78,7 +79,7 @@ void GBufferPass::Initialize(D3D::D3D12Viewport* pViewport, std::shared_ptr<gfx:
 	samplers.at(0) = D3D::Utility::CreateStaticSampler(0, 0, D3D12_FILTER_ANISOTROPIC, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_COMPARISON_FUNC_LESS_EQUAL);
 	m_RootSignature.Create(parameters, samplers, rootFlags, L"Deferred GBuffer Root Signature");
 
-	auto* builder{ new D3D::D3D12GraphicsPipelineStateBuilder(pShaderManager) };
+	auto* builder{ new D3D::D3D12GraphicsPipelineStateBuilder() };
 
 	auto layout{ D3D::Utility::GetModelInputLayout() };
 	builder->SetInputLayout(layout);

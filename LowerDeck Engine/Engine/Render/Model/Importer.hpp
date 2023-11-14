@@ -5,7 +5,7 @@
 
 using namespace DirectX;
 
-class DeviceContext;
+class TextureManager;
 struct aiScene;
 struct aiNode;
 struct aiMesh;

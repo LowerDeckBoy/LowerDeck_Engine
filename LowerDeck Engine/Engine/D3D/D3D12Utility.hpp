@@ -58,7 +58,7 @@ namespace D3D
 		/// <summary>
 		/// D3D12_HEAP_TYPE_GPU_UPLOAD
 		/// </summary>
-		//inline static const CD3DX12_HEAP_PROPERTIES HeapGpuUpload{ CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_GPU_UPLOAD) };
+		inline static const CD3DX12_HEAP_PROPERTIES HeapGpuUpload{ CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_GPU_UPLOAD) };
 
 		/// <summary>
 		/// 

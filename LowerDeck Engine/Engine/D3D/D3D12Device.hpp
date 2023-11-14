@@ -17,12 +17,24 @@ using Microsoft::WRL::ComPtr;
 
 // Experimental approach
 // Goal is to reduce amount of data passing
-// whenever D3D context is required, via using global variables.
+// whenever D3D context is required, via using static variables.
 namespace D3D
 {
-	bool InitializeDevice();
+	class D3D12Device
+	{
+		public:
+
+
+	};
+
+	/// <summary>
+	/// Creates Adapter and Device objects.
+	/// </summary>
+	void InitializeDevice();
+	/// <summary>
 	/// Raytracing support is mendatory
 	/// as engine is meant to be built around hybrid path
+	/// </summary>
 	bool CheckRaytracingSupport();
 	/// <summary> GPU Virtual Memory usage. </summary>
 	/// <returns> Current VRAM usage in MegaBytes. </returns>
@@ -44,13 +56,10 @@ namespace D3D
 
 	/// <summary> 
 	/// Release all Device related ComPtrs.<br/>
-	/// Should return Refcount: 1 for ID3D12Device.<br/>
+	/// Should return Refcount: 1 for Device object.<br/>
 	/// Otherwise some resources haven't been released, or were released incorrectly.
 	/// </summary>
 	void ReleaseDevice();
-
-	// TODO:
-	// Add GPU feature checking and asserting.
 
 	extern ComPtr<IDXGIFactory7> g_Factory;
 	extern ComPtr<IDXGIAdapter3> g_Adapter;

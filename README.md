@@ -10,20 +10,28 @@
 <!--/TOC-->
 
 ## **Overview**
-**WIP** - calling it *engine* at this point is an overstatement.<br/><br/>
-Restructured and improved version of my other project: [**DirectX 12 Rendering**](https://github.com/LowerDeckBoy/DirectX-12-Rendering).<br/><br/>Current goals are focused more on ECS based graphics pipeline workflow for hybrid rendering path rather then graphics techniques.
+**WIP** - calling it *engine* at this point is an overstatement.
+
+Restructured and improved version of my other project: [**DirectX 12 Rendering**](https://github.com/LowerDeckBoy/DirectX-12-Rendering).
+
+Current goals are focused more on ECS based graphics pipeline workflow for hybrid rendering path rather then graphics techniques.
+
 
 ## **Features**
-- [x] **Deferred Rendering**
+- [x] **Deferred Rendering**:
+    - [ ] Tile-Based 
 - [x] **Bindless Resources**:
-    - [x] Texturing
-    - [ ] Buffers
+    - [x] Textures
+    - [x] Buffers
 - [ ] **DXR**:
     - [ ] Raytraced Shadows
     - [ ] Raytraced Ambient Occlusion
     - [ ] Raytraced Reflections
+- [x] **Shaders**:
+    - [x] **SM6.x** support - **default**
+    - [x] **SM5.x** support
 - [ ] **Mesh Shading**:
-    - [ ] *Meshletizing*
+    - [ ] Meshlets
     - [ ] Amplification/Tesselation
 - [x] **Image Based Lighting**:
     - [x] Diffuse
@@ -42,7 +50,7 @@ Restructured and improved version of my other project: [**DirectX 12 Rendering**
 
 
 ## **Built with**
-- **C++ 20**
+- **C++20**
 - **DirectX 12**
 - **DXR**
 - **Visual Studio 2022:**
@@ -51,13 +59,17 @@ Restructured and improved version of my other project: [**DirectX 12 Rendering**
     - *Windows SDK*
     - *Win32 API*
 - [**vcpkg**](https://www.vcpkg.io)
-- [**XML Documentation**](https://learn.microsoft.com/en-us/cpp/build/reference/xml-documentation-visual-cpp?view=msvc-170)
 
-**Note:<br/>Supports **x64** architecture only.<br/>Windows 11 and Visual Studio 2022 are required in order to access **HLSL SM6.6.**<br/>DLLs for compiling HLSL 6.x are provided via Post-Build event.**
+**Note:**
+
+> [!NOTE] Supports **x64** architecture only.
+
+> [!NOTE] **HLSL SM6.6** support is required.
 
 ## **Dependencies**
 - [**D3D12MemoryAllocator**](https://github.com/GPUOpen-LibrariesAndSDKs/D3D12MemoryAllocator)
-- [**ImGui**](https://github.com/ocornut/imgui) - Docking branch
+- [**D3D12 Agility SDK**](https://devblogs.microsoft.com/directx/directx12agility/)
+- [**ImGui**](https://github.com/ocornut/imgui)
 - [**assimp**](https://github.com/assimp/assimp)
 - [**EnTT**](https://github.com/skypjack/entt)
 - [**DirectXTex**](https://github.com/microsoft/DirectXTex)
