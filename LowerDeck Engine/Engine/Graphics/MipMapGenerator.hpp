@@ -28,9 +28,7 @@ public:
 		}
 	}
 
-	//https://github.com/EldarMuradov/EraEngine/blob/master/Source/Graphics/Backend/RenderBackend.cpp#L147
 	void CreateComputeState(std::weak_ptr<gfx::ShaderManager> wpShaderManager);
-
 
 	static ID3D12RootSignature* m_RootSignature;
 	static ID3D12PipelineState* m_ComputePipeline;

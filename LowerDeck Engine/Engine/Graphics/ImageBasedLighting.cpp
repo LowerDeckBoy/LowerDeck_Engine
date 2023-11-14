@@ -30,6 +30,7 @@ namespace lde
 		CreateTextures(Filepath);
 
 		// Transition all resources to PIXEL_SHADER_RESOURCE
+		/*
 		const auto toPixel = [&](ID3D12GraphicsCommandList4* pCommandList) {
 			std::array<D3D12_RESOURCE_BARRIER, 4> barriers{};
 			barriers.at(0) = CD3DX12_RESOURCE_BARRIER::Transition(m_IrradianceMap.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
@@ -39,7 +40,7 @@ namespace lde
 			pCommandList->ResourceBarrier(static_cast<uint32_t>(barriers.size()), barriers.data());
 			};
 		toPixel(D3D::g_CommandList.Get());	
-
+		*/
 	}
 
 	void ImageBasedLighting::Draw(Camera* pCamera)
@@ -67,10 +68,10 @@ namespace lde
 
 	void ImageBasedLighting::Release()
 	{
-		SAFE_RELEASE(m_SpecularBRDF_LUT);
-		SAFE_RELEASE(m_SpecularMap);
-		SAFE_RELEASE(m_IrradianceMap);
-		SAFE_RELEASE(m_Skybox);
+		//SAFE_RELEASE(m_SpecularBRDF_LUT);
+		//SAFE_RELEASE(m_SpecularMap);
+		//SAFE_RELEASE(m_IrradianceMap);
+		//SAFE_RELEASE(m_Skybox);
 
 		m_VertexBuffer.reset();
 		m_IndexBuffer.reset();
@@ -209,26 +210,26 @@ namespace lde
 		dispatch(D3D::g_CommandList.Get());
 
 		// Actual Skybox resource
-		
-		TextureUtility::CreateResource(m_Skybox.ReleaseAndGetAddressOf(), { cubeResolution, cubeResolution, 6, DXGI_FORMAT_R16G16B16A16_FLOAT, 6 }, TextureDesc(D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS));
-		m_Skybox.Get()->SetName(L"[Image Based Lighting] TextureCube Resource");
+		m_Skybox = new Texture();
+		TextureUtility::CreateResource(m_Skybox->m_Resource.ReleaseAndGetAddressOf(), { cubeResolution, cubeResolution, 6, DXGI_FORMAT_R16G16B16A16_FLOAT, 6 }, TextureDesc(D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS));
+		m_Skybox->m_Resource.Get()->SetName(L"[Image Based Lighting] TextureCube Resource");
 
 		std::array<D3D12_RESOURCE_BARRIER, 2> preCopyBarriers{};
 		preCopyBarriers.at(0) = CD3DX12_RESOURCE_BARRIER::Transition(uavTexture.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE);
-		preCopyBarriers.at(1) = CD3DX12_RESOURCE_BARRIER::Transition(m_Skybox.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COPY_DEST);
+		preCopyBarriers.at(1) = CD3DX12_RESOURCE_BARRIER::Transition(m_Skybox->m_Resource.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COPY_DEST);
 		D3D::g_CommandList.Get()->ResourceBarrier(static_cast<uint32_t>(preCopyBarriers.size()), preCopyBarriers.data());
 
-		D3D::g_CommandList.Get()->CopyResource(m_Skybox.Get(), uavTexture.Get());
+		D3D::g_CommandList.Get()->CopyResource(m_Skybox->m_Resource.Get(), uavTexture.Get());
 
 		// States back to COMMON
 		std::array<D3D12_RESOURCE_BARRIER, 2> postCopyBarriers{};
 		postCopyBarriers.at(0) = CD3DX12_RESOURCE_BARRIER::Transition(uavTexture.Get(), D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_COMMON);
-		postCopyBarriers.at(1) = CD3DX12_RESOURCE_BARRIER::Transition(m_Skybox.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_COMMON);
+		postCopyBarriers.at(1) = CD3DX12_RESOURCE_BARRIER::Transition(m_Skybox->m_Resource.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_COMMON);
 		D3D::g_CommandList.Get()->ResourceBarrier(static_cast<uint32_t>(postCopyBarriers.size()), postCopyBarriers.data());
 
 		D3D::ExecuteCommandLists(true);
 
-		TextureUtility::CreateSRV(m_Skybox.GetAddressOf(), m_SkyboxDescriptor, 1, DXGI_FORMAT_R16G16B16A16_FLOAT, D3D12_SRV_DIMENSION_TEXTURECUBE);
+		TextureUtility::CreateSRV(m_Skybox->m_Resource.GetAddressOf(), m_SkyboxDescriptor, 1, DXGI_FORMAT_R16G16B16A16_FLOAT, D3D12_SRV_DIMENSION_TEXTURECUBE);
 
 		SAFE_RELEASE(preTransformResource);
 		SAFE_RELEASE(uavTexture);
@@ -262,13 +263,14 @@ namespace lde
 
 		// Resource and Descriptor creation
 		{
-			TextureUtility::CreateResource(m_IrradianceMap.ReleaseAndGetAddressOf(), TextureData(32, 32, 6, DXGI_FORMAT_R16G16B16A16_FLOAT),
+			m_IrradianceMap = new Texture();
+			TextureUtility::CreateResource(m_IrradianceMap->m_Resource.ReleaseAndGetAddressOf(), TextureData(32, 32, 6, DXGI_FORMAT_R16G16B16A16_FLOAT),
 				TextureDesc(D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 
 			D3D::D3D12Context::GetMainHeap()->Allocate(m_IrradianceDescriptor);
-			TextureUtility::CreateUAV(m_IrradianceMap.GetAddressOf(), m_IrradianceDescriptor, 6, DXGI_FORMAT_R16G16B16A16_FLOAT);
+			TextureUtility::CreateUAV(m_IrradianceMap->m_Resource.GetAddressOf(), m_IrradianceDescriptor, 6, DXGI_FORMAT_R16G16B16A16_FLOAT);
 
-			m_IrradianceMap.Get()->SetName(L"[Image Based Lighting] Irradiance Map");
+			m_IrradianceMap->m_Resource.Get()->SetName(L"[Image Based Lighting] Irradiance Map");
 		}
 		
 		// Compute execution and resource transition
@@ -280,14 +282,14 @@ namespace lde
 			pCommandList->SetComputeRootDescriptorTable(1, m_IrradianceDescriptor.GetGPU());
 			pCommandList->Dispatch(32 / 32, 32 / 32, 6);
 
-			const auto toCommon = CD3DX12_RESOURCE_BARRIER::Transition(m_IrradianceMap.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COMMON);
+			const auto toCommon = CD3DX12_RESOURCE_BARRIER::Transition(m_IrradianceMap->m_Resource.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COMMON);
 			pCommandList->ResourceBarrier(1, &toCommon);
 			};
 		dispatch(D3D::g_CommandList.Get());
 
 		D3D::ExecuteCommandLists(true);
 
-		TextureUtility::CreateSRV(m_IrradianceMap.GetAddressOf(), m_IrradianceDescriptor, 1, DXGI_FORMAT_R16G16B16A16_FLOAT, D3D12_SRV_DIMENSION_TEXTURECUBE);
+		TextureUtility::CreateSRV(m_IrradianceMap->m_Resource.GetAddressOf(), m_IrradianceDescriptor, 1, DXGI_FORMAT_R16G16B16A16_FLOAT, D3D12_SRV_DIMENSION_TEXTURECUBE);
 
 		SAFE_DELETE(pipelineState);
 	}
@@ -308,13 +310,21 @@ namespace lde
 		uint16_t mips = 1;
 		// Resource and Descriptor creation
 		{
-			TextureUtility::CreateResource(m_SpecularMap.ReleaseAndGetAddressOf(), TextureData(256, 256, 6, DXGI_FORMAT_R16G16B16A16_FLOAT, mips),
+			m_SpecularMap = new Texture();
+			TextureUtility::CreateResource(m_SpecularMap->m_Resource.ReleaseAndGetAddressOf(), TextureData(256, 256, 6, DXGI_FORMAT_R16G16B16A16_FLOAT, mips),
 				TextureDesc(D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 
+			const auto desc{ m_SpecularMap->m_Resource->GetDesc() };
+			m_SpecularMap->Width  = static_cast<uint32_t>(desc.Width);
+			m_SpecularMap->Height = desc.Height;
+			m_SpecularMap->MipLevels = 4;
+
 			D3D::D3D12Context::GetMainHeap()->Allocate(m_SpecularDescriptor);
-			TextureUtility::CreateUAV(m_SpecularMap.GetAddressOf(), m_SpecularDescriptor, 6, DXGI_FORMAT_R16G16B16A16_FLOAT);
-			m_SpecularMap.Get()->SetName(L"[Image Based Lighting] Specular Map");
+			TextureUtility::CreateUAV(m_SpecularMap->m_Resource.GetAddressOf(), m_SpecularDescriptor, 6, DXGI_FORMAT_R16G16B16A16_FLOAT);
+			m_SpecularMap->m_Resource.Get()->SetName(L"[Image Based Lighting] Specular Map");
 		}
+
+		MipMapGenerator::Generate2D(*m_SpecularMap);
 
 		// Compute execution and resource transition
 		const auto dispatch = [&](ID3D12GraphicsCommandList4* pCommandList) {
@@ -325,7 +335,7 @@ namespace lde
 			pCommandList->SetComputeRootDescriptorTable(1, m_SpecularDescriptor.GetGPU());
 			pCommandList->Dispatch(256 / 32, 256 / 32, 6);
 		
-			const auto toCommon = CD3DX12_RESOURCE_BARRIER::Transition(m_SpecularMap.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COMMON);
+			const auto toCommon = CD3DX12_RESOURCE_BARRIER::Transition(m_SpecularMap->m_Resource.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COMMON);
 			pCommandList->ResourceBarrier(1, &toCommon);
 			};
 		
@@ -355,7 +365,7 @@ namespace lde
 
 		D3D::ExecuteCommandLists(true);
 		
-		TextureUtility::CreateSRV(m_SpecularMap.GetAddressOf(), m_SpecularDescriptor, mips, DXGI_FORMAT_R16G16B16A16_FLOAT, D3D12_SRV_DIMENSION_TEXTURECUBE);
+		TextureUtility::CreateSRV(m_SpecularMap->m_Resource.GetAddressOf(), m_SpecularDescriptor, mips, DXGI_FORMAT_R16G16B16A16_FLOAT, D3D12_SRV_DIMENSION_TEXTURECUBE);
 
 		SAFE_DELETE(pipelineState);
 	}
@@ -375,13 +385,14 @@ namespace lde
 
 		// Resource and Descriptor creation
 		{
-			TextureUtility::CreateResource(m_SpecularBRDF_LUT.ReleaseAndGetAddressOf(), TextureData(256, 256, 1, DXGI_FORMAT_R16G16_FLOAT),
+			m_SpecularBRDF_LUT = new Texture();
+			TextureUtility::CreateResource(m_SpecularBRDF_LUT->m_Resource.ReleaseAndGetAddressOf(), TextureData(256, 256, 1, DXGI_FORMAT_R16G16_FLOAT),
 				TextureDesc(D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 
 			D3D::D3D12Context::GetMainHeap()->Allocate(m_SpBRDFDescriptor);
-			TextureUtility::CreateUAV(m_SpecularBRDF_LUT.GetAddressOf(), m_SpBRDFDescriptor, 1, DXGI_FORMAT_R16G16_FLOAT);
+			TextureUtility::CreateUAV(m_SpecularBRDF_LUT->m_Resource.GetAddressOf(), m_SpBRDFDescriptor, 1, DXGI_FORMAT_R16G16_FLOAT);
 
-			m_SpecularBRDF_LUT.Get()->SetName(L"[Image Based Lighting] Specular BRDF LUT");
+			m_SpecularBRDF_LUT->m_Resource.Get()->SetName(L"[Image Based Lighting] Specular BRDF LUT");
 		}
 
 		// Compute execution and resource transition
@@ -392,14 +403,14 @@ namespace lde
 			pCommandList->SetComputeRootDescriptorTable(1, m_SpBRDFDescriptor.GetGPU());
 			pCommandList->Dispatch(256 / 32, 256 / 32, 6);
 
-			const auto toCommon{ CD3DX12_RESOURCE_BARRIER::Transition(m_SpecularBRDF_LUT.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COMMON) };
+			const auto toCommon{ CD3DX12_RESOURCE_BARRIER::Transition(m_SpecularBRDF_LUT->m_Resource.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COMMON) };
 			pCommandList->ResourceBarrier(1, &toCommon);
 			};
 		dispatch(D3D::g_CommandList.Get());
 
 		D3D::ExecuteCommandLists(true);
 
-		TextureUtility::CreateSRV(m_SpecularBRDF_LUT.GetAddressOf(), m_SpBRDFDescriptor, 1, DXGI_FORMAT_R16G16_FLOAT);
+		TextureUtility::CreateSRV(m_SpecularBRDF_LUT->m_Resource.GetAddressOf(), m_SpBRDFDescriptor, 1, DXGI_FORMAT_R16G16_FLOAT);
 
 		SAFE_DELETE(pipelineState);
 	}

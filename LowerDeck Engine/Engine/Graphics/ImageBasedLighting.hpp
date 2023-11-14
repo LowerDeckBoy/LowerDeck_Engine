@@ -80,8 +80,8 @@ namespace lde
 		/// Post-transformed equirectangular texture.<br/>
 		/// Used for drawing Skybox.
 		/// </summary>
-		ComPtr<ID3D12Resource> m_Skybox;
-		//Texture* m_Skybox{ nullptr };
+		//ComPtr<ID3D12Resource> m_Skybox;
+		Texture* m_Skybox{ nullptr };
 		/// <summary>
 		/// SRV Descriptor for post-transform equirectangular texture usage.
 		/// </summary>
@@ -90,7 +90,8 @@ namespace lde
 		/// <summary>
 		/// 32x32 Irradiance Map.
 		/// </summary>
-		ComPtr<ID3D12Resource> m_IrradianceMap;
+		//ComPtr<ID3D12Resource> m_IrradianceMap;
+		Texture* m_IrradianceMap{ nullptr };
 		/// <summary>
 		/// Descriptor for Irradiance Map usage.
 		/// </summary>
@@ -100,7 +101,8 @@ namespace lde
 		/// Specular Map for sky reflections.<br/>
 		/// Note: requires a fix (mipmapping issue)!
 		/// </summary>
-		ComPtr<ID3D12Resource> m_SpecularMap;
+		//ComPtr<ID3D12Resource> m_SpecularMap;
+		Texture* m_SpecularMap{ nullptr };
 		/// <summary>
 		/// Descriptor for SpecularMap usage.
 		/// </summary>
@@ -109,7 +111,8 @@ namespace lde
 		/// <summary>
 		/// Specular BRDF LookUp Table texture.
 		/// </summary>
-		ComPtr<ID3D12Resource> m_SpecularBRDF_LUT;
+		//ComPtr<ID3D12Resource> m_SpecularBRDF_LUT;
+		Texture* m_SpecularBRDF_LUT{ nullptr };
 		/// <summary>
 		/// Descriptor for BRDF LUT.
 		/// </summary>
