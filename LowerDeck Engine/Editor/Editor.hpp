@@ -2,13 +2,9 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_win32.h>
 #include <imgui/imgui_impl_dx12.h>
-#include "ImGui/ImGuizmo.h"
 
 class Camera;
 class Timer;
-
-// TODO:
-// Seprate ImGui from Renderer logic
 
 /// <summary>
 /// <b>ImGui</b> based.

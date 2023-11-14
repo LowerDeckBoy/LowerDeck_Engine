@@ -7,17 +7,15 @@
 
 using namespace DirectX;
 
+class DeviceContext;
 class Camera;
-class TextureManager;
 
 class Model : public Importer
 {
 public:
-	Model(std::string_view Filepath, const std::string& ModelName = "Unnamed");
-	//Model(std::string_view Filepath, const std::string& ModelName = "Unnamed");
+	Model(std::string_view Filepath, const std::string& ModelName = "Non-given");
 	~Model();
 
-	//void Create(std::string_view Filepath);
 	void Create(std::string_view Filepath);
 	void Draw(Camera* pCamera);
 
@@ -33,6 +31,12 @@ protected:
 	// Constant Buffers
 	std::unique_ptr<gfx::ConstantBuffer<gfx::cbPerObject>> m_cbPerObject;
 	gfx::cbPerObject m_cbPerObjectData{};
+	//std::unique_ptr<gfx::ConstantBuffer<gfx::cbMaterialIndices>> m_cbMaterial;
+	//gfx::cbMaterial m_cbMaterialData{};
+	//std::unique_ptr<ConstantBuffer<cbPerObject>> m_cbPerObject;
+	//std::unique_ptr<ConstantBuffer<cbCamera>> m_cbCamera;
+	//cbCamera m_cbCameraData{};
+	// Data for light shading
 
 	// Transforms
 	void UpdateWorld() noexcept;

@@ -32,8 +32,6 @@ namespace D3D
 	/// </summary>
 	void WaitForGPU();
 
-	void FlushGPU();
-
 	/// <summary> Execute content currently bound to ID3D12GraphicsCommandList4*. </summary>
 	/// <param name="bResetAllocator">: If true Close command list. False by default.</param>
 	void ExecuteCommandLists(bool bResetAllocator = false);

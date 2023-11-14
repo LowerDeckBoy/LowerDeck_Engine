@@ -25,9 +25,9 @@ public:
 	cbPointLights m_cbPointLightsData{};
 
 private:
-	std::vector<DirectX::XMFLOAT4>		m_LightPositions{};
+	std::vector<DirectX::XMFLOAT4>				m_LightPositions{};
 	std::vector<std::array<float, 4>>   m_LightPositionsFloat{};
-	std::vector<DirectX::XMFLOAT4>		m_LightColors{};
+	std::vector<DirectX::XMFLOAT4>				m_LightColors{};
 	std::vector<std::array<float, 4>>	m_LightColorsFloat{};
 
 	const uint32_t m_Count{ 4 };

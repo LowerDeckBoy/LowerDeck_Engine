@@ -19,7 +19,7 @@ public:
 	/// <param name="pViewport"> Pointer to Scene Viewport. </param>
 	/// <param name="pSceneDepth"> Pointer to Scene Depth Buffer. </param>
 	/// <param name="pShaderManager"> Shared Pointer to <c>ShaderManager</c> object. </param>
-	LightPass(D3D::D3D12Viewport* pViewport, D3D::D3D12DepthBuffer* pSceneDepth);
+	LightPass(D3D::D3D12Viewport* pViewport, D3D::D3D12DepthBuffer* pSceneDepth, std::shared_ptr<gfx::ShaderManager> pShaderManager);
 	/// <summary>
 	/// Releases Resources.
 	/// </summary>

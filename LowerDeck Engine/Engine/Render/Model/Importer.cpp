@@ -1,4 +1,3 @@
-#include "../../Graphics/TextureManager.hpp"
 #include <assimp/scene.h>
 #include "Importer.hpp"
 #include "../../Utility/FileSystem.hpp"
@@ -7,7 +6,6 @@
 #include <assimp/postprocess.h>
 #include <assimp/GltfMaterial.h>
 #include "../../Utility/Utility.hpp"
-#include "../../Graphics/MipMapGenerator.hpp"
 
 
 Importer::Importer(std::string_view Filepath)
@@ -212,28 +210,23 @@ void Importer::ProcessMaterials(const aiScene* pScene, const aiMesh* pMesh)
 		return;
 	}
 
-	auto& textureManager{ TextureManager::GetInstance() };
-
 	aiMaterial* material{ pScene->mMaterials[pMesh->mMaterialIndex] };
 	for (uint32_t i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); ++i)
 	{
-
-		aiString materialPath;
-		if (material->GetTexture(aiTextureType_DIFFUSE, i, &materialPath) == aiReturn_SUCCESS)
-		{
-			auto texPath{ utility::glTF::GetTexturePath(m_ModelPath.data(), std::string(materialPath.C_Str())) };
-
-			Texture* baseColorTexture = new Texture(textureManager.Create(texPath));
-			m_Textures.emplace_back(baseColorTexture);
-			newMaterial->BaseColorIndex = baseColorTexture->SRV().Index;
-
-			aiColor4D colorFactor{};
-			aiGetMaterialColor(material, AI_MATKEY_BASE_COLOR, &colorFactor);
-			newMaterial->BaseColorFactor = XMFLOAT4(colorFactor.r, colorFactor.g, colorFactor.b, colorFactor.a);
-		}
 		if (material->GetTextureCount(aiTextureType_DIFFUSE) >= 0)
 		{
-			
+			aiString materialPath;
+			if (material->GetTexture(aiTextureType_DIFFUSE, i, &materialPath) == aiReturn_SUCCESS)
+			{
+				auto texPath{ utility::glTF::GetTexturePath(m_ModelPath.data(), std::string(materialPath.C_Str())) };
+				Texture* baseColorTexture = new Texture(texPath);
+				m_Textures.emplace_back(baseColorTexture);
+				newMaterial->BaseColorIndex = baseColorTexture->SRV().Index;
+
+				aiColor4D colorFactor{};
+				aiGetMaterialColor(material, AI_MATKEY_BASE_COLOR, &colorFactor);
+				newMaterial->BaseColorFactor = XMFLOAT4(colorFactor.r, colorFactor.g, colorFactor.b, colorFactor.a);
+			}
 		}
 	}
 	
@@ -243,7 +236,7 @@ void Importer::ProcessMaterials(const aiScene* pScene, const aiMesh* pMesh)
 		if (material->GetTexture(aiTextureType_NORMALS, i, &materialPath) == aiReturn_SUCCESS)
 		{
 			auto texPath{ utility::glTF::GetTexturePath(m_ModelPath.data(), std::string(materialPath.C_Str())) };
-			Texture* NormalTexture = new Texture(textureManager.Create(texPath));
+			Texture* NormalTexture = new Texture(texPath);
 			m_Textures.emplace_back(NormalTexture);
 			newMaterial->NormalIndex = NormalTexture->SRV().Index;
 		}	
@@ -255,7 +248,7 @@ void Importer::ProcessMaterials(const aiScene* pScene, const aiMesh* pMesh)
 		if (material->GetTexture(aiTextureType_METALNESS, i, &materialPath) == aiReturn_SUCCESS)
 		{
 			auto texPath{ utility::glTF::GetTexturePath(m_ModelPath.data(), std::string(materialPath.C_Str())) };
-			Texture* metallicRoughnessTexture = new Texture(textureManager.Create(texPath));
+			Texture* metallicRoughnessTexture = new Texture(texPath);
 			m_Textures.emplace_back(metallicRoughnessTexture);
 			newMaterial->MetallicRoughnessIndex = metallicRoughnessTexture->SRV().Index;
 
@@ -270,7 +263,7 @@ void Importer::ProcessMaterials(const aiScene* pScene, const aiMesh* pMesh)
 		if (material->GetTexture(aiTextureType_EMISSIVE, i, &materialPath) == aiReturn_SUCCESS)
 		{
 			auto texPath{ utility::glTF::GetTexturePath(m_ModelPath.data(), std::string(materialPath.C_Str())) };
-			Texture* emissiveTexture = new Texture(textureManager.Create(texPath));
+			Texture* emissiveTexture = new Texture(texPath);
 			m_Textures.emplace_back(emissiveTexture);
 			newMaterial->EmissiveIndex = emissiveTexture->SRV().Index;
 
@@ -283,8 +276,8 @@ void Importer::ProcessMaterials(const aiScene* pScene, const aiMesh* pMesh)
 	aiGetMaterialFloat(material, AI_MATKEY_GLTF_ALPHACUTOFF, &newMaterial->AlphaCutoff);
 
 	m_Materials.emplace_back(newMaterial);
-
 }
+
 
 void Importer::ProcessAnimations(const aiScene*)
 {

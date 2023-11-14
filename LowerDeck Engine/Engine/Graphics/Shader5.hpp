@@ -8,8 +8,6 @@
 
 namespace gfx
 {
-	// TODO: Deprecated
-
 	/// <summary>
 	/// Shader Model 5.x usage only.
 	/// </summary>
