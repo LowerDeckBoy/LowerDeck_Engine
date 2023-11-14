@@ -5,7 +5,7 @@
 // so shader can iterate properly
 //#define MAX_POINT_LIGHT_COUNT 256
 
-#include "Deferred_Common.hlsli"
+#include "DeferredCommon.hlsli"
 #include "DeferredLighting.hlsli"
 
 cbuffer cbCamera : register(b0, space0)
@@ -29,20 +29,22 @@ ScreenQuadOutput VSmain(ScreenQuadInput vin)
 	return output;
 }
 
-cbuffer cbTextureIndices : register(b1, space0)
+cbuffer cbGBufferIndices : register(b1, space0)
 {
-	// GBuffers
 	int DepthIndex;
 	int BaseColorIndex;
 	int NormalIndex;
-	int MetalRoughnessIndex;
+	int MetalRoughnessIndex;	
 	int WorldPositionIndex;
-	// IBL
+};
+
+cbuffer cbIBLIndices : register(b2, space0)
+{
 	int SkyboxIndex;
 	int IrradianceIndex;
 	int SpecularIndex;
 	int SpecularBRDFIndex;
-};
+}
 
 cbuffer cbPointLights : register(b0, space1)
 {

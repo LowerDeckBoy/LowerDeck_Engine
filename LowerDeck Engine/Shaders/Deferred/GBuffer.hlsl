@@ -32,9 +32,9 @@ DeferredOutput VSmain(uint VertexID : SV_VertexID)
 
 SamplerState texSampler : register(s0, space0);
 
-GBuffer_Output PSmain(DeferredOutput pin)
+GBufferOutput PSmain(DeferredOutput pin)
 {
-	GBuffer_Output output = (GBuffer_Output) 0;
+	GBufferOutput output = (GBufferOutput) 0;
 	
 	// Load BaseColor texture
 	if (Material.BaseColorIndex > INVALID_INDEX)
