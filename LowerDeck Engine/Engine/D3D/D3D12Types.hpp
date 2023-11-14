@@ -1,5 +1,5 @@
 #pragma once
-
+#include <cstdint>
 // Mostly helper enum types to use across D3D and Shader content.
 
 // TODO:
@@ -36,6 +36,14 @@ enum class ShaderType : uint8_t
 	eGeometry,
 	eHull,
 	eDomain
+};
+
+enum class BufferType : uint8_t
+{
+	eVertex		= 0x00,
+	eIndex		= 0x01,
+	eConstant	= 0x02,
+	eStructured = 0x04
 };
 
 /// <summary>

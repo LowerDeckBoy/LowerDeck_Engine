@@ -81,13 +81,7 @@
     <ClCompile Include="Engine\D3D\D3D12Utility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\D3D\D3D12GraphicsPipelineState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Graphics\ShaderManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Graphics\Shader5.cpp">
+    <ClCompile Include="Engine\D3D\D3D12PipelineState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\D3D\D3D12RootSignature.cpp">
@@ -96,19 +90,10 @@
     <ClCompile Include="Engine\D3D\D3D12DepthBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Render\Deferred\DeferredContext.cpp">
+    <ClCompile Include="Engine\Render\RenderPass\GBufferPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Render\Deferred\GBufferPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Render\Deferred\ScreenOutput.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Graphics\Buffer\Buffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Graphics\Buffer\BufferUtility.cpp">
+    <ClCompile Include="Engine\Render\ScreenOutput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Render\Model\Importer.cpp">
@@ -120,31 +105,73 @@
     <ClCompile Include="Engine\Scene\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Graphics\Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Logger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Graphics\TextureUtility.cpp">
+    <ClCompile Include="Engine\Core\Logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Utility\FileSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Graphics\TextureManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Render\Lights\PointLight.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Graphics\ImageBasedLighting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Render\Lights\PointLights.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\D3D\D3D12Buffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Render\RenderPass\LightPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\ImGui\ImGuizmo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Scene\GameObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Utility\Utility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Utility\Math.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\Buffer\Buffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\Buffer\BufferUtility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\ImageBasedLighting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\Shader5.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\ShaderManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\TextureManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\TextureUtility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\D3D\D3D12Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\D3D\D3D12Adapter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Platform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\MipMapGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\D3D\D3D12Memory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -239,13 +266,7 @@
     <ClInclude Include="Engine\ECS\Component.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\D3D\D3D12GraphicsPipelineState.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\ShaderManager.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\Shader5.hpp">
+    <ClInclude Include="Engine\D3D\D3D12PipelineState.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\D3D\D3D12RootSignature.hpp">
@@ -254,22 +275,10 @@
     <ClInclude Include="Engine\D3D\D3D12DepthBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Render\Deferred\DeferredContext.hpp">
+    <ClInclude Include="Engine\Render\RenderPass\GBufferPass.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Render\Deferred\GBufferPass.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Render\Deferred\ScreenOutput.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\Buffer\Buffer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\Buffer\Vertex.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\Buffer\BufferUtility.hpp">
+    <ClInclude Include="Engine\Render\ScreenOutput.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Dependencies\EnTT\entt.hpp">
@@ -284,13 +293,7 @@
     <ClInclude Include="Engine\Render\Model\Model.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\Buffer\ConstantBuffer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Utility\FileSystem.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\Buffer\ConstantTypes.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Utility\MemoryUsage.hpp">
@@ -299,19 +302,10 @@
     <ClInclude Include="Engine\Scene\Scene.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\Texture.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Logger.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\TextureUtility.hpp">
+    <ClInclude Include="Engine\Core\Logger.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\ECS\Entity.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\TextureManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Render\Lights\PointLight.hpp">
@@ -320,29 +314,99 @@
     <ClInclude Include="Engine\Render\Model\Meshlet.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\ImageBasedLighting.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Render\Lights\PointLights.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\D3D\D3D12Buffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Render\RenderPass\LightPass.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Render\Lights.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\ImGui\ImGuizmo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Scene\GameObject.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\stb\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Utility\Math.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Buffer\Buffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Buffer\BufferUtility.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Buffer\ConstantBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Buffer\ConstantTypes.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Buffer\Vertex.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\ImageBasedLighting.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Shader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Shader5.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\ShaderManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Texture.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\TextureManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\TextureUtility.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\MipMapGenerator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\D3D\D3D12Texture.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\D3D\D3D12Adapter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Platform.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Utility\Singleton.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\D3D\D3D12Memory.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-    <None Include="Shaders\Deferred\Deferred_Common.hlsli" />
+    <None Include="Shaders\Deferred\DeferredCommon.hlsli" />
     <None Include="Shaders\Deferred\GBuffer.hlsli" />
     <None Include="Shaders\Common.hlsli" />
     <None Include="Shaders\Deferred\DeferredLighting.hlsli" />
+    <None Include="Shaders\RootSignatures.hlsli" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Assets\Fonts\CascadiaCode-Bold.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shaders\Default_Forward.hlsl" />
-    <FxCompile Include="Shaders\Deferred\DeferredOutput.hlsl" />
+    <FxCompile Include="Shaders\Forward.hlsl" />
+    <FxCompile Include="Shaders\Deferred\Deferred.hlsl" />
     <FxCompile Include="Shaders\Test\Mesh.hlsl" />
     <FxCompile Include="Shaders\Deferred\GBuffer.hlsl" />
     <FxCompile Include="Shaders\Sky\EquirectangularToCube_CS.hlsl" />
@@ -350,5 +414,6 @@
     <FxCompile Include="Shaders\Sky\IrradianceMap_CS.hlsl" />
     <FxCompile Include="Shaders\Sky\SpBRDF_LUT_CS.hlsl" />
     <FxCompile Include="Shaders\Sky\SpecularMap_CS.hlsl" />
+    <FxCompile Include="Shaders\MipMaps_CS.hlsl" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\vcpkg.F.vcpkg.1.0.0\build\native\vcpkg.F.vcpkg.props" Condition="Exists('..\packages\vcpkg.F.vcpkg.1.0.0\build\native\vcpkg.F.vcpkg.props')" />
+  <Import Project="..\packages\Microsoft.Direct3D.D3D12.1.611.0\build\native\Microsoft.Direct3D.D3D12.props" Condition="Exists('..\packages\Microsoft.Direct3D.D3D12.1.611.0\build\native\Microsoft.Direct3D.D3D12.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
@@ -71,7 +71,8 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -81,6 +82,10 @@
     <PostBuildEvent>
       <Command>(robocopy "$(SolutionDir)Libraries\\" "$(TargetDir)\" dxil.dll dxcompiler.dll /COPY:DAT /XC /XN /XO /z /NP /NS /NFL /NDL /NJH  /NJS) ^&amp; IF %ERRORLEVEL% LEQ 1 exit 0</Command>
     </PostBuildEvent>
+    <Xdcmake>
+      <DocumentLibraryDependencies>false</DocumentLibraryDependencies>
+      <OutputFile>$(SolutionDir)Docs/XML/$(TargetName).xml</OutputFile>
+    </Xdcmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -99,17 +104,42 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Engine\D3D\D3D12Buffer.cpp" />
+    <ClCompile Include="Engine\D3D\D3D12Memory.cpp" />
+    <ClCompile Include="Engine\D3D\D3D12Adapter.cpp" />
+    <ClCompile Include="Engine\D3D\D3D12Texture.cpp" />
+    <ClCompile Include="Dependencies\ImGui\ImGuizmo.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <ClCompile Include="Engine\D3D\D3D12Buffer.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <ClCompile Include="Engine\D3D\D3D12DepthBuffer.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <ClCompile Include="Engine\D3D\D3D12RootSignature.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <ClCompile Include="Engine\D3D\D3D12PipelineState.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <ClCompile Include="Engine\D3D\D3D12Utility.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <ClCompile Include="Engine\Engine\Engine.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
     <ClCompile Include="Engine\Graphics\Buffer\Buffer.cpp" />
     <ClCompile Include="Engine\Graphics\Buffer\BufferUtility.cpp" />
-    <ClCompile Include="Engine\Render\Deferred\DeferredContext.cpp" />
-    <ClCompile Include="Engine\D3D\D3D12DepthBuffer.cpp" />
-    <ClCompile Include="Engine\D3D\D3D12RootSignature.cpp" />
-    <ClCompile Include="Engine\D3D\D3D12GraphicsPipelineState.cpp" />
-    <ClCompile Include="Engine\D3D\D3D12Utility.cpp" />
-    <ClCompile Include="Engine\Engine\Engine.cpp" />
+    <ClCompile Include="Engine\Graphics\ImageBasedLighting.cpp" />
+    <ClCompile Include="Engine\Graphics\MipMapGenerator.cpp" />
     <ClCompile Include="Engine\Graphics\Shader5.cpp" />
-    <ClCompile Include="Engine\Render\Camera.cpp" />
+    <ClCompile Include="Engine\Graphics\ShaderManager.cpp" />
+    <ClCompile Include="Engine\Graphics\Texture.cpp" />
+    <ClCompile Include="Engine\Graphics\TextureManager.cpp" />
+    <ClCompile Include="Engine\Graphics\TextureUtility.cpp" />
+    <ClCompile Include="Engine\Render\Camera.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
     <ClCompile Include="Dependencies\D3D12MA\D3D12MemAlloc.cpp">
       <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</GenerateXMLDocumentationFiles>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">TurnOffAllWarnings</WarningLevel>
@@ -129,52 +159,100 @@
     <ClCompile Include="Dependencies\ImGui\imgui_widgets.cpp">
       <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</GenerateXMLDocumentationFiles>
     </ClCompile>
-    <ClCompile Include="Editor\Editor.cpp" />
-    <ClCompile Include="Engine\D3D\D3D12Command.cpp" />
-    <ClCompile Include="Engine\D3D\D3D12Context.cpp" />
-    <ClCompile Include="Engine\D3D\D3D12DescriptorHeap.cpp" />
-    <ClCompile Include="Engine\D3D\D3D12Device.cpp" />
-    <ClCompile Include="Engine\D3D\D3D12SwapChain.cpp" />
-    <ClCompile Include="Engine\D3D\D3D12Viewport.cpp" />
+    <ClCompile Include="Editor\Editor.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <ClCompile Include="Engine\D3D\D3D12Command.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <ClCompile Include="Engine\D3D\D3D12Context.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <ClCompile Include="Engine\D3D\D3D12DescriptorHeap.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <ClCompile Include="Engine\D3D\D3D12Device.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <ClCompile Include="Engine\D3D\D3D12SwapChain.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <ClCompile Include="Engine\D3D\D3D12Viewport.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
     <ClCompile Include="Engine\Render\Lights\PointLights.cpp" />
-    <ClCompile Include="Engine\Render\Model\Importer.cpp" />
-    <ClCompile Include="Engine\Render\Model\Model.cpp" />
-    <ClCompile Include="Engine\Utility\FileSystem.cpp" />
-    <ClCompile Include="Engine\Window\Window.cpp" />
+    <ClCompile Include="Engine\Render\Model\Importer.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <ClCompile Include="Engine\Render\Model\Model.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <ClCompile Include="Engine\Utility\FileSystem.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <ClCompile Include="Engine\Utility\Utility.cpp" />
+    <ClCompile Include="Engine\Window\Window.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
     <ClCompile Include="Dependencies\ImGui\imgui.cpp">
       <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</GenerateXMLDocumentationFiles>
     </ClCompile>
-    <ClCompile Include="Engine\Render\Deferred\GBufferPass.cpp" />
-    <ClCompile Include="Engine\Graphics\ImageBasedLighting.cpp" />
+    <ClCompile Include="Engine\Render\RenderPass\GBufferPass.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <ClCompile Include="Engine\Scene\GameObject.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
     <ClCompile Include="Input\CameraInput.cpp" />
-    <ClCompile Include="Engine\Utility\Logger.cpp" />
+    <ClCompile Include="Engine\Core\Logger.cpp" />
+    <ClCompile Include="Engine\Render\RenderPass\LightPass.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Engine\Engine\Renderer.cpp" />
-    <ClCompile Include="Engine\ECS\World.cpp" />
-    <ClCompile Include="Engine\Graphics\ShaderManager.cpp" />
-    <ClCompile Include="Engine\Render\Deferred\ScreenOutput.cpp" />
-    <ClCompile Include="Engine\Scene\Scene.cpp" />
-    <ClCompile Include="Engine\Graphics\Texture.cpp" />
-    <ClCompile Include="Engine\Graphics\TextureUtility.cpp" />
-    <ClCompile Include="Engine\Graphics\TextureManager.cpp" />
+    <ClCompile Include="Engine\Engine\Renderer.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <ClCompile Include="Engine\ECS\World.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <ClCompile Include="Engine\Render\ScreenOutput.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <ClCompile Include="Engine\Scene\Scene.cpp">
+      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
+    </ClCompile>
     <ClCompile Include="Engine\Render\Lights\PointLight.cpp" />
+    <ClCompile Include="Engine\Utility\Math.cpp" />
+    <ClCompile Include="Engine\Core\Platform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\D3D\D3D12Memory.hpp" />
+    <ClInclude Include="Engine\D3D\D3D12Adapter.hpp" />
+    <ClInclude Include="Engine\D3D\D3D12Texture.hpp" />
+    <ClInclude Include="Dependencies\ImGui\ImGuizmo.h" />
+    <ClInclude Include="Dependencies\stb\stb_image.h" />
     <ClInclude Include="Engine\D3D\D3D12Buffer.hpp" />
     <ClInclude Include="Dependencies\EnTT\entt.hpp" />
     <ClInclude Include="Engine\ECS\Entity.hpp" />
+    <ClInclude Include="Engine\D3D\D3D12DepthBuffer.hpp" />
+    <ClInclude Include="Engine\D3D\D3D12RootSignature.hpp" />
+    <ClInclude Include="Engine\D3D\D3D12PipelineState.hpp" />
+    <ClInclude Include="Engine\D3D\D3D12Descriptor.hpp" />
+    <ClInclude Include="Engine\ECS\Component.hpp" />
+    <ClInclude Include="Engine\Engine\Engine.hpp" />
     <ClInclude Include="Engine\Graphics\Buffer\Buffer.hpp" />
     <ClInclude Include="Engine\Graphics\Buffer\BufferUtility.hpp" />
     <ClInclude Include="Engine\Graphics\Buffer\ConstantBuffer.hpp" />
     <ClInclude Include="Engine\Graphics\Buffer\ConstantTypes.hpp" />
     <ClInclude Include="Engine\Graphics\Buffer\Vertex.hpp" />
-    <ClInclude Include="Engine\Render\Deferred\DeferredContext.hpp" />
-    <ClInclude Include="Engine\D3D\D3D12DepthBuffer.hpp" />
-    <ClInclude Include="Engine\D3D\D3D12RootSignature.hpp" />
-    <ClInclude Include="Engine\D3D\D3D12GraphicsPipelineState.hpp" />
-    <ClInclude Include="Engine\D3D\D3D12Descriptor.hpp" />
-    <ClInclude Include="Engine\ECS\Component.hpp" />
-    <ClInclude Include="Engine\Engine\Engine.hpp" />
+    <ClInclude Include="Engine\Graphics\ImageBasedLighting.hpp" />
+    <ClInclude Include="Engine\Graphics\MipMapGenerator.hpp" />
+    <ClInclude Include="Engine\Graphics\Shader.hpp" />
+    <ClInclude Include="Engine\Graphics\Shader5.hpp" />
+    <ClInclude Include="Engine\Graphics\ShaderManager.hpp" />
+    <ClInclude Include="Engine\Graphics\Texture.hpp" />
+    <ClInclude Include="Engine\Graphics\TextureManager.hpp" />
+    <ClInclude Include="Engine\Graphics\TextureUtility.hpp" />
     <ClInclude Include="Engine\Render\Camera.hpp" />
     <ClInclude Include="Dependencies\D3D12MA\D3D12MemAlloc.h" />
     <ClInclude Include="Dependencies\d3dx12.h" />
@@ -194,6 +272,7 @@
     <ClInclude Include="Engine\D3D\D3D12Types.hpp" />
     <ClInclude Include="Engine\D3D\D3D12Utility.hpp" />
     <ClInclude Include="Engine\D3D\D3D12Viewport.hpp" />
+    <ClInclude Include="Engine\Render\Lights.hpp" />
     <ClInclude Include="Engine\Render\Lights\PointLights.hpp" />
     <ClInclude Include="Engine\Render\Model\Importer.hpp" />
     <ClInclude Include="Engine\Render\Model\Mesh.hpp" />
@@ -201,36 +280,36 @@
     <ClInclude Include="Engine\Render\Model\Model.hpp" />
     <ClInclude Include="Engine\Utility\FileSystem.hpp" />
     <ClInclude Include="Engine\Utility\MemoryUsage.hpp" />
+    <ClInclude Include="Engine\Utility\Singleton.hpp" />
     <ClInclude Include="Engine\Utility\Timer.hpp" />
     <ClInclude Include="Engine\Utility\TimeUtility.hpp" />
     <ClInclude Include="Engine\Utility\Utility.hpp" />
     <ClInclude Include="Engine\Window\Window.hpp" />
     <ClInclude Include="Dependencies\ImGui\imgui.h" />
-    <ClInclude Include="Engine\Render\Deferred\GBufferPass.hpp" />
-    <ClInclude Include="Engine\Graphics\ImageBasedLighting.hpp" />
+    <ClInclude Include="Engine\Render\RenderPass\GBufferPass.hpp" />
+    <ClInclude Include="Engine\Scene\GameObject.hpp" />
     <ClInclude Include="Input\CameraInput.hpp" />
     <ClInclude Include="Engine\Engine\Renderer.hpp" />
     <ClInclude Include="Engine\ECS\World.hpp" />
-    <ClInclude Include="Engine\Graphics\ShaderManager.hpp" />
-    <ClInclude Include="Engine\Graphics\Shader5.hpp" />
-    <ClInclude Include="Engine\Render\Deferred\ScreenOutput.hpp" />
+    <ClInclude Include="Engine\Render\ScreenOutput.hpp" />
     <ClInclude Include="Engine\Scene\Scene.hpp" />
-    <ClInclude Include="Engine\Graphics\Texture.hpp" />
-    <ClInclude Include="Engine\Utility\Logger.hpp" />
-    <ClInclude Include="Engine\Graphics\TextureUtility.hpp" />
-    <ClInclude Include="Engine\Graphics\TextureManager.hpp" />
+    <ClInclude Include="Engine\Core\Logger.hpp" />
     <ClInclude Include="Engine\Render\Lights\PointLight.hpp" />
+    <ClInclude Include="Engine\Render\RenderPass\LightPass.hpp" />
+    <ClInclude Include="Engine\Utility\Math.hpp" />
+    <ClInclude Include="Engine\Core\Platform.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Shaders\Common.hlsli" />
     <None Include="Shaders\Deferred\DeferredLighting.hlsli" />
-    <None Include="Shaders\Deferred\Deferred_Common.hlsli">
+    <None Include="Shaders\Deferred\DeferredCommon.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
     <None Include="Shaders\Deferred\GBuffer.hlsli">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
     </None>
+    <None Include="Shaders\RootSignatures.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Assets\Fonts\CascadiaCode-Bold.ttf">
@@ -239,7 +318,7 @@
     </Font>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shaders\Default_Forward.hlsl">
+    <FxCompile Include="Shaders\Forward.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
@@ -249,7 +328,7 @@
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </EntryPointName>
     </FxCompile>
-    <FxCompile Include="Shaders\Deferred\DeferredOutput.hlsl">
+    <FxCompile Include="Shaders\Deferred\Deferred.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -260,6 +339,13 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </EntryPointName>
+    </FxCompile>
+    <FxCompile Include="Shaders\MipMaps_CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Shaders\Sky\EquirectangularToCube_CS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
@@ -305,13 +391,13 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\vcpkg.F.vcpkg.1.0.0\build\native\vcpkg.F.vcpkg.targets" Condition="Exists('..\packages\vcpkg.F.vcpkg.1.0.0\build\native\vcpkg.F.vcpkg.targets')" />
+    <Import Project="..\packages\Microsoft.Direct3D.D3D12.1.611.0\build\native\Microsoft.Direct3D.D3D12.targets" Condition="Exists('..\packages\Microsoft.Direct3D.D3D12.1.611.0\build\native\Microsoft.Direct3D.D3D12.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\vcpkg.F.vcpkg.1.0.0\build\native\vcpkg.F.vcpkg.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\vcpkg.F.vcpkg.1.0.0\build\native\vcpkg.F.vcpkg.props'))" />
-    <Error Condition="!Exists('..\packages\vcpkg.F.vcpkg.1.0.0\build\native\vcpkg.F.vcpkg.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\vcpkg.F.vcpkg.1.0.0\build\native\vcpkg.F.vcpkg.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Direct3D.D3D12.1.611.0\build\native\Microsoft.Direct3D.D3D12.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.D3D12.1.611.0\build\native\Microsoft.Direct3D.D3D12.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Direct3D.D3D12.1.611.0\build\native\Microsoft.Direct3D.D3D12.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.D3D12.1.611.0\build\native\Microsoft.Direct3D.D3D12.targets'))" />
   </Target>
 </Project>

@@ -22,7 +22,7 @@ public:
 	/// <param name="pViewport"> Scene Viewport to determine resource dimensions. </param>
 	/// <param name="pSceneDepth"> Scene Depth Buffer. </param>
 	/// <param name="pShaderManager"> Required to create States. </param>
-	GBufferPass(D3D::D3D12Viewport* pViewport, D3D::D3D12DepthBuffer* pSceneDepth, std::shared_ptr<gfx::ShaderManager> pShaderManager);
+	GBufferPass(D3D::D3D12Viewport* pViewport, D3D::D3D12DepthBuffer* pSceneDepth);
 	/// <summary>
 	/// Releases underlying resources.
 	/// </summary>
@@ -74,7 +74,7 @@ private:
 	/// </summary>
 	/// <param name="pViewport"> Pointer to Scene Viewport. </param>
 	/// <param name="pShaderManager"> Shared Pointer to ShaderManager object. </param>
-	void Initialize(D3D::D3D12Viewport* pViewport, std::shared_ptr<gfx::ShaderManager> pShaderManager);
+	void Initialize(D3D::D3D12Viewport* pViewport);
 	/// <summary>
 	/// Used at initialization and <c>OnResize()</c>.
 	/// </summary>
