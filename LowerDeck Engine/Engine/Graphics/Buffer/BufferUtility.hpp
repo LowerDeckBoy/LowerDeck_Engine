@@ -84,7 +84,6 @@ namespace gfx
 
 	protected:
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_Buffer;
-		Microsoft::WRL::ComPtr<ID3D12Resource> m_UploadBuffer;
 		D3D12MA::Allocation* m_Allocation{ nullptr };
 
 		/// <summary>

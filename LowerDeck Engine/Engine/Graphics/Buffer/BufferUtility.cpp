@@ -10,7 +10,6 @@ namespace gfx
 
 	Buffer::~Buffer()
 	{
-		SAFE_RELEASE(m_UploadBuffer);
 		SAFE_RELEASE(m_Buffer);
 
 		if (m_Allocation)
@@ -29,15 +28,17 @@ namespace gfx
 
 		D3D::HeapAllocation(&m_Buffer, &m_Allocation, heapDesc, allocFlags, D3D12_HEAP_TYPE_DEFAULT, D3D12_HEAP_FLAG_ALLOW_ONLY_BUFFERS);
 		
+		ComPtr<ID3D12Resource> uploadResource;
 		D3D12MA::Allocation* uploadHeapAllocation{ nullptr };
-		D3D::HeapAllocation(&m_UploadBuffer, &uploadHeapAllocation, heapDesc, allocFlags, D3D12_HEAP_TYPE_UPLOAD, D3D12_HEAP_FLAG_ALLOW_ONLY_BUFFERS);
+		D3D::HeapAllocation(&uploadResource, &uploadHeapAllocation, heapDesc, allocFlags, D3D12_HEAP_TYPE_UPLOAD, D3D12_HEAP_FLAG_ALLOW_ONLY_BUFFERS);
 
 		D3D12_SUBRESOURCE_DATA subresource{};
 		subresource.pData		= Data.pData;
 		subresource.RowPitch	= Data.Size;
 		subresource.SlicePitch	= Data.Size;
 
-		::UpdateSubresources(D3D::g_CommandList.Get(), m_Buffer.Get(), m_UploadBuffer.Get(), 0, 0, 1, &subresource);
+		::UpdateSubresources(D3D::g_CommandList.Get(), m_Buffer.Get(), uploadResource.Get(), 0, 0, 1, &subresource);
+		D3D::g_CommandList->CopyResource(m_Buffer.Get(), uploadResource.Get());
 
 		// Transit resource to appropiate state.
 		switch (Usage)
@@ -65,10 +66,11 @@ namespace gfx
 			}
 		}
 
+		D3D::ExecuteCommandLists(true);
+
 		uploadHeapAllocation->Release();
 		uploadHeapAllocation = nullptr;
-
-		D3D::ExecuteCommandLists(true);
+		SAFE_RELEASE(uploadResource);
 
 		if (bSRV)
 			CreateSRV(m_Buffer.Get(), Data, m_Descriptor);
