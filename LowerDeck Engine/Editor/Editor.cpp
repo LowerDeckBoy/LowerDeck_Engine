@@ -47,6 +47,8 @@ void Editor::Initialize(Camera* pCamera, Timer* pEngineTimer)
 	m_MainViewport->Flags |= ImGuiViewportFlags_TopMost;
 	m_MainViewport->Flags |= ImGuiViewportFlags_OwnedByApp; 
 
+	LOG_INFO("LOG TESTING");
+
 }
 
 void Editor::OnFrameBegin()
@@ -101,9 +103,7 @@ void Editor::OnFrameEnd()
 	//ImGui::Text("Available size: %.2f x %.2f", avail.x, avail.y);
 	ImGui::End();
 
-	ImGui::Begin("Log", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
-	ImGui::Text("TODO");
-	ImGui::End();
+	DrawLogs();
 
 	ImGui::PopFont();
 	ImGui::EndFrame();
@@ -126,4 +126,12 @@ void Editor::Release()
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
+}
+
+void Editor::DrawLogs()
+{
+	ImGui::Begin("Logs", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
+	Logger::ClearLogs();
+	Logger::PrintAll();
+	ImGui::End();
 }

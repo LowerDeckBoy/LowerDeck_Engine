@@ -21,17 +21,6 @@ namespace model
 		int32_t EmissiveIndex			{ -1 };
 	};
 
-	// Redundant
-	// Meant for pushing constants
-	// -1 equals lack of index
-	//struct MaterialIndices
-	//{
-	//	int32_t BaseColorIndex			{ -1 };
-	//	int32_t NormalIndex				{ -1 };
-	//	int32_t MetallicRoughnessIndex	{ -1 };
-	//	int32_t EmissiveIndex			{ -1 };
-	//};
-
 	struct Mesh
 	{
 		std::string Name;

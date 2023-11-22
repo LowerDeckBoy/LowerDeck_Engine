@@ -114,6 +114,7 @@ namespace D3D
 		WaitForGPU();
 		FlushGPU();
 		::CloseHandle(g_FenceEvent);
+
 		// Despite being a std::unique_ptr Heap is released manualy.
 		// Otherwise other structs are released before Heap causing to false-positive LIVE_DESCRIPTORHEAP.
 

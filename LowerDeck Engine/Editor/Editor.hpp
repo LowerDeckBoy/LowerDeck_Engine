@@ -3,6 +3,7 @@
 #include <imgui/imgui_impl_win32.h>
 #include <imgui/imgui_impl_dx12.h>
 #include "ImGui/ImGuizmo.h"
+#include "../Engine/Core/Logger.hpp"
 
 class Camera;
 class Timer;
@@ -37,6 +38,9 @@ public:
 
 	float GetWidth() { return m_ViewportWidth; }
 	float GetHeight() { return m_ViewportHeigth; }
+
+private:
+	void DrawLogs();
 
 private:
 	/// <summary>

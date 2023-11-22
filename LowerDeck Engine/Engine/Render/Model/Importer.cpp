@@ -215,9 +215,9 @@ void Importer::ProcessMaterials(const aiScene* pScene, const aiMesh* pMesh)
 	auto& textureManager{ TextureManager::GetInstance() };
 
 	aiMaterial* material{ pScene->mMaterials[pMesh->mMaterialIndex] };
+
 	for (uint32_t i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); ++i)
 	{
-
 		aiString materialPath;
 		if (material->GetTexture(aiTextureType_DIFFUSE, i, &materialPath) == aiReturn_SUCCESS)
 		{
@@ -230,10 +230,6 @@ void Importer::ProcessMaterials(const aiScene* pScene, const aiMesh* pMesh)
 			aiColor4D colorFactor{};
 			aiGetMaterialColor(material, AI_MATKEY_BASE_COLOR, &colorFactor);
 			newMaterial->BaseColorFactor = XMFLOAT4(colorFactor.r, colorFactor.g, colorFactor.b, colorFactor.a);
-		}
-		if (material->GetTextureCount(aiTextureType_DIFFUSE) >= 0)
-		{
-			
 		}
 	}
 	
@@ -279,7 +275,7 @@ void Importer::ProcessMaterials(const aiScene* pScene, const aiMesh* pMesh)
 			newMaterial->EmissiveFactor = XMFLOAT4(colorFactor.r, colorFactor.g, colorFactor.b, colorFactor.a);
 		}
 	}
-	
+
 	aiGetMaterialFloat(material, AI_MATKEY_GLTF_ALPHACUTOFF, &newMaterial->AlphaCutoff);
 
 	m_Materials.emplace_back(newMaterial);

@@ -102,7 +102,7 @@ void Window::Show()
 
 void Window::Release()
 {
-	::UnregisterClassW(m_WindowClass, m_hInstance);
+	::UnregisterClass(m_WindowClass, m_hInstance);
 
 	if (m_hWnd)		 m_hWnd = nullptr;
 	if (m_hInstance) m_hInstance = nullptr;

@@ -145,7 +145,7 @@ OutputData PSmain(ScreenQuadOutput pin)
 		float2 specularBRDF = specularBRDFTexture.Sample(spBRDFSampler, float2(NdotV, roughness)).rg;
 		float3 specularIBL = (F0 * specularBRDF.x + specularBRDF.y) * specular;
 
-		ambientLighting = (diffuseIBL + specularIBL);
+		ambientLighting = (diffuseIBL);
 	}
 	
 	output = output / (output + float3(1.0f, 1.0f, 1.0f));

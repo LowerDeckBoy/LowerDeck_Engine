@@ -54,11 +54,13 @@ void Renderer::Initialize()
 	//m_ImageBasedLighting = std::make_unique<lde::ImageBasedLighting>("Assets/Textures/HDR/satara_night_4k.hdr");
 
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/DamagedHelmet/DamagedHelmet.gltf", "DamagedHelmet"));
+	m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/SciFiHelmet/SciFiHelmet.gltf", "SciFiHelmet"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/sponza/Sponza.gltf", "Sponza"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/MetalRoughSpheres/MetalRoughSpheres.gltf", "ballz"));
-	m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/SciFiHelmet/SciFiHelmet.gltf", "SciFiHelmet"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/cube/Cube.gltf"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/mathilda/scene.gltf"));
+	
+	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/Bistro_v5_2/Bistro_v5_2/BistroExterior.fbx", "Bistro"));
 
 	D3D::ExecuteCommandLists();
 }
