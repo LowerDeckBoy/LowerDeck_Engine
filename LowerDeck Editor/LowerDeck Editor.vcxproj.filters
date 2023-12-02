@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Editor.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -74,5 +71,8 @@
     <ClCompile Include="Dependencies\ImGui\ImGuizmo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
