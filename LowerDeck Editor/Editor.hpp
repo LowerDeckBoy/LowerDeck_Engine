@@ -1,46 +1,74 @@
 #pragma once
-#include <ImGui/imgui.h>
-#include <ImGui/imgui_impl_win32.h>
-#include <ImGui/imgui_impl_dx12.h>
-#include <vector>
-#include <string>
+#include "Dependencies/ImGui/imgui.h"
+#include "Dependencies/ImGui/imgui_impl_win32.h"
+#include "Dependencies/ImGui/imgui_impl_dx12.h"
+#include "../LowerDeck Engine/Core/Logger.hpp"
 
-class Window;
+class Camera;
 class Timer;
+class Renderer;
 
-namespace D3D { class D3D12Context; }
-
+/// <summary>
+/// <b>ImGui</b> based.
+/// </summary>
 class Editor
 {
-	Editor(D3D::D3D12Context* pD3DContext, Timer* pTimer);
+public:
+	Editor() = default;
 	~Editor();
 
-	void OnBeginFrame();
+	void Initialize(Renderer* pRenderer, Camera* pCamera, Timer* pEngineTimer);
 
-	void OnEndFrame();
+	/// <summary>
+	/// Goes after reseting commend lists.
+	/// </summary>
+	void OnFrameBegin();
+
+	/// <summary>
+	/// Goes before making Barrier Resource Transition for Present state
+	/// </summary>
+	void OnFrameEnd();
 
 	void DrawMenuBar();
 	void DrawScene();
 	void DrawHierarchy();
-	void DrawProperty();
-	void DrawContent();
-	void DrawLog();
+	void DrawProperties();
+
+
+	void Release();
+
+	//std::vector<>
+
+	float GetWidth() { return m_ViewportWidth; }
+	float GetHeight() { return m_ViewportHeigth; }
 
 private:
-	Window* m_Window{ nullptr };
-	D3D::D3D12Context* m_D3D{ nullptr };
-	Timer* m_Timer{ nullptr };
-
-
-	ImFont* m_EditorFont{ nullptr };
-	ImGuiViewport* m_EditorViewport{ nullptr };
-
-	std::vector<std::string> m_EditorLogs;
-
-	//ECS::Entity m_SelectedEntity;
-
-	void Initialize(D3D::D3D12Context* pD3DContext, Timer* pTimer);
+	void DrawLogs();
 
 private:
+	/// <summary>
+	/// Viewport area
+	/// </summary>
+	ImGuiViewport* m_MainViewport{ nullptr };
+	/// <summary>
+	/// CascadiaCode Bold by default.
+	/// </summary>
+	ImFont* m_MainFont{ nullptr };
+
+	Renderer* m_Renderer{ nullptr };
+
+	/// <summary>
+	/// Reference to Scene Camera object.
+	/// </summary>
+	Camera* m_Camera;
+	/// <summary>
+	/// Reference to Engine Timer object.
+	/// </summary>
+	Timer* m_Timer;
+
+	/// <summary>Image output Viewport width</summary>
+	float m_ViewportWidth{};
+	/// <summary>Image output Viewport height</summary>
+	float m_ViewportHeigth{};
 
 };

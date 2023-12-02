@@ -20,7 +20,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -64,15 +64,15 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(ProjectDir)Dependencies</AdditionalIncludeDirectories>
-      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies;$(ProjectDir)Dependencies</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>MinSpace</Optimization>
-      <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <FloatingPointModel>Fast</FloatingPointModel>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
-      <CompileAs>Default</CompileAs>
+      <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -86,6 +86,9 @@
       <DocumentLibraryDependencies>false</DocumentLibraryDependencies>
       <OutputFile>$(SolutionDir)Docs/XML/$(TargetName).xml</OutputFile>
     </Xdcmake>
+    <Lib>
+      <AdditionalLibraryDirectories>d3d12.lib;dxgi.lib;dxguid.lib;dinput8.lib;pdh.lib</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -104,200 +107,106 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Engine\D3D\D3D12Memory.cpp" />
-    <ClCompile Include="Engine\D3D\D3D12Adapter.cpp" />
-    <ClCompile Include="Engine\D3D\D3D12Texture.cpp" />
-    <ClCompile Include="Dependencies\ImGui\ImGuizmo.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\D3D\D3D12Buffer.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\D3D\D3D12DepthBuffer.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\D3D\D3D12RootSignature.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\D3D\D3D12PipelineState.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\D3D\D3D12Utility.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\Engine\Engine.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\Graphics\Buffer\Buffer.cpp" />
-    <ClCompile Include="Engine\Graphics\Buffer\BufferUtility.cpp" />
-    <ClCompile Include="Engine\Graphics\ImageBasedLighting.cpp" />
-    <ClCompile Include="Engine\Graphics\MipMapGenerator.cpp" />
-    <ClCompile Include="Engine\Graphics\Shader5.cpp" />
-    <ClCompile Include="Engine\Graphics\ShaderManager.cpp" />
-    <ClCompile Include="Engine\Graphics\Texture.cpp" />
-    <ClCompile Include="Engine\Graphics\TextureManager.cpp" />
-    <ClCompile Include="Engine\Graphics\TextureUtility.cpp" />
-    <ClCompile Include="Engine\Render\Camera.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Dependencies\D3D12MA\D3D12MemAlloc.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</GenerateXMLDocumentationFiles>
-      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">TurnOffAllWarnings</WarningLevel>
-    </ClCompile>
-    <ClCompile Include="Dependencies\ImGui\imgui_draw.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Dependencies\ImGui\imgui_impl_dx12.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Dependencies\ImGui\imgui_impl_win32.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Dependencies\ImGui\imgui_tables.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Dependencies\ImGui\imgui_widgets.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Editor\Editor.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\D3D\D3D12Command.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\D3D\D3D12Context.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\D3D\D3D12DescriptorHeap.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\D3D\D3D12Device.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\D3D\D3D12SwapChain.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\D3D\D3D12Viewport.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\Render\Lights\PointLights.cpp" />
-    <ClCompile Include="Engine\Render\Model\Importer.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\Render\Model\Model.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\FileSystem.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Utility.cpp" />
-    <ClCompile Include="Engine\Window\Window.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Dependencies\ImGui\imgui.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\Render\RenderPass\GBufferPass.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\Scene\GameObject.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
+    <ClCompile Include="Core\Logger.cpp" />
+    <ClCompile Include="Core\Platform.cpp" />
+    <ClCompile Include="D3D\D3D12Adapter.cpp" />
+    <ClCompile Include="D3D\D3D12Buffer.cpp" />
+    <ClCompile Include="D3D\D3D12Command.cpp" />
+    <ClCompile Include="D3D\D3D12Context.cpp" />
+    <ClCompile Include="D3D\D3D12DepthBuffer.cpp" />
+    <ClCompile Include="D3D\D3D12DescriptorHeap.cpp" />
+    <ClCompile Include="D3D\D3D12Device.cpp" />
+    <ClCompile Include="D3D\D3D12Memory.cpp" />
+    <ClCompile Include="D3D\D3D12PipelineState.cpp" />
+    <ClCompile Include="D3D\D3D12RootSignature.cpp" />
+    <ClCompile Include="D3D\D3D12SwapChain.cpp" />
+    <ClCompile Include="D3D\D3D12Texture.cpp" />
+    <ClCompile Include="D3D\D3D12Utility.cpp" />
+    <ClCompile Include="D3D\D3D12Viewport.cpp" />
+    <ClCompile Include="ECS\World.cpp" />
+    <ClCompile Include="Graphics\Buffer\Buffer.cpp" />
+    <ClCompile Include="Graphics\Buffer\BufferUtility.cpp" />
+    <ClCompile Include="Graphics\ImageBasedLighting.cpp" />
+    <ClCompile Include="Graphics\MipMapGenerator.cpp" />
+    <ClCompile Include="Graphics\Shader5.cpp" />
+    <ClCompile Include="Graphics\ShaderManager.cpp" />
+    <ClCompile Include="Graphics\Texture.cpp" />
+    <ClCompile Include="Graphics\TextureManager.cpp" />
+    <ClCompile Include="Graphics\TextureUtility.cpp" />
     <ClCompile Include="Input\CameraInput.cpp" />
-    <ClCompile Include="Engine\Core\Logger.cpp" />
-    <ClCompile Include="Engine\Render\RenderPass\LightPass.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Engine\Engine\Renderer.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\ECS\World.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\Render\ScreenOutput.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\Scene\Scene.cpp">
-      <GenerateXMLDocumentationFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateXMLDocumentationFiles>
-    </ClCompile>
-    <ClCompile Include="Engine\Render\Lights\PointLight.cpp" />
-    <ClCompile Include="Engine\Utility\Math.cpp" />
-    <ClCompile Include="Engine\Core\Platform.cpp" />
+    <ClCompile Include="Render\Camera.cpp" />
+    <ClCompile Include="Render\Lights\PointLight.cpp" />
+    <ClCompile Include="Render\Lights\PointLights.cpp" />
+    <ClCompile Include="Render\Model\Importer.cpp" />
+    <ClCompile Include="Render\Model\Model.cpp" />
+    <ClCompile Include="Render\Renderer.cpp" />
+    <ClCompile Include="Render\RenderPass\GBufferPass.cpp" />
+    <ClCompile Include="Render\RenderPass\LightPass.cpp" />
+    <ClCompile Include="Render\ScreenOutput.cpp" />
+    <ClCompile Include="Scene\GameObject.cpp" />
+    <ClCompile Include="Scene\Scene.cpp" />
+    <ClCompile Include="Utility\FileSystem.cpp" />
+    <ClCompile Include="Utility\Math.cpp" />
+    <ClCompile Include="Utility\Utility.cpp" />
+    <ClCompile Include="Dependencies\D3D12MA\D3D12MemAlloc.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Engine\D3D\D3D12Memory.hpp" />
-    <ClInclude Include="Engine\D3D\D3D12Adapter.hpp" />
-    <ClInclude Include="Engine\D3D\D3D12Texture.hpp" />
-    <ClInclude Include="Dependencies\ImGui\ImGuizmo.h" />
-    <ClInclude Include="Dependencies\stb\stb_image.h" />
-    <ClInclude Include="Engine\D3D\D3D12Buffer.hpp" />
-    <ClInclude Include="Dependencies\EnTT\entt.hpp" />
-    <ClInclude Include="Engine\ECS\Entity.hpp" />
-    <ClInclude Include="Engine\D3D\D3D12DepthBuffer.hpp" />
-    <ClInclude Include="Engine\D3D\D3D12RootSignature.hpp" />
-    <ClInclude Include="Engine\D3D\D3D12PipelineState.hpp" />
-    <ClInclude Include="Engine\D3D\D3D12Descriptor.hpp" />
-    <ClInclude Include="Engine\ECS\Component.hpp" />
-    <ClInclude Include="Engine\Engine\Engine.hpp" />
-    <ClInclude Include="Engine\Graphics\Buffer\Buffer.hpp" />
-    <ClInclude Include="Engine\Graphics\Buffer\BufferUtility.hpp" />
-    <ClInclude Include="Engine\Graphics\Buffer\ConstantBuffer.hpp" />
-    <ClInclude Include="Engine\Graphics\Buffer\ConstantTypes.hpp" />
-    <ClInclude Include="Engine\Graphics\Buffer\Vertex.hpp" />
-    <ClInclude Include="Engine\Graphics\ImageBasedLighting.hpp" />
-    <ClInclude Include="Engine\Graphics\MipMapGenerator.hpp" />
-    <ClInclude Include="Engine\Graphics\Shader.hpp" />
-    <ClInclude Include="Engine\Graphics\Shader5.hpp" />
-    <ClInclude Include="Engine\Graphics\ShaderManager.hpp" />
-    <ClInclude Include="Engine\Graphics\Texture.hpp" />
-    <ClInclude Include="Engine\Graphics\TextureManager.hpp" />
-    <ClInclude Include="Engine\Graphics\TextureUtility.hpp" />
-    <ClInclude Include="Engine\Render\Camera.hpp" />
+    <ClInclude Include="Core\Logger.hpp" />
+    <ClInclude Include="Core\Platform.hpp" />
+    <ClInclude Include="D3D\D3D12Adapter.hpp" />
+    <ClInclude Include="D3D\D3D12Buffer.hpp" />
+    <ClInclude Include="D3D\D3D12Command.hpp" />
+    <ClInclude Include="D3D\D3D12Context.hpp" />
+    <ClInclude Include="D3D\D3D12DepthBuffer.hpp" />
+    <ClInclude Include="D3D\D3D12Descriptor.hpp" />
+    <ClInclude Include="D3D\D3D12DescriptorHeap.hpp" />
+    <ClInclude Include="D3D\D3D12Device.hpp" />
+    <ClInclude Include="D3D\D3D12Memory.hpp" />
+    <ClInclude Include="D3D\D3D12PipelineState.hpp" />
+    <ClInclude Include="D3D\D3D12RootSignature.hpp" />
+    <ClInclude Include="D3D\D3D12SwapChain.hpp" />
+    <ClInclude Include="D3D\D3D12Texture.hpp" />
+    <ClInclude Include="D3D\D3D12Types.hpp" />
+    <ClInclude Include="D3D\D3D12Utility.hpp" />
+    <ClInclude Include="D3D\D3D12Viewport.hpp" />
     <ClInclude Include="Dependencies\D3D12MA\D3D12MemAlloc.h" />
-    <ClInclude Include="Dependencies\d3dx12.h" />
-    <ClInclude Include="Dependencies\ImGui\imconfig.h" />
-    <ClInclude Include="Dependencies\ImGui\imgui_impl_dx12.h" />
-    <ClInclude Include="Dependencies\ImGui\imgui_impl_win32.h" />
-    <ClInclude Include="Dependencies\ImGui\imgui_internal.h" />
-    <ClInclude Include="Dependencies\ImGui\imstb_rectpack.h" />
-    <ClInclude Include="Dependencies\ImGui\imstb_textedit.h" />
-    <ClInclude Include="Dependencies\ImGui\imstb_truetype.h" />
-    <ClInclude Include="Editor\Editor.hpp" />
-    <ClInclude Include="Engine\D3D\D3D12Command.hpp" />
-    <ClInclude Include="Engine\D3D\D3D12Context.hpp" />
-    <ClInclude Include="Engine\D3D\D3D12DescriptorHeap.hpp" />
-    <ClInclude Include="Engine\D3D\D3D12Device.hpp" />
-    <ClInclude Include="Engine\D3D\D3D12SwapChain.hpp" />
-    <ClInclude Include="Engine\D3D\D3D12Types.hpp" />
-    <ClInclude Include="Engine\D3D\D3D12Utility.hpp" />
-    <ClInclude Include="Engine\D3D\D3D12Viewport.hpp" />
-    <ClInclude Include="Engine\Render\Lights.hpp" />
-    <ClInclude Include="Engine\Render\Lights\PointLights.hpp" />
-    <ClInclude Include="Engine\Render\Model\Importer.hpp" />
-    <ClInclude Include="Engine\Render\Model\Mesh.hpp" />
-    <ClInclude Include="Engine\Render\Model\Meshlet.hpp" />
-    <ClInclude Include="Engine\Render\Model\Model.hpp" />
-    <ClInclude Include="Engine\Utility\FileSystem.hpp" />
-    <ClInclude Include="Engine\Utility\MemoryUsage.hpp" />
-    <ClInclude Include="Engine\Utility\Singleton.hpp" />
-    <ClInclude Include="Engine\Utility\Timer.hpp" />
-    <ClInclude Include="Engine\Utility\TimeUtility.hpp" />
-    <ClInclude Include="Engine\Utility\Utility.hpp" />
-    <ClInclude Include="Engine\Window\Window.hpp" />
-    <ClInclude Include="Dependencies\ImGui\imgui.h" />
-    <ClInclude Include="Engine\Render\RenderPass\GBufferPass.hpp" />
-    <ClInclude Include="Engine\Scene\GameObject.hpp" />
+    <ClInclude Include="ECS\Component.hpp" />
+    <ClInclude Include="ECS\Entity.hpp" />
+    <ClInclude Include="ECS\World.hpp" />
+    <ClInclude Include="Graphics\Buffer\Buffer.hpp" />
+    <ClInclude Include="Graphics\Buffer\BufferUtility.hpp" />
+    <ClInclude Include="Graphics\Buffer\ConstantBuffer.hpp" />
+    <ClInclude Include="Graphics\Buffer\ConstantTypes.hpp" />
+    <ClInclude Include="Graphics\Buffer\Vertex.hpp" />
+    <ClInclude Include="Graphics\ImageBasedLighting.hpp" />
+    <ClInclude Include="Graphics\MipMapGenerator.hpp" />
+    <ClInclude Include="Graphics\Shader.hpp" />
+    <ClInclude Include="Graphics\Shader5.hpp" />
+    <ClInclude Include="Graphics\ShaderManager.hpp" />
+    <ClInclude Include="Graphics\Texture.hpp" />
+    <ClInclude Include="Graphics\TextureManager.hpp" />
+    <ClInclude Include="Graphics\TextureUtility.hpp" />
+    <ClInclude Include="Render\Camera.hpp" />
+    <ClInclude Include="Render\Lights.hpp" />
+    <ClInclude Include="Render\Lights\PointLight.hpp" />
+    <ClInclude Include="Render\Lights\PointLights.hpp" />
+    <ClInclude Include="Render\Model\Importer.hpp" />
+    <ClInclude Include="Render\Model\Mesh.hpp" />
+    <ClInclude Include="Render\Model\Meshlet.hpp" />
+    <ClInclude Include="Render\Model\Model.hpp" />
+    <ClInclude Include="Render\Renderer.hpp" />
+    <ClInclude Include="Render\RenderPass\GBufferPass.hpp" />
+    <ClInclude Include="Render\RenderPass\LightPass.hpp" />
+    <ClInclude Include="Render\ScreenOutput.hpp" />
+    <ClInclude Include="Scene\GameObject.hpp" />
+    <ClInclude Include="Scene\Scene.hpp" />
+    <ClInclude Include="Utility\FileSystem.hpp" />
+    <ClInclude Include="Utility\Math.hpp" />
+    <ClInclude Include="Utility\MemoryUsage.hpp" />
+    <ClInclude Include="Utility\Singleton.hpp" />
+    <ClInclude Include="Utility\TimeUtility.hpp" />
+    <ClInclude Include="Utility\Utility.hpp" />
     <ClInclude Include="Input\CameraInput.hpp" />
-    <ClInclude Include="Engine\Engine\Renderer.hpp" />
-    <ClInclude Include="Engine\ECS\World.hpp" />
-    <ClInclude Include="Engine\Render\ScreenOutput.hpp" />
-    <ClInclude Include="Engine\Scene\Scene.hpp" />
-    <ClInclude Include="Engine\Core\Logger.hpp" />
-    <ClInclude Include="Engine\Render\Lights\PointLight.hpp" />
-    <ClInclude Include="Engine\Render\RenderPass\LightPass.hpp" />
-    <ClInclude Include="Engine\Utility\Math.hpp" />
-    <ClInclude Include="Engine\Core\Platform.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -399,6 +308,5 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.Direct3D.D3D12.1.611.1\build\native\Microsoft.Direct3D.D3D12.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.D3D12.1.611.0\build\native\Microsoft.Direct3D.D3D12.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Direct3D.D3D12.1.611.1\build\native\Microsoft.Direct3D.D3D12.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.D3D12.1.611.0\build\native\Microsoft.Direct3D.D3D12.targets'))" />
-
   </Target>
 </Project>
