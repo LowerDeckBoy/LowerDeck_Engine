@@ -1,7 +1,7 @@
-#include "../Engine/Render/Camera.hpp"
+#include "../Render/Camera.hpp"
 #include "CameraInput.hpp"
-#include "../Engine/Window/Window.hpp"
-#include "../Engine/Utility/Utility.hpp"
+#include "../LowerDeck/Window.hpp"
+#include "../Utility/Utility.hpp"
 
 void CameraInput::Initialize()
 {
