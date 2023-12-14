@@ -10,32 +10,18 @@
 <!--/TOC-->
 
 ## **Overview**
-**WIP** - calling it *engine* at this point is an overstatement.
 
-Restructured and improved version of my other project: [**DirectX 12 Rendering**](https://github.com/LowerDeckBoy/DirectX-12-Rendering).
-
-Current goals are focused more on ECS based graphics pipeline workflow for hybrid rendering path rather then graphics techniques.
-
+Personal sandbox project for tinkering with DirectX 12.
 
 ## **Features**
-- [x] **Deferred Rendering**:
-    - [ ] Tile-Based 
-- [x] **Bindless Resources**:
-    - [x] Textures
-    - [x] Buffers
-- [ ] **DXR**:
-    - [ ] Raytraced Shadows
-    - [ ] Raytraced Ambient Occlusion
-    - [ ] Raytraced Reflections
+- [x] **Deferred Rendering**
+- [x] **Bindless Resources**
 - [x] **Shaders**:
     - [x] **SM6.x** support - **default**
     - [x] **SM5.x** support
-- [ ] **Mesh Shading**:
-    - [ ] Meshlets
-    - [ ] Amplification/Tesselation
 - [x] **Image Based Lighting**:
     - [x] Diffuse
-    - [ ] Specular
+    - [ ] Specular - WIP
 - [ ] **Physically Based Rendering**:
     - [x] Epic's UE4 PBR Model
     - [ ] Disney's PBR
@@ -43,10 +29,7 @@ Current goals are focused more on ECS based graphics pipeline workflow for hybri
 - [ ] **Model loading**:
     - [x] glTF 2.0
     - [ ] glb
-    - [ ] fbx
-- [ ] **Physics**:
-    - [ ] *PhysX*
-- [ ] **Particle System**
+    - [x] fbx
 
 
 ## **Built with**
