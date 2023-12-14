@@ -2,12 +2,12 @@
 #include <d3d12.h>
 #include <wrl/client.h>
 
-class D3D12Viewport;
-class D3D12Descriptor;
-class D3D12DescriptorHeap;
-
 namespace D3D
 {
+	class D3D12Viewport;
+	class D3D12Descriptor;
+	class D3D12DescriptorHeap;
+
 	/// <summary>
 	/// Holds <c>ID3D12Resource ComPtr</c> for DepthStencil usage.
 	/// </summary>

@@ -76,9 +76,9 @@ OutputData PSmain(ScreenQuadOutput pin)
 	// pow 2.2 for gamma correction
 	float4 baseColor	= pow(gbufferBaseColor.Load(int3(position, 0)), 2.2f);
 	//float4 baseColor	= gbufferBaseColor.Load(int3(position, 0));
-	float4 normal		= gbufferNormal.Load(int3(position, 0));
+	float4 normal		= normalize(gbufferNormal.Load(int3(position, 0)));
 	float metalness		= gbufferMetallic.Load(int3(position, 0)).b;
-	float roughness		= gbufferMetallic.Load(int3(position, 0)).g;
+	float roughness		= max(0.01f, gbufferMetallic.Load(int3(position, 0)).g);
 	float4 positions	= gbufferPositions.Load(int3(position, 0));
 
 	float3 N = normal.rgb;
@@ -145,7 +145,7 @@ OutputData PSmain(ScreenQuadOutput pin)
 		float2 specularBRDF = specularBRDFTexture.Sample(spBRDFSampler, float2(NdotV, roughness)).rg;
 		float3 specularIBL = (F0 * specularBRDF.x + specularBRDF.y) * specular;
 
-		ambientLighting = (diffuseIBL);
+		ambientLighting = (diffuseIBL + specularIBL);
 	}
 	
 	output = output / (output + float3(1.0f, 1.0f, 1.0f));

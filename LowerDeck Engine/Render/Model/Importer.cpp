@@ -31,14 +31,15 @@ Importer::~Importer()
 bool Importer::Import(std::string_view Filepath)
 {
 	Assimp::Importer importer;
+	// |
+	// aiProcess_CalcTangentSpace |
+	// aiProcess_GenSmoothNormals
 	const auto loadFlags{  
 		aiProcess_Triangulate |
 		aiProcess_ConvertToLeftHanded |
 		aiProcess_JoinIdenticalVertices |
 		aiProcess_PreTransformVertices |
-		aiProcess_ValidateDataStructure |
-		aiProcess_CalcTangentSpace |
-		aiProcess_GenSmoothNormals
+		aiProcess_ValidateDataStructure
 	};
 	importer.SetExtraVerbose(true);
 	const aiScene* scene{ importer.ReadFile(Filepath.data(), loadFlags) };

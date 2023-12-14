@@ -9,6 +9,7 @@ namespace D3D
 		m_Format = Format;
 		Create(pDepthHeap, pViewport, bSRV);
 	}
+
 	D3D12DepthBuffer::~D3D12DepthBuffer()
 	{
 		Release();

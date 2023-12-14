@@ -134,6 +134,7 @@
     <ClCompile Include="Graphics\TextureManager.cpp" />
     <ClCompile Include="Graphics\TextureUtility.cpp" />
     <ClCompile Include="Input\CameraInput.cpp" />
+    <ClCompile Include="Managers\AssetManager.cpp" />
     <ClCompile Include="Render\Camera.cpp" />
     <ClCompile Include="Render\Lights\PointLight.cpp" />
     <ClCompile Include="Render\Lights\PointLights.cpp" />
@@ -257,6 +258,7 @@
     <ClInclude Include="Engine\Render\RenderPass\LightPass.hpp" />
     <ClInclude Include="Engine\Utility\Math.hpp" />
     <ClInclude Include="Engine\Core\Platform.hpp" />
+    <ClInclude Include="Managers\AssetManager.hpp" />
     <ClInclude Include="Render\Camera.hpp" />
     <ClInclude Include="Render\Lights.hpp" />
     <ClInclude Include="Render\Lights\PointLight.hpp" />
@@ -270,6 +272,8 @@
     <ClInclude Include="Render\RenderPass\LightPass.hpp" />
     <ClInclude Include="Render\ScreenOutput.hpp" />
     <ClInclude Include="Scene\GameObject.hpp" />
+    <ClInclude Include="Scene\Model\Actor.hpp" />
+    <ClInclude Include="Scene\Model\Model.hpp" />
     <ClInclude Include="Scene\Scene.hpp" />
     <ClInclude Include="Utility\FileSystem.hpp" />
     <ClInclude Include="Utility\Math.hpp" />

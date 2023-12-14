@@ -1,5 +1,7 @@
 #pragma once
 #include <DirectXMath.h>
+#include <array>
+#include <string>
 
 // TODO:
 namespace ecs
@@ -9,40 +11,60 @@ namespace ecs
 		
 	}
 
-	/// <summary>
-	/// Transform matrix
-	/// </summary>
+	struct TagComponent
+	{
+		std::string Name{ "Empty" };
+		TagComponent() = default;
+		TagComponent(const TagComponent&) = default;
+		TagComponent(const std::string& Tag) : Name(Tag) {}
+	};
+
 	struct TransformComponent
 	{
-		DirectX::XMFLOAT4X4 Transform;
-		operator const DirectX::XMFLOAT4X4& () { return Transform; }
+		TransformComponent() = default;
+		TransformComponent(DirectX::XMFLOAT3 Position)
+			: Translation(Position)
+		{
+		}
+
+		DirectX::XMFLOAT3 Translation	{ DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f) };
+		DirectX::XMFLOAT3 Rotation		{ DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f) };
+		DirectX::XMFLOAT3 Scale			{ DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f) };
+
+		DirectX::XMFLOAT3& GetTranslation()
+		{
+			return Translation;
+		}
 	};
 
-	/// <summary>
-	/// XYZ 
-	/// </summary>
-	struct TranslationComponent
+	struct PositionComponent
 	{
-		DirectX::XMFLOAT3 Translation;
-		operator const DirectX::XMFLOAT3&() { return Translation; }
+		PositionComponent() = default;
+		PositionComponent(DirectX::XMFLOAT3 Position) 
+			: Position(Position) { }
+		
+		DirectX::XMFLOAT3 Position{ DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f) };
 	};
 
-	/// <summary>
-	/// XYZW
-	/// </summary>
-	struct RotationComponent
+	struct ColorComponent
 	{
-		DirectX::XMFLOAT4 Rotation;
-		operator const DirectX::XMFLOAT4& () { return Rotation; }
+		//DirectX::XMFLOAT4 Color{ DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) };
+		std::array<float, 4> Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+		
 	};
 
-	/// <summary>
-	/// XYZ
-	/// </summary>
-	struct ScaleComponent
+	struct DirectionalLightComponent
 	{
-		DirectX::XMFLOAT3 Scale;
-		operator const DirectX::XMFLOAT3& () { return Scale; }
+		DirectX::XMFLOAT3 Direction;
+		std::array<float, 4> Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+	};
+
+	struct PointLightComponent
+	{
+		DirectX::XMFLOAT4 Position;
+		//DirectX::XMFLOAT4 Color{ DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) };
+		std::array<float, 4> Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+		float Radius{ 25.0f };
 	};
 
 }

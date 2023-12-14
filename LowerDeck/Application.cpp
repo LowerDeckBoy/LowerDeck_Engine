@@ -22,10 +22,11 @@ void Application::Initialize()
 	m_SceneCameraInputs = std::make_shared<CameraInput>();
 	m_SceneCameraInputs->Initialize();
 
+	m_Scene = new Scene();
 	m_Renderer = std::make_unique<Renderer>(m_D3D12Context, m_SceneCamera.get());
 
 	m_Editor = std::make_shared<Editor>();
-	m_Editor->Initialize(m_Renderer.get(), m_SceneCamera.get(), m_AppTimer.get());
+	m_Editor->Initialize(m_Renderer.get(), m_Scene, m_SceneCamera.get(), m_AppTimer.get());
 
 }
 

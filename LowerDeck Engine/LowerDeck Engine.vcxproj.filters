@@ -141,6 +141,9 @@
     <ClCompile Include="Input\CameraInput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Managers\AssetManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Input\CameraInput.hpp">
@@ -519,6 +522,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Utility\Utility.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Managers\AssetManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Model\Model.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Model\Actor.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

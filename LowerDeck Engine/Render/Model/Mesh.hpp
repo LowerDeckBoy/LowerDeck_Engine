@@ -10,7 +10,7 @@ namespace model
 		DirectX::XMFLOAT4 BaseColorFactor{ DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) };
 		DirectX::XMFLOAT4 EmissiveFactor { DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) };
 
-		float MetallicFactor	{ 1.0f };
+		float MetallicFactor	{ 0.0f };
 		float RoughnessFactor	{ 1.0f };
 		float AlphaCutoff		{ 0.5f };
 		alignas(4) bool bDoubleSided{ false };

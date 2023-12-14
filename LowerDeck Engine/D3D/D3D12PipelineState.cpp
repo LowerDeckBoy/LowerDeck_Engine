@@ -45,6 +45,7 @@ namespace D3D
 		desc.RasterizerState = m_RasterizerDesc;
 		desc.RasterizerState.CullMode = m_CullMode;
 		desc.RasterizerState.FillMode = m_FillMode;
+		desc.RasterizerState.MultisampleEnable = TRUE;
 
 		// Depth State
 		desc.DepthStencilState = m_DepthDesc;

@@ -2,7 +2,6 @@
 #include <cstdlib>
 #include <cassert>
 
-#include <dwmapi.h>
 #pragma comment(lib, "dwmapi")
 
 HINSTANCE Window::m_hInstance = nullptr;
@@ -73,8 +72,8 @@ bool Window::Initialize()
 
 	try
 	{
-		const BOOL bDarkMode{ TRUE };
-		::DwmSetWindowAttribute(m_hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &bDarkMode, sizeof(bDarkMode));
+		//const BOOL bDarkMode{ TRUE };
+		//::DwmSetWindowAttribute(m_hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &bDarkMode, sizeof(bDarkMode));
 
 		
 	}
@@ -90,8 +89,8 @@ bool Window::Initialize()
 
 void Window::Show()
 {
-	COLORREF captionColor{ RGB(32, 32, 32) };
-	DwmSetWindowAttribute(m_hWnd, DWMWA_CAPTION_COLOR, &captionColor, sizeof(captionColor));
+	//COLORREF captionColor{ RGB(32, 32, 32) };
+	//DwmSetWindowAttribute(m_hWnd, DWMWA_CAPTION_COLOR, &captionColor, sizeof(captionColor));
 
 	::ShowWindow(m_hWnd, SW_SHOW);
 	::SetForegroundWindow(m_hWnd);

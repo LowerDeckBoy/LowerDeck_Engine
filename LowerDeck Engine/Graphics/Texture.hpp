@@ -36,6 +36,9 @@ public:
 
 	DXGI_FORMAT Format{ DXGI_FORMAT_R8G8B8A8_UNORM };
 	D3D12_RESOURCE_DESC Desc{};
+
 private:
+	// For serialization purposes
+	std::string m_Filepath;
 
 };

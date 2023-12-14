@@ -1,39 +1,50 @@
 #pragma once
 #include "../ECS/World.hpp"
+#include "../ECS/Entity.hpp"
 #include <vector>
 #include <memory>
 
 class Camera;
 class Model;
 
-namespace lde
-{
-
-}
 
 class Scene
 {
 public:
-	Scene(Camera* pCamera);
-	Scene(const Scene&) = delete;
-	Scene(const Scene&&) = delete;
-	/// <summary>
-	/// Self cleanup.
-	/// </summary>
+	Scene();
 	~Scene();
 
 	void Initialize();
-	void LoadAssets();
+	//void DrawScene(ECS::World& World);
 
-	void Update();
-	void Draw();
+	// TODO:
+	// Serialize
 
-	void Release();
-	
+	ecs::World* World()
+	{
+		return m_World;
+	}
+
+	entt::registry* Registry() const
+	{
+		return m_World->Registry();
+	}
+
+	inline ecs::Entity NewEntity()
+	{
+		return ecs::Entity(m_World, m_World->CreateEntity());
+	}
+
+	std::shared_ptr<Camera> Camera;
+
+	// Scene light data
+	ecs::Entity DirectionalLight;
+	std::vector<ecs::Entity> PointLights;
+
+
+	//ECS::Entity m_CameraEntity;
+	std::string SceneName{ "Default scene" };
 private:
-	std::unique_ptr<ecs::World> m_World;
-
-	Camera* m_SceneCamera{ nullptr };
-
-	std::vector<std::unique_ptr<Model>> m_Models;
+	/// @brief World to draw objects from
+	ecs::World* m_World;
 };

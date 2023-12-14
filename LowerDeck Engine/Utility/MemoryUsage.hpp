@@ -27,7 +27,7 @@ namespace utility
 			if (!::GlobalMemoryStatusEx(&mem))
 				return -1.0f;
 
-			return static_cast<float>(pcmex.PrivateUsage / (1024.0f * 1024.0f));
+			return static_cast<float>(pcmex.WorkingSetSize / (1024.0f * 1024.0f));
 		}
 	};
 }

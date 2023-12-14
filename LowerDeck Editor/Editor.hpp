@@ -3,6 +3,8 @@
 #include "Dependencies/ImGui/imgui_impl_win32.h"
 #include "Dependencies/ImGui/imgui_impl_dx12.h"
 #include "../LowerDeck Engine/Core/Logger.hpp"
+#include "../LowerDeck Engine/ECS/Entity.hpp"
+#include "../LowerDeck Engine/Scene/Scene.hpp"
 
 class Camera;
 class Timer;
@@ -17,7 +19,7 @@ public:
 	Editor() = default;
 	~Editor();
 
-	void Initialize(Renderer* pRenderer, Camera* pCamera, Timer* pEngineTimer);
+	void Initialize(Renderer* pRenderer, Scene* pScene, Camera* pCamera, Timer* pEngineTimer);
 
 	/// <summary>
 	/// Goes after reseting commend lists.
@@ -32,18 +34,24 @@ public:
 	void DrawMenuBar();
 	void DrawScene();
 	void DrawHierarchy();
-	void DrawProperties();
-
+	void DrawPropertyPanel();
 
 	void Release();
 
 	//std::vector<>
 
-	float GetWidth() { return m_ViewportWidth; }
-	float GetHeight() { return m_ViewportHeigth; }
-
 private:
 	void DrawLogs();
+
+	void DrawNode(ecs::Entity& Entity);
+
+	void DrawComponentsData(ecs::Entity& Entity);
+
+	template<typename T, typename UI>
+	void DrawProperties(ecs::Entity& Entity, UI ui);
+
+	void DrawFloat3(std::string Label, DirectX::XMFLOAT3& Float3, float ResetValue = 0.0f);
+	void DrawFloat4(std::string Label, DirectX::XMFLOAT4& Float4, float ResetValue = 0.0f);
 
 private:
 	/// <summary>
@@ -56,6 +64,8 @@ private:
 	ImFont* m_MainFont{ nullptr };
 
 	Renderer* m_Renderer{ nullptr };
+	Scene* m_Scene{ nullptr };
+	ecs::Entity m_SelectedEntity;
 
 	/// <summary>
 	/// Reference to Scene Camera object.
@@ -65,10 +75,5 @@ private:
 	/// Reference to Engine Timer object.
 	/// </summary>
 	Timer* m_Timer;
-
-	/// <summary>Image output Viewport width</summary>
-	float m_ViewportWidth{};
-	/// <summary>Image output Viewport height</summary>
-	float m_ViewportHeigth{};
 
 };

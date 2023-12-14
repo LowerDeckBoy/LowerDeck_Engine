@@ -23,9 +23,11 @@ DeferredOutput VSmain(uint VertexID : SV_VertexID)
 	output.Position		  = mul(WVP, float4(vertex.Position, 1.0f));
 	output.WorldPosition  = mul(World, float4(vertex.Position, 1.0f));
 	output.TexCoord		  = vertex.TexCoord;
-	output.Normal		  = normalize(mul((float3x3) World, vertex.Normal));
-	output.Tangent		  = normalize(mul((float3x3) World, vertex.Tangent));
-	output.Bitangent	  = normalize(mul((float3x3) World, vertex.Bitangent));
+	output.Normal		  = normalize(mul((float3x3)World, vertex.Normal));
+	output.Tangent		  = normalize(mul((float3x3)World, vertex.Tangent));
+	output.Bitangent	  = normalize(mul((float3x3)World, vertex.Bitangent));
+	float3x3 TBN = float3x3(vertex.Tangent, vertex.Bitangent, vertex.Normal);
+	output.TBN = mul((float3x3)World, transpose(TBN));
 	
 	return output;
 }
@@ -55,12 +57,15 @@ GBufferOutput PSmain(DeferredOutput pin)
 	if (Material.NormalIndex > INVALID_INDEX)
 	{
 		Texture2D<float4> normalTexture = ResourceDescriptorHeap[Material.NormalIndex];
-		float4 normalMap = normalize(2.0f * normalTexture.Sample(texSampler, pin.TexCoord) - 1.0f);
+		float4 normalMap = normalize(2.0f * normalTexture.Sample(texSampler, pin.TexCoord) - float4(1.0f, 1.0f, 1.0f, 1.0f));
 		float3 tangent = normalize(pin.Tangent - dot(pin.Tangent, pin.Normal) * pin.Normal);
 		float3 bitangent = cross(pin.Normal, tangent);
-		float3x3 texSpace = float3x3(tangent, bitangent, pin.Normal);
-		//normalMap.w
-		output.Normal = float4(normalize(mul(normalMap.xyz, texSpace)), normalMap.w);
+		//float3x3 TBN = float3x3(tangent, bitangent, pin.Normal);
+		float3x3 TBN = float3x3(pin.Tangent, pin.Bitangent, pin.Normal);
+
+		//output.Normal = float4(normalize(mul(TBN, normalMap.xyz)), normalMap.w);
+		output.Normal = float4(normalize(mul(pin.TBN, normalMap.xyz)), normalMap.w);
+		//output.Normal = float4(normalize(mul(pin.TBN, (normalMap.xyz * 0.5f + 0.5f))), 1.0f);
 	}
 	else
 	{

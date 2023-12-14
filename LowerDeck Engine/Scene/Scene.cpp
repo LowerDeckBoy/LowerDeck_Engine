@@ -1,41 +1,32 @@
 #include "../Render/Camera.hpp"
 #include "../Render/Model/Model.hpp"
 #include "Scene.hpp"
+#include "../ECS/Entity.hpp"
 
 
-Scene::Scene(Camera* pCamera) :
-	m_SceneCamera(pCamera)
+Scene::Scene()
 {
 	Initialize();
 }
 
 Scene::~Scene()
 {
-	Release();
+	delete m_World;
 }
 
 void Scene::Initialize()
 {
-	LoadAssets();
-}
+	m_World = new ecs::World();
 
-void Scene::LoadAssets()
-{
-}
-
-void Scene::Update()
-{
-}
-
-void Scene::Draw()
-{
-}
-
-void Scene::Release()
-{
-	for (auto& model : m_Models)
+	for (uint32_t i = 0; i < 4; i++)
 	{
-		model.reset();
-		model = nullptr;
+		ecs::Entity e(m_World, m_World->CreateEntity());
+		e.AddComponent<ecs::TagComponent>("Point Light " + std::to_string(i));
+		e.AddComponent<ecs::PointLightComponent>();
+		PointLights.emplace_back(e);
 	}
+	DirectionalLight.Create(m_World);
+	DirectionalLight.AddComponent<ecs::TagComponent>("Directional Light");
+	DirectionalLight.AddComponent<ecs::DirectionalLightComponent>();
+
 }

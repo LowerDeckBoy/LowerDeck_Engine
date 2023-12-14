@@ -3,6 +3,7 @@
 #include "../LowerDeck Engine/Render/Camera.hpp"
 #include "../LowerDeck Engine/Input/CameraInput.hpp"
 #include "../LowerDeck Engine/Render/Renderer.hpp"
+#include "../LowerDeck Engine/Scene/Scene.hpp"
 #include "Editor.hpp"
 #include "Timer.hpp"
 //#include "../D3D/D3D12Context.hpp"
@@ -34,6 +35,7 @@ private:
 	std::shared_ptr<Editor>				m_Editor;
 	std::shared_ptr<D3D::D3D12Context>	m_D3D12Context;
 	std::unique_ptr<Renderer>			m_Renderer;
+	Scene* m_Scene{ nullptr };
 
 
 };

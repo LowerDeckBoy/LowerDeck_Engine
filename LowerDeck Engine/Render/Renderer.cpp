@@ -48,14 +48,16 @@ void Renderer::Initialize()
 
 	m_PointLights = std::make_unique<PointLights>();
 
+	//PointLightComps.emplace_back(ecs::Entity());
 
 	m_ImageBasedLighting = std::make_unique<lde::ImageBasedLighting>("Assets/Textures/HDR/newport_loft.hdr");
 	//m_ImageBasedLighting = std::make_unique<lde::ImageBasedLighting>("Assets/Textures/HDR/environment.hdr");
+	//m_ImageBasedLighting = std::make_unique<lde::ImageBasedLighting>("Assets/Textures/HDR/kloppenheim_06_puresky_4k.hdr");
 	//m_ImageBasedLighting = std::make_unique<lde::ImageBasedLighting>("Assets/Textures/HDR/satara_night_4k.hdr");
 
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/DamagedHelmet/DamagedHelmet.gltf", "DamagedHelmet"));
-	m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/SciFiHelmet/SciFiHelmet.gltf", "SciFiHelmet"));
-	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/sponza/Sponza.gltf", "Sponza"));
+	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/SciFiHelmet/SciFiHelmet.gltf", "SciFiHelmet"));
+	m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/sponza/Sponza.gltf", "Sponza"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/MetalRoughSpheres/MetalRoughSpheres.gltf", "ballz"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/cube/Cube.gltf"));
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/mathilda/scene.gltf"));
@@ -63,6 +65,7 @@ void Renderer::Initialize()
 	//m_Models.emplace_back(std::make_unique<Model>("Assets/glTF/Bistro_v5_2/Bistro_v5_2/BistroExterior.fbx", "Bistro"));
 
 	D3D::ExecuteCommandLists();
+
 }
 
 void Renderer::RecordCommandLists()
@@ -92,7 +95,7 @@ void Renderer::RecordCommandLists()
 	
 		D3D::g_CommandList.Get()->SetGraphicsRootConstantBufferView(0, m_cbCamera->GetBuffer()->GetGPUVirtualAddress());
 		D3D::g_CommandList.Get()->SetGraphicsRootConstantBufferView(3, m_PointLights->m_cbPointLights->GetBuffer()->GetGPUVirtualAddress());
-	
+		//D3D::g_CommandList.Get()->SetGraphicsRoot32BitConstants()
 		m_DeferredOutput->Draw();
 	
 		D3D::TransitResource(m_DepthStencil->Get(), D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_DEPTH_WRITE);

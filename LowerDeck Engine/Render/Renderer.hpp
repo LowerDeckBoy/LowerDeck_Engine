@@ -22,6 +22,9 @@
 
 #include "../Graphics/MipMapGenerator.hpp"
 
+#include "../ECS/Component.hpp"
+#include "../ECS/Entity.hpp"
+
 
 class Camera;
 class Editor;
@@ -71,6 +74,11 @@ public:
 	/// Called when render loops and to ensure that there are NO resource "in-flight".
 	/// </summary>
 	void Idle();
+
+	D3D::D3D12Context* GetD3D()
+	{
+		return m_D3DContext.get();
+	}
 
 protected:
 	/// <summary>
@@ -153,4 +161,6 @@ public:
 	static int32_t SelectedRenderTarget;
 	static bool bDrawSky;
 	
+	
+
 };

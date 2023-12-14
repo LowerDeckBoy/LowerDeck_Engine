@@ -11,6 +11,7 @@ struct DeferredOutput
 	float3 Normal			: NORMAL;
 	float3 Tangent			: TANGENT;
 	float3 Bitangent		: BITANGENT;
+	float3x3 TBN		: TBN;
 };
 
 struct GBufferOutput
