@@ -11,6 +11,9 @@
 #include "../D3D/D3D12Command.hpp"
 #include "MipMapGenerator.hpp"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
+
 Texture TextureManager::Create(std::string_view Filepath)
 {
 	const auto extension{ utility::FileExtToEnum(Filepath) };
@@ -72,17 +75,81 @@ void TextureManager::CreateFromWIC(const std::string_view& Filepath, Texture* pT
 
 	auto finish{ upload.End(D3D::g_CommandQueue.Get()) };
 	finish.wait();
-	CreateSRV(pTarget->m_Resource.GetAddressOf(), pTarget->m_SRV, mipLevel, desc.Format);
 	
-	pTarget->Width = static_cast<uint32_t>(desc.Width);
-	pTarget->Height = desc.Height;
-	pTarget->MipLevels = mipLevel;
+
+	//CreateSRV(pTarget->m_Resource.GetAddressOf(), pTarget->m_SRV, mipLevel, desc.Format);
+	
+	//pTarget->Width = static_cast<uint32_t>(desc.Width);
+	//pTarget->Height = desc.Height;
+	//pTarget->MipLevels = mipLevel;
 }
 
 void TextureManager::CreateWIC(const std::string_view& Filepath, Texture& Target, bool bMipMaps)
 {
 	auto path{ utility::ToWideString(Filepath) };
 
+	int32_t width, height, channels;
+	void* pixels{ stbi_load(Filepath.data(), &width, &height, &channels, STBI_rgb_alpha) };
+	if (!pixels)
+	{
+		throw std::runtime_error("");
+	}
+
+	D3D12_RESOURCE_DESC texDesc{};
+	texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	texDesc.Width = static_cast<uint64_t>(width);
+	texDesc.Height = static_cast<uint32_t>(height);
+	texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	texDesc.DepthOrArraySize = 1;
+	texDesc.MipLevels = CountMips(static_cast<uint32_t>(texDesc.Width), texDesc.Height);
+	texDesc.SampleDesc = { 1, 0 };
+	texDesc.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
+	texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	texDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+
+	D3D12_SUBRESOURCE_DATA subresource{};
+	subresource.pData		= pixels;
+	subresource.RowPitch	= static_cast<LONG_PTR>((texDesc.Width * 4u));
+	subresource.SlicePitch	= static_cast<LONG_PTR>(subresource.RowPitch * texDesc.Height);
+
+	ThrowIfFailed(D3D::g_Device->CreateCommittedResource(
+		&D3D::Utility::HeapDefault,
+		D3D12_HEAP_FLAG_NONE,
+		&texDesc,
+		D3D12_RESOURCE_STATE_COPY_DEST,
+		nullptr,
+		IID_PPV_ARGS(Target.m_Resource.ReleaseAndGetAddressOf())
+		));
+
+	const UINT64 uploadBufferSize = GetRequiredIntermediateSize(Target.m_Resource.Get(), 0, 1); //texDesc.MipLevels
+	const auto uploadBuffer = CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize);
+
+	ComPtr<ID3D12Resource> uploadResource;
+	ThrowIfFailed(D3D::g_Device->CreateCommittedResource(
+		&D3D::Utility::HeapUpload,
+		D3D12_HEAP_FLAG_NONE,
+		&uploadBuffer,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(uploadResource.ReleaseAndGetAddressOf())
+	));
+
+	::UpdateSubresources(D3D::g_CommandList.Get(), Target.m_Resource.Get(), uploadResource.Get(), 0, 0, 1, &subresource);
+	
+	auto transition{ CD3DX12_RESOURCE_BARRIER::Transition(Target.m_Resource.Get(),
+		D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE) };
+	D3D::g_CommandList.Get()->ResourceBarrier(1, &transition);
+
+	Target.MipLevels = CountMips(texDesc.Width, texDesc.Height);
+	Target.Width = texDesc.Width;
+	Target.Height = texDesc.Height;
+
+	D3D::ExecuteCommandLists(true);
+
+	if (bMipMaps)
+		MipMapGenerator::Generate2D(Target);
+	
+	/*
 	DirectX::ResourceUploadBatch upload(D3D::g_Device.Get());
 	upload.Begin();
 
@@ -98,19 +165,19 @@ void TextureManager::CreateWIC(const std::string_view& Filepath, Texture& Target
 		Target.m_Resource.GetAddressOf()));
 
 	const auto desc{ Target.m_Resource->GetDesc() };
-	//uint16_t mipLevel = desc.MipLevels;
+	uint16_t mipLevel = desc.MipLevels;
 
 	Target.MipLevels = CountMips(static_cast<uint32_t>(desc.Width), desc.Height);
 	Target.Desc   = desc;
 	Target.Width  = static_cast<uint32_t>(desc.Width);
 	Target.Height = desc.Height;
-
 	auto finish{ upload.End(D3D::g_CommandQueue.Get()) };
 	finish.wait();
-
+	
+	//D3D::ExecuteCommandLists(true);
 	if (bMipMaps)
 		MipMapGenerator::Generate2D(Target);
-
+	*/
 }
 
 uint16_t TextureManager::CountMips(uint32_t Width, uint32_t Height)

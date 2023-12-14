@@ -17,6 +17,8 @@ private:
 	void CreateFromWIC(const std::string_view& Filepath, Texture* pTarget);
 	void CreateWIC(const std::string_view& Filepath, Texture& Target, bool bMipMaps = true);
 
+	void CreateFromDDS(const std::string_view& Filepath, Texture& Target, bool bMipMaps = true);
+
 	uint16_t CountMips(uint32_t Width, uint32_t Height);
 
 	void CreateFromHDR(const std::string_view& Filepath, Texture* pTarget);
